@@ -1,0 +1,22 @@
+export const colors = {
+    milkyWhite: "#F1EEDD",
+    icyWhite: "#F0F4F8",
+    white: "white",
+    darkOrange: "#FB6801",
+    lightOrange: "#FF8A00",
+    darkBlue: "#3B4A9E",
+    lightBlue: "#A8B6F1",
+    grey: "rgba(0, 0, 0, 0.5)",
+    black: "black",
+    pastelDark: "#B3CFBD",
+    pastelLight: "#CCDDC7",
+    mintDark: "#F4F7FC",
+    mintLight: "#E0F7FA",
+    darkGreen: "#2FD726",
+    lightGreen: "#51E329",
+    darkYellow: "#FFD700",
+    lightYellow: "#FFEA00",
+    darkRed: "#FF0000",
+    lightRed: "#FF7F7F",
+    lightOcean: "#78EFFF"
+};
