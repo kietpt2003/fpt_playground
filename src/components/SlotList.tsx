@@ -1,29 +1,17 @@
-import { View, Text, FlatList } from 'react-native'
+import { FlatList } from 'react-native'
 import React from 'react'
-import SlotItem from './SlotItem'
-import { ScreenWidth } from '@rneui/base'
+import { SlotItemType, SlotListProps } from './types/slotItemTypes'
+import SlotItem from './SlotItem';
 
-const slotItems = [
-    "Test1",
-    "Test2",
-    "Test3",
-    "Test4",
-    "Test5",
-    "Test6",
-    "Test7",
-    "Test8",
-    "Test9",
-]
-export default function SlotList() {
+export default function SlotList({ data }: SlotListProps) {
     return (
-        <FlatList
-            data={slotItems}
+        <FlatList<SlotItemType>
+            data={data}
             scrollEnabled={false}
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
             renderItem={({ item }) => (
-                <SlotItem
-                />
+                <SlotItem item={item} />
             )}
             keyExtractor={(item, index) => index.toString()}
             numColumns={3} // Hiển thị 2 cột

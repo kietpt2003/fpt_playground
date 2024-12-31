@@ -7,7 +7,7 @@ export type RootStackParamList = {
     ForgotPassword: undefined;
     ChangePasswordScreen: { userEmail: string };
     HomeScreen: undefined;
-    GroupChat: undefined;
+    GroupChat: { firstFilter: number };
 };
 
 export type NavigationProps = StackNavigationProp<RootStackParamList>;

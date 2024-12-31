@@ -187,7 +187,9 @@ export default function HomeScreen() {
                         lottieSrc: require("../../assets/animations/bookFlying.json"),
                         linearColors: [colors.darkGreen, colors.lightGreen],
                         onPress: () => {
-                            navigation.navigate("GroupChat");
+                            navigation.navigate("GroupChat", {
+                                firstFilter: 0
+                            });
                         }
                     },
                     {
@@ -195,7 +197,9 @@ export default function HomeScreen() {
                         lottieSrc: require("../../assets/animations/penguinSearching.json"),
                         linearColors: [colors.icyWhite, colors.white],
                         onPress: () => {
-                            navigation.navigate("GroupChat");
+                            navigation.navigate("GroupChat", {
+                                firstFilter: 1
+                            });
                         }
                     },
                     {
@@ -203,7 +207,9 @@ export default function HomeScreen() {
                         lottieSrc: require("../../assets/animations/coffeeChilling.json"),
                         linearColors: [colors.lightOrange, colors.darkYellow],
                         onPress: () => {
-                            navigation.navigate("GroupChat");
+                            navigation.navigate("GroupChat", {
+                                firstFilter: 2
+                            });
                         }
                     },
                     {
@@ -211,7 +217,9 @@ export default function HomeScreen() {
                         lottieSrc: require("../../assets/animations/heartFlying.json"),
                         linearColors: [colors.darkRed, colors.lightRed],
                         onPress: () => {
-                            navigation.navigate("GroupChat");
+                            navigation.navigate("GroupChat", {
+                                firstFilter: 3
+                            });
                         }
                     },
                 ]}
@@ -285,7 +293,7 @@ export default function HomeScreen() {
                         lottieSrc: require("../../assets/animations/friends.json"),
                         linearColors: [colors.lightOcean, colors.darkGreen],
                         onPress: () => {
-                            navigation.navigate("GroupChat");
+                            // navigation.navigate("GroupChat");
                         }
                     },
                     {
@@ -293,7 +301,7 @@ export default function HomeScreen() {
                         lottieSrc: require("../../assets/animations/stranger.json"),
                         linearColors: [colors.darkBlue, colors.black],
                         onPress: () => {
-                            navigation.navigate("GroupChat");
+                            // navigation.navigate("GroupChat");
                         }
                     },
                     {
@@ -301,7 +309,7 @@ export default function HomeScreen() {
                         lottieSrc: require("../../assets/animations/searchUser.json"),
                         linearColors: [colors.icyWhite, colors.white],
                         onPress: () => {
-                            navigation.navigate("GroupChat");
+                            // navigation.navigate("GroupChat");
                         }
                     },
                     {
@@ -309,7 +317,7 @@ export default function HomeScreen() {
                         lottieSrc: require("../../assets/animations/blocking.json"),
                         linearColors: [colors.lightOcean, colors.darkBlue],
                         onPress: () => {
-                            navigation.navigate("GroupChat");
+                            // navigation.navigate("GroupChat");
                         }
                     },
                 ]}
