@@ -10,13 +10,13 @@ const horizontalLevelBarStyleSheet = StyleSheet.create({
     loadingBackground: {
         width: ScreenHeight / 8, // Chiều rộng tổng thể thanh loading
         height: 8, // Chiều cao tổng thể
-        backgroundColor: colors.milkyWhite, // Màu nền
+        backgroundColor: colors.lightBlue, // Màu nền
         borderRadius: 10, // Bo góc tổng thể
         overflow: "hidden", // Ẩn phần dư thừa
     },
     loadingBar: {
         height: "100%",
-        backgroundColor: colors.black, // Màu thanh loading
+        backgroundColor: colors.white, // Màu thanh loading
         borderRadius: 10, // Bo góc thanh loading
     },
 });

@@ -31,7 +31,10 @@ export default function ErrorModal({ stringErr, isError, setIsError }: errorModa
             >
                 <TouchableOpacity
                     style={errorModalStyleSheet.closeBtnContainer}
-                    onPress={() => setIsError(false)}
+                    onPress={() => {
+                        playSound();
+                        setIsError(false);
+                    }}
                 >
                     <LinearGradient
                         colors={theme === "dark" ? [colors.darkBlue, colors.darkBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu

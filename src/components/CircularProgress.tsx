@@ -4,6 +4,8 @@ import Svg, { Circle } from "react-native-svg";
 import { CircularProgressProps } from "./types/circularProgressTypes";
 import circularProgressStyleSheet from "./styles/circularProgressStyleSheet";
 import { colors } from "../constants/colors";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
 
 export default function CircularProgress({ currentLevelPercent, totalDuration, targetLevel }: CircularProgressProps) {
     const [currentLevel, setCurrentLevel] = useState(0);
@@ -13,6 +15,8 @@ export default function CircularProgress({ currentLevelPercent, totalDuration, t
     const strokeWidth = 2;
     const circumference = 2 * Math.PI * radius;
     const strokeDashoffset = circumference - (progress / 100) * circumference;
+
+    const theme = useSelector((state: RootState) => state.theme.theme);
 
     useEffect(() => {
         const step = 5; // Mỗi lần tăng 1%
@@ -55,16 +59,16 @@ export default function CircularProgress({ currentLevelPercent, totalDuration, t
                     cx={radius}
                     cy={radius}
                     r={radius - 1}
-                    stroke={colors.icyWhite}
+                    stroke={theme === "dark" ? colors.lightBlue : colors.grey}
                     strokeWidth={strokeWidth}
-                    fill={colors.milkyWhite}
+                    fill={theme === "dark" ? colors.lightBlue : colors.grey}
                 />
                 {/* Vòng tròn động */}
                 <Circle
                     cx={radius}
                     cy={radius}
                     r={radius - 1}
-                    stroke={colors.black}
+                    stroke={colors.white}
                     strokeWidth={strokeWidth}
                     fill="none"
                     strokeDasharray={circumference}

@@ -29,7 +29,6 @@ const headerLeftStyleSheet = StyleSheet.create({
         height: ScreenHeight / 14,
         borderBottomRightRadius: 20,
         borderTopRightRadius: 20,
-        opacity: 0.5,
         borderColor: colors.white,
         borderBottomWidth: 1,
         borderTopWidth: 1,
@@ -44,10 +43,13 @@ const headerLeftStyleSheet = StyleSheet.create({
         width: ScreenHeight / 7
     },
     nameTxt: {
-        fontWeight: "600"
+        fontWeight: "600",
+        color: colors.white
     },
     yearTxt: {
-        fontSize: 12
+        fontSize: 12,
+        color: colors.white,
+        fontWeight: "500"
     },
     levelContainer: {
         flexDirection: "row",
@@ -55,7 +57,9 @@ const headerLeftStyleSheet = StyleSheet.create({
         paddingLeft: 5
     },
     levelTxt: {
-        fontSize: 12
+        fontSize: 12,
+        color: colors.white,
+        fontWeight: "500"
     }
 });
 

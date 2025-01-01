@@ -54,34 +54,19 @@ export default function HeaderLeft() {
                 />
                 <View style={headerLeftStyleSheet.nameContainer}>
                     <Text
-                        style={[
-                            headerLeftStyleSheet.nameTxt,
-                            {
-                                color: theme === "dark" ? colors.white : colors.black
-                            }
-                        ]}
+                        style={headerLeftStyleSheet.nameTxt}
                         numberOfLines={1}
                     >
                         Phạm Tuấn Kiệt
                     </Text>
                     <Text
-                        style={[
-                            headerLeftStyleSheet.yearTxt,
-                            {
-                                color: theme === "dark" ? colors.white : colors.black
-                            }
-                        ]}
+                        style={headerLeftStyleSheet.yearTxt}
                         numberOfLines={1}
                     >{t("member-since")}2024</Text>
                 </View>
             </View>
             <View style={headerLeftStyleSheet.levelContainer}>
-                <Text style={[
-                    headerLeftStyleSheet.levelTxt,
-                    {
-                        color: theme === "dark" ? colors.white : colors.black
-                    }
-                ]}>Exp:</Text>
+                <Text style={headerLeftStyleSheet.levelTxt}>Exp:</Text>
                 <HorizontalLevelBar
                     percentage={currentLevelPercent}
                     totalDuration={totalDuration}

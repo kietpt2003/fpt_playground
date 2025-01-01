@@ -5,20 +5,23 @@ import { RootState } from '../store/store';
 import { colors } from '../constants/colors';
 import { LinearGradient } from 'expo-linear-gradient';
 import groupChatStyleSheet from './styles/groupChatStyleSheet';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import SlotList from '../components/SlotList';
 import { SlotItemType } from '../components/types/slotItemTypes';
 import HeaderLeft from '../components/HeaderLeft';
 import GroupChatFilters from '../components/GroupChatFilters';
 import { useRoute } from '@react-navigation/native';
 import { GroupChatRouteProp } from './types/groupChatTypes';
+import useClick from '../hooks/useClick';
 
 export default function GroupChat() {
     const route = useRoute<GroupChatRouteProp>();
-
     const params = route.params;
+
     const theme = useSelector((state: RootState) => state.theme.theme);
     const [page, setPage] = useState<number>(1);
+
+    const { playSound } = useClick();
 
     const [data, setData] = useState<SlotItemType[]>([
         {
@@ -95,6 +98,24 @@ export default function GroupChat() {
 
             {/* Header left */}
             <HeaderLeft />
+
+            {/* Header right */}
+            <TouchableOpacity
+                style={groupChatStyleSheet.headerRightNoti}
+                onPress={() => {
+                    playSound();
+                }}
+            >
+                <LinearGradient
+                    colors={theme === "dark" ? [colors.darkBlue, colors.darkBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
+                    style={groupChatStyleSheet.headerRightIconLinear}
+                />
+                <FontAwesome5
+                    name="question"
+                    size={20}
+                    color={colors.white}
+                />
+            </TouchableOpacity>
 
             <GroupChatFilters firstFilter={params.firstFilter} />
 

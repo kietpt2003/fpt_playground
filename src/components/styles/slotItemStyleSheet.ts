@@ -15,6 +15,12 @@ export const slotItemStyleSheet = StyleSheet.create({
         height: ScreenHeight / 14,
         borderRadius: 50,
         borderWidth: 1
+    },
+    plusIcon: {
+        justifyContent: "center",
+        alignItems: "center",
+        width: ScreenHeight / 14,
+        height: ScreenHeight / 14,
     }
 })
 

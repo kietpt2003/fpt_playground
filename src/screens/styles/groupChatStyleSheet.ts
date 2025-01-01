@@ -1,5 +1,6 @@
 import { ScreenHeight, ScreenWidth } from "@rneui/base";
 import { StyleSheet } from "react-native";
+import { colors } from "../../constants/colors";
 
 export const groupChatStyleSheet = StyleSheet.create({
     container: {
@@ -45,7 +46,30 @@ export const groupChatStyleSheet = StyleSheet.create({
     paginationTxt: {
         fontSize: 25,
         fontWeight: "bold",
-    }
+    },
+    headerRightNoti: {
+        position: "absolute",
+        top: 50,
+        right: 10,
+        width: ScreenHeight / 22,
+        height: ScreenHeight / 22,
+        borderRadius: 30,
+        justifyContent: "center",
+        alignItems: "center",
+        borderColor: colors.white,
+        borderWidth: 2.8,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 5 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 10,
+    },
+    headerRightIconLinear: {
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        borderRadius: 30,
+    },
 })
 
 export default groupChatStyleSheet;

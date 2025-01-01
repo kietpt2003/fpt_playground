@@ -15,6 +15,8 @@ import FeatureComponent from '../components/FeatureComponent';
 import HeaderLeft from '../components/HeaderLeft';
 import { useNavigation } from '@react-navigation/native';
 import { GroupChatNavigationProp } from './types/groupChatTypes';
+import DailyCheckPoint from '../components/DailyCheckPoint';
+import { StatusBar } from 'expo-status-bar';
 
 export default function HomeScreen() {
     const theme = useSelector((state: RootState) => state.theme.theme);
@@ -37,6 +39,8 @@ export default function HomeScreen() {
 
     const [stringErr, setStringErr] = useState<string>("");
     const [isError, setIsError] = useState<boolean>(false);
+
+    const [isOpenDailyCheckPoint, setIsOpenDailyCheckPoint] = useState<boolean>(true);
 
     return (
         <ScrollView
@@ -367,6 +371,15 @@ export default function HomeScreen() {
                     />
                 </TouchableOpacity>
             </View>
+
+            <StatusBar backgroundColor={
+                isOpenDailyCheckPoint ? "rgba(0,0,0,0.7)" : undefined
+            } />
+
+            <DailyCheckPoint
+                isOpenDailyCheckPoint={isOpenDailyCheckPoint}
+                setIsOpenDailyCheckPoint={setIsOpenDailyCheckPoint}
+            />
         </ScrollView >
     )
 }

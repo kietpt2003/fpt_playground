@@ -2,9 +2,14 @@ import React, { useEffect, useState } from "react";
 import { View, Animated } from "react-native";
 import { HorizontalLevelBarProps } from "./types/horizontalLevelBarTypes";
 import horizontalLevelBarStyleSheet from "./styles/horizontalLevelBarStyleSheet";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
+import { colors } from "../constants/colors";
 
 export default function HorizontalLevelBar({ percentage, totalDuration }: HorizontalLevelBarProps) {
     const [progress, setProgress] = useState(new Animated.Value(0)); // Giá trị tiến độ
+
+    const theme = useSelector((state: RootState) => state.theme.theme);
 
     useEffect(() => {
         // Tạo hiệu ứng tăng tiến độ
@@ -24,7 +29,12 @@ export default function HorizontalLevelBar({ percentage, totalDuration }: Horizo
     return (
         <View style={horizontalLevelBarStyleSheet.container}>
             {/* Nền của thanh loading */}
-            <View style={horizontalLevelBarStyleSheet.loadingBackground}>
+            <View style={[
+                horizontalLevelBarStyleSheet.loadingBackground,
+                {
+                    backgroundColor: theme === "dark" ? colors.lightBlue : colors.grey
+                }
+            ]}>
                 {/* Thanh loading */}
                 <Animated.View
                     style={[

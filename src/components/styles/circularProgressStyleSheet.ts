@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { colors } from "../../constants/colors";
 
 const circularProgressStyleSheet = StyleSheet.create({
     container: {
@@ -8,7 +9,8 @@ const circularProgressStyleSheet = StyleSheet.create({
     levelTxt: {
         position: "absolute",
         fontSize: 12,
-        fontWeight: "600",
+        fontWeight: "bold",
+        color: colors.white
     },
 });
 

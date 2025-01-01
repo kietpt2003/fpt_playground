@@ -4,8 +4,12 @@ import { FontAwesome } from '@expo/vector-icons';
 import { colors } from '../constants/colors';
 import slotItemStyleSheet from './styles/slotItemStyleSheet';
 import { SlotItemProps } from './types/slotItemTypes';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
 
 export default function SlotItem({ item }: SlotItemProps) {
+    const theme = useSelector((state: RootState) => state.theme.theme);
+
     return (
         <TouchableOpacity style={slotItemStyleSheet.container}>
             {
@@ -22,11 +26,16 @@ export default function SlotItem({ item }: SlotItemProps) {
                         </Text>
                     </>
                     :
-                    <FontAwesome
-                        name="plus"
-                        size={30}
-                        color={colors.darkBlue}
-                    />
+                    <>
+                        <View style={slotItemStyleSheet.plusIcon}>
+                            <FontAwesome
+                                name="plus"
+                                size={30}
+                                color={theme === "dark" ? colors.darkBlue : colors.darkOrange}
+                            />
+                        </View>
+                        <Text>Trống</Text>
+                    </>
             }
         </TouchableOpacity>
     )
