@@ -59,9 +59,9 @@ export default function CircularProgress({ currentLevelPercent, totalDuration, t
                     cx={radius}
                     cy={radius}
                     r={radius - 1}
-                    stroke={theme === "dark" ? colors.lightBlue : colors.grey}
+                    stroke={theme === "dark" ? colors.lighterBlue : colors.brown}
                     strokeWidth={strokeWidth}
-                    fill={theme === "dark" ? colors.lightBlue : colors.grey}
+                    fill={theme === "dark" ? colors.lighterBlue : colors.brown}
                 />
                 {/* Vòng tròn động */}
                 <Circle

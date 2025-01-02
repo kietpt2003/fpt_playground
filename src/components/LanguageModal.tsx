@@ -40,7 +40,7 @@ export default function LanguageModal({ openChooseLanguage, setOpenChooseLanguag
             <View style={languageStyleSheet.modalContent}>
                 {/* Thanh cam trên cùng */}
                 <LinearGradient
-                    colors={reduxTheme === "dark" ? [colors.darkBlue, colors.darkBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
+                    colors={reduxTheme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
                     style={languageStyleSheet.header}
                 />
 

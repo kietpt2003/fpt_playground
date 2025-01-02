@@ -31,5 +31,15 @@
     "ptk-coin": "PTK Coin",
     "signout": "Signout",
     "profile": "Personal Profile",
-    "member-since": "Member since "
+    "member-since": "Member since ",
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday",
+    "daily-checked": "Checked",
+    "daily-expired": "Expired",
+    "coin": "coin"
 }

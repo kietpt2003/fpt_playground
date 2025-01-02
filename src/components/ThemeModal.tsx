@@ -42,7 +42,7 @@ export default function ThemeModal({ openChooseTheme, setOpenChooseTheme }: Them
             <View style={themeModalStyleSheet.modalContent}>
                 {/* Thanh cam trên cùng */}
                 <LinearGradient
-                    colors={reduxTheme === "dark" ? [colors.darkBlue, colors.darkBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
+                    colors={reduxTheme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
                     style={themeModalStyleSheet.header}
                 />
 

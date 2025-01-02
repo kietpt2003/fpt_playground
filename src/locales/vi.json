@@ -31,5 +31,15 @@
     "ptk-coin": "PTK Xu",
     "signout": "Đăng xuất",
     "profile": "Cá nhân",
-    "member-since": "Thành viên từ "
+    "member-since": "Thành viên từ ",
+    "monday": "Thứ Hai",
+    "tuesday": "Thứ Ba",
+    "wednesday": "Thứ Tư",
+    "thursday": "Thứ Năm",
+    "friday": "Thứ Sáu",
+    "saturday": "Thứ Bảy",
+    "sunday": "Chủ Nhật",
+    "daily-checked": "Đã nhận",
+    "daily-expired": "Hết hạn",
+    "coin": "xu"
 }

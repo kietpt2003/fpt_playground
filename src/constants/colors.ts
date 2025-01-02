@@ -3,10 +3,13 @@ export const colors = {
     icyWhite: "#F0F4F8",
     white: "white",
     darkOrange: "#FB6801",
+    mediumOrange: "#FF822B",
     lightOrange: "#FF8A00",
     darkBlue: "#3B4A9E",
-    lightBlue: "#A8B6F1",
+    lightBlue: "#435BBE",
+    lighterBlue: "#A8B6F1",
     grey: "rgba(0, 0, 0, 0.5)",
+    blurBlack: "rgba(0, 0, 0, 0.3)",
     black: "black",
     pastelDark: "#B3CFBD",
     pastelLight: "#CCDDC7",
@@ -18,5 +21,9 @@ export const colors = {
     lightYellow: "#FFEA00",
     darkRed: "#FF0000",
     lightRed: "#FF7F7F",
-    lightOcean: "#78EFFF"
+    lightOcean: "#78EFFF",
+    approve: "#2E9724",
+    disapprove: "#A63B29",
+    blurWhite: "rgba(255,255,255,0.7)",
+    brown: "#E5C09A"
 };

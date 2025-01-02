@@ -19,7 +19,6 @@ const dailyCheckPointStyleSheet = StyleSheet.create({
         borderTopWidth: 5,
         borderEndWidth: 6,
         borderBottomWidth: 3,
-        borderColor: colors.darkOrange,
         borderRadius: 10
     },
     cornerTopLeft: {
@@ -36,7 +35,6 @@ const dailyCheckPointStyleSheet = StyleSheet.create({
         borderTopWidth: 1.5,
         borderEndWidth: 1.5,
         borderBottomWidth: 1,
-        borderColor: colors.darkOrange, // Viền đen
     },
     cornerBottomRight: {
         position: "absolute",
@@ -52,7 +50,6 @@ const dailyCheckPointStyleSheet = StyleSheet.create({
         borderTopWidth: 1,
         borderEndWidth: 1.5,
         borderBottomWidth: 1.5,
-        borderColor: colors.darkOrange,
     },
     closeBtnContainer: {
         borderRadius: 30,
@@ -68,6 +65,103 @@ const dailyCheckPointStyleSheet = StyleSheet.create({
         height: "100%",
         borderRadius: 30,
     },
+    flatListContainer: {
+        width: ScreenWidth * 0.7,
+        height: ScreenHeight / 3,
+    },
+    checkPointItemContainer: {
+        width: ScreenWidth / 5.3,
+        height: ScreenWidth / 4.5,
+        justifyContent: "center",
+        alignItems: "center",
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+        alignSelf: "center"
+    },
+    checkPointItemBgLinear: {
+        position: "absolute",
+        width: ScreenWidth / 5.3,
+        height: ScreenWidth / 4.5,
+        borderWidth: 1,
+        borderTopWidth: 0,
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+    },
+    dateItemContainer: {
+        width: ScreenWidth / 5,
+        borderRadius: 5,
+        borderWidth: 1,
+    },
+    dateItemContainerLinear: {
+        position: "absolute",
+        width: ScreenWidth / 5.1,
+        height: "100%",
+        borderRadius: 5,
+        borderWidth: 1,
+    },
+    dateItemTxt: {
+        textAlign: "center",
+        marginVertical: 2
+    },
+    lockContainer: {
+        position: "absolute",
+        width: ScreenWidth / 5.3,
+        height: ScreenWidth / 4.5,
+        borderWidth: 1,
+        borderTopWidth: 0,
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 1,
+        backgroundColor: colors.blurBlack,
+        borderColor: colors.grey
+    },
+    coinImage: {
+        width: ScreenWidth * 0.08,
+        height: ScreenWidth * 0.08,
+        resizeMode: "stretch",
+        borderRadius: 25,
+        alignSelf: "center"
+    },
+    checkedContainer: {
+        position: "absolute",
+        width: ScreenWidth / 7,
+        height: ScreenWidth / 7,
+        borderRadius: 50,
+        justifyContent: "center",
+        alignItems: "center",
+        borderWidth: 3,
+        borderColor: colors.approve,
+        zIndex: 2,
+        backgroundColor: colors.blurWhite
+    },
+    checkedTxt: {
+        color: colors.approve,
+        fontWeight: "bold",
+        transform: [{ rotate: "-45deg" }],
+    },
+    notCheckedContainer: {
+        position: "absolute",
+        width: ScreenWidth / 7,
+        height: ScreenWidth / 7,
+        borderRadius: 50,
+        justifyContent: "center",
+        alignItems: "center",
+        borderWidth: 3,
+        borderColor: colors.disapprove,
+        zIndex: 2,
+        backgroundColor: colors.blurWhite
+    },
+    notCheckedTxt: {
+        color: colors.disapprove,
+        fontWeight: "bold",
+        transform: [{ rotate: "-45deg" }],
+    },
+    valueTxt: {
+        textAlign: "center",
+        fontWeight: "bold"
+    }
 });
 
 export default dailyCheckPointStyleSheet;

@@ -73,7 +73,7 @@ export default function HomeScreen() {
                     }}
                 >
                     <LinearGradient
-                        colors={theme === "dark" ? [colors.darkBlue, colors.darkBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
+                        colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
                         style={homeScreenStyleSheet.headerRightIconLinear}
                     />
                     <MaterialCommunityIcons
@@ -86,7 +86,7 @@ export default function HomeScreen() {
                 {/* Menu */}
                 <View style={homeScreenStyleSheet.headerRightMenu}>
                     <LinearGradient
-                        colors={theme === "dark" ? [colors.darkBlue, colors.darkBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
+                        colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
                         style={homeScreenStyleSheet.headerRightIconLinear}
                     />
                     <Menu

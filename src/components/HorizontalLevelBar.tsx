@@ -32,7 +32,7 @@ export default function HorizontalLevelBar({ percentage, totalDuration }: Horizo
             <View style={[
                 horizontalLevelBarStyleSheet.loadingBackground,
                 {
-                    backgroundColor: theme === "dark" ? colors.lightBlue : colors.grey
+                    backgroundColor: theme === "dark" ? colors.lighterBlue : colors.brown
                 }
             ]}>
                 {/* Thanh loading */}

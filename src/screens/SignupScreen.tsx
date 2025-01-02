@@ -83,7 +83,7 @@ export default function SignupScreen() {
             <View style={signupStyleSheet.container}>
                 <View style={signupStyleSheet.header}>
                     <LinearGradient
-                        colors={theme === "dark" ? [colors.darkBlue, colors.darkBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
+                        colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
                         style={signupStyleSheet.settingIcon}
                     />
                     <Menu
@@ -181,7 +181,7 @@ export default function SignupScreen() {
                     }}
                 >
                     <LinearGradient
-                        colors={theme === "dark" ? [colors.darkBlue, colors.darkBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
+                        colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
                         style={signupStyleSheet.signinBtnLinear}
                     />
                     <Text style={signupStyleSheet.buttonText}>

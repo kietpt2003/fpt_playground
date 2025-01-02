@@ -43,7 +43,7 @@ export default function HeaderLeft() {
             ]}
         >
             <LinearGradient
-                colors={theme === "dark" ? [colors.darkBlue, colors.darkBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
+                colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
                 style={headerLeftStyleSheet.containerLinear}
             />
             <View style={headerLeftStyleSheet.topContentContainer}>

@@ -122,7 +122,7 @@ const ForgotPassword = () => {
             <View style={forgotPasswordStyleSheet.container}>
                 <View style={forgotPasswordStyleSheet.header}>
                     <LinearGradient
-                        colors={theme === "dark" ? [colors.darkBlue, colors.darkBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
+                        colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
                         style={forgotPasswordStyleSheet.settingIcon}
                     />
                     <Menu
@@ -233,7 +233,7 @@ const ForgotPassword = () => {
                         {
                             !(isRecentPushed || userEmail === "") &&
                             <LinearGradient
-                                colors={theme === "dark" ? [colors.darkBlue, colors.darkBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
+                                colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
                                 style={forgotPasswordStyleSheet.requestCodeBtnLinear}
                             />
                         }

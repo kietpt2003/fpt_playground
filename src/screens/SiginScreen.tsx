@@ -154,7 +154,7 @@ export default function SiginScreen() {
             <View style={signinStyleSheet.container}>
                 <View style={signinStyleSheet.header}>
                     <LinearGradient
-                        colors={theme === "dark" ? [colors.darkBlue, colors.darkBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
+                        colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
                         style={signinStyleSheet.settingIcon}
                     />
                     <Menu
@@ -252,7 +252,7 @@ export default function SiginScreen() {
                     }}
                 >
                     <LinearGradient
-                        colors={theme === "dark" ? [colors.darkBlue, colors.darkBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
+                        colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
                         style={signinStyleSheet.signinBtnLinear}
                     />
                     <Text style={signinStyleSheet.buttonText}>
