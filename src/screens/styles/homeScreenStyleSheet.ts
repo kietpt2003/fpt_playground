@@ -114,6 +114,29 @@ const homeScreenStyleSheet = StyleSheet.create({
     },
     functionContentContainer: {
         width: ScreenWidth / 2 - 25,
+    },
+    featureContainer: {
+        padding: 15,
+        gap: 10
+    },
+    featureHeaderContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center"
+    },
+    featureTilte: {
+        fontSize: 19,
+        fontWeight: "bold",
+    },
+    featureButton: {
+        flexDirection: "row",
+        gap: 5,
+    },
+    featureImage: {
+        width: ScreenWidth - 30,
+        height: ScreenHeight / 4.5,
+        resizeMode: "stretch",
+        borderRadius: 25
     }
 });
 

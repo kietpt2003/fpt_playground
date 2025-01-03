@@ -10,7 +10,13 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { colors } from '../constants/colors';
 
-export default function FeatureComponent({ sliderContents = [], featureTitle = "Feature Default", functionItems = [], changePosition = false }: FeatureComponentProps) {
+export default function FeatureComponent({
+    sliderContents = [],
+    featureTitle = "Feature Default",
+    functionItems = [],
+    changePosition = false,
+    isGuideline
+}: FeatureComponentProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const flatListRef = useRef<FlatList>(null);
 
@@ -110,6 +116,7 @@ export default function FeatureComponent({ sliderContents = [], featureTitle = "
                                             lottieSrc={item.lottieSrc}
                                             contentTxt={item.contentTxt}
                                             onPress={item.onPress}
+                                            isGuideline={isGuideline}
                                         />
                                     )}
                                     keyExtractor={(item, index) => index.toString()}

@@ -8,13 +8,20 @@ import { colors } from '../constants/colors'
 import { useSelector } from 'react-redux'
 import { RootState } from '../store/store'
 
-export default function FunctionItem({ linearColors, lottieSrc, contentTxt, onPress }: FunctionItemProps) {
+export default function FunctionItem({
+    linearColors,
+    lottieSrc,
+    contentTxt,
+    onPress,
+    isGuideline
+}: FunctionItemProps) {
     const theme = useSelector((state: RootState) => state.theme.theme);
 
     return (
         <TouchableOpacity
             style={functionItemStyleSheet.container}
             onPress={onPress}
+            disabled={isGuideline}
         >
             <View style={functionItemStyleSheet.imageContainer}>
                 <LinearGradient

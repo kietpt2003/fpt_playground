@@ -10,4 +10,5 @@ export interface FeatureComponentProps {
     featureTitle: string,
     functionItems: FunctionItemProps[];
     changePosition?: boolean;
+    isGuideline: boolean;
 }
