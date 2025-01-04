@@ -22,6 +22,7 @@ export default function FunctionItem({
             style={functionItemStyleSheet.container}
             onPress={onPress}
             disabled={isGuideline}
+            touchSoundDisabled={true}
         >
             <View style={functionItemStyleSheet.imageContainer}>
                 <LinearGradient

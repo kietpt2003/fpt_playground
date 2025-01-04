@@ -13,7 +13,11 @@ export default function GoogleSignInButton({ onPress }: GoogleSigninButtonProps)
     const { t } = useTranslation();
 
     return (
-        <TouchableOpacity style={googleButtonStyleSheet.button} onPress={onPress}>
+        <TouchableOpacity
+            style={googleButtonStyleSheet.button}
+            onPress={onPress}
+            touchSoundDisabled={true}
+        >
             <LinearGradient
                 colors={theme === "dark" ? [colors.black, colors.grey] : [colors.milkyWhite, colors.white]} // Hiệu ứng chuyển màu
                 style={googleButtonStyleSheet.signinBtnLinear}

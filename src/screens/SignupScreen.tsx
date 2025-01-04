@@ -89,7 +89,10 @@ export default function SignupScreen() {
                     <Menu
                         visible={menuVisible}
                         anchor={
-                            <TouchableOpacity onPress={showMenu}>
+                            <TouchableOpacity
+                                onPress={showMenu}
+                                touchSoundDisabled={true}
+                            >
                                 <MaterialIcons name="settings" size={24} color={colors.white} />
                             </TouchableOpacity>
                         }
@@ -179,6 +182,7 @@ export default function SignupScreen() {
                     onPress={() => {
                         navigation.replace("Signup");
                     }}
+                    touchSoundDisabled={true}
                 >
                     <LinearGradient
                         colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
@@ -196,6 +200,7 @@ export default function SignupScreen() {
                         onPress={() => {
                             navigation.goBack();
                         }}
+                        touchSoundDisabled={true}
                     >
                         <Text style={signupStyleSheet.signinTxt}>
                             {t("signin-txt")}
@@ -208,6 +213,7 @@ export default function SignupScreen() {
                         onPress={() => {
                             navigation.navigate("ForgotPassword");
                         }}
+                        touchSoundDisabled={true}
                     >
                         <Text style={signupStyleSheet.forgotPasswordTxt}>
                             {t("forgot-password")}

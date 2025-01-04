@@ -137,6 +137,9 @@ const homeScreenStyleSheet = StyleSheet.create({
         height: ScreenHeight / 4.5,
         resizeMode: "stretch",
         borderRadius: 25
+    },
+    dummyGuideline: {
+        height: ScreenHeight
     }
 });
 

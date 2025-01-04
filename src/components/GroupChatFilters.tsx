@@ -56,9 +56,12 @@ export default function GroupChatFilters({ firstFilter }: GroupChatFilterProps) 
             showsVerticalScrollIndicator={false}
             horizontal={true}
             renderItem={({ item, index: fIndex }) => (
-                <TouchableOpacity onPress={() => {
-                    setIndex(fIndex);
-                }}>
+                <TouchableOpacity
+                    onPress={() => {
+                        setIndex(fIndex);
+                    }}
+                    touchSoundDisabled={true}
+                >
                     <MotiView
                         animate={{
                             backgroundColor: (theme === "dark" && fIndex === index) ? colors.darkBlue :

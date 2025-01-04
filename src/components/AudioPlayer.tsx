@@ -59,6 +59,7 @@ export default function AudioPlayer() {
                     playSound();
                     handleBackward();
                 }}
+                touchSoundDisabled={true}
             >
                 <LinearGradient
                     colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
@@ -91,6 +92,7 @@ export default function AudioPlayer() {
                     playSound();
                     handleForward();
                 }}
+                touchSoundDisabled={true}
             >
                 <LinearGradient
                     colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu

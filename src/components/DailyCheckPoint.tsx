@@ -120,6 +120,7 @@ export default function DailyCheckPoint({ isOpenDailyCheckPoint, setIsOpenDailyC
                             playSound();
                             setIsOpenDailyCheckPoint(false);
                         }}
+                        touchSoundDisabled={true}
                     >
                         <LinearGradient
                             colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
@@ -138,6 +139,7 @@ export default function DailyCheckPoint({ isOpenDailyCheckPoint, setIsOpenDailyC
                                 <TouchableOpacity
                                     style={dailyCheckPointStyleSheet.checkPointItemContainer}
                                     disabled={item.status === "Checked" || item.dayStatus !== "Today"}
+                                    touchSoundDisabled={true}
                                 >
                                     <LinearGradient
                                         colors={[colors.lightYellow, colors.darkYellow]} // Hiệu ứng chuyển màu
@@ -217,6 +219,7 @@ export default function DailyCheckPoint({ isOpenDailyCheckPoint, setIsOpenDailyC
                     <TouchableOpacity
                         style={dailyCheckPointStyleSheet.checkPointFinalDateContainer}
                         disabled={sundayCheckPoint?.status === "Checked" || sundayCheckPoint?.dayStatus !== "Today"}
+                        touchSoundDisabled={true}
                     >
                         <LinearGradient
                             colors={[colors.lightYellow, colors.darkYellow]} // Hiệu ứng chuyển màu

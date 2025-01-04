@@ -12,6 +12,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useCallback, useEffect, useState } from 'react';
 import messaging from '@react-native-firebase/messaging';
 import { ClickProvider } from './src/context/ClickContext';
+import { NonPlayerCharacterProvider } from './src/context/NonPlayerCharacterContext';
 
 // Register background handler
 messaging().setBackgroundMessageHandler(async remoteMessage => {
@@ -44,12 +45,14 @@ export default function App() {
       <Provider store={store}>
         <AudioProvider>
           <ClickProvider>
-            <NavigationContainer>
-              <GestureHandlerRootView style={{ flex: 1 }}>
-                <StatusBar backgroundColor={undefined} />
-                <RootNavigator onMount={() => setIsMounted(true)} />
-              </GestureHandlerRootView>
-            </NavigationContainer>
+            <NonPlayerCharacterProvider>
+              <NavigationContainer>
+                <GestureHandlerRootView style={{ flex: 1 }}>
+                  <StatusBar backgroundColor={undefined} />
+                  <RootNavigator onMount={() => setIsMounted(true)} />
+                </GestureHandlerRootView>
+              </NavigationContainer>
+            </NonPlayerCharacterProvider>
           </ClickProvider>
         </AudioProvider>
       </Provider>

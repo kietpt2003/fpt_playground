@@ -14,14 +14,19 @@ function ClickProvider({ children }: ClickProviderProps) {
         }
     };
 
+    const loadSound = async () => {
+        if (soundRef.current) {
+            await soundRef.current.unloadAsync(); // Dừng bài hát hiện tại
+        }
+
+        const { sound } = await Audio.Sound.createAsync(
+            require('../../assets/audios/click.mp3')
+        );
+        soundRef.current = sound;
+    };
+
     // Load âm thanh khi component được mount
     useEffect(() => {
-        const loadSound = async () => {
-            const { sound } = await Audio.Sound.createAsync(
-                require('../../assets/audios/click.mp3') // Đường dẫn tới file âm thanh
-            );
-            soundRef.current = sound;
-        };
 
         loadSound();
 

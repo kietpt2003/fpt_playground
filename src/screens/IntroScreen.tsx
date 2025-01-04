@@ -58,6 +58,7 @@ export default function IntroScreen() {
                         playSound();
                         handleSkip();
                     }}
+                    touchSoundDisabled={true}
                 >
                     <LinearGradient
                         colors={[colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu

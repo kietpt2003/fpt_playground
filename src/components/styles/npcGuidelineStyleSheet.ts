@@ -1,9 +1,8 @@
 import { ScreenHeight, ScreenWidth } from "@rneui/base";
-import { Platform, StatusBar, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { colors } from "../../constants/colors";
-
-const statusBarHeight = (Platform.OS === 'android' && StatusBar.currentHeight) ? StatusBar.currentHeight : 0;
-
+import { statusBarHeight } from "../../constants/statusBarHeight";
+import { featureComponentHeight } from "../../constants/scrollHeight";
 
 const npcGuidelineStyleSheet = StyleSheet.create({
     container: {
@@ -14,19 +13,48 @@ const npcGuidelineStyleSheet = StyleSheet.create({
     },
     npcBlurContainer: {
         width: ScreenWidth - 10,
-        height: ScreenHeight / 3,
+        height: ScreenHeight / 3.8,
         position: "absolute",
         bottom: 5,
         left: 5,
         backgroundColor: colors.grey,
         borderRadius: 10,
         borderWidth: 2,
+        flexDirection: "row",
+        gap: 5
     },
     npcImage: {
         width: ScreenHeight / 7.5,
         height: ScreenHeight / 4,
         resizeMode: "stretch"
-    }
+    },
+    textContent: {
+        width: ScreenWidth / 1.8,
+        color: colors.white,
+        overflow: "hidden",
+        marginTop: 25
+    },
+    textCursor: {
+        fontWeight: "bold"
+    },
+    nextButton: {
+        position: "absolute",
+        bottom: 5,
+        right: 10,
+    },
+    topBlur: {
+        width: ScreenWidth,
+        height: ScreenHeight / 3.5,
+        position: "absolute",
+        top: 0,
+        backgroundColor: colors.grey
+    },
+    bottomBlur: {
+        width: ScreenWidth,
+        position: "absolute",
+        bottom: 0,
+        backgroundColor: colors.grey
+    },
 });
 
 export default npcGuidelineStyleSheet;

@@ -11,7 +11,10 @@ export default function SlotItem({ item }: SlotItemProps) {
     const theme = useSelector((state: RootState) => state.theme.theme);
 
     return (
-        <TouchableOpacity style={slotItemStyleSheet.container}>
+        <TouchableOpacity
+            style={slotItemStyleSheet.container}
+            touchSoundDisabled={true}
+        >
             {
                 item.id ?
                     <>

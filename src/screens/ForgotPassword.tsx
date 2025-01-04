@@ -128,7 +128,10 @@ const ForgotPassword = () => {
                     <Menu
                         visible={menuVisible}
                         anchor={
-                            <TouchableOpacity onPress={showMenu}>
+                            <TouchableOpacity
+                                onPress={showMenu}
+                                touchSoundDisabled={true}
+                            >
                                 <MaterialIcons name="settings" size={24} color={colors.white} />
                             </TouchableOpacity>
                         }
@@ -229,6 +232,7 @@ const ForgotPassword = () => {
                         ]}
                         onPress={() => handleRequestCode()}
                         disabled={isRecentPushed || userEmail === ""}
+                        touchSoundDisabled={true}
                     >
                         {
                             !(isRecentPushed || userEmail === "") &&
@@ -254,6 +258,7 @@ const ForgotPassword = () => {
                         onPress={() => {
                             navigation.goBack();
                         }}
+                        touchSoundDisabled={true}
                     >
                         <Text style={forgotPasswordStyleSheet.backBtnTxt}>
                             {t("back-login-btn")}

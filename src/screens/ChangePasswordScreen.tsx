@@ -189,7 +189,10 @@ const ChangePasswordScreen = () => {
                     <Menu
                         visible={menuVisible}
                         anchor={
-                            <TouchableOpacity onPress={showMenu}>
+                            <TouchableOpacity
+                                onPress={showMenu}
+                                touchSoundDisabled={true}
+                            >
                                 <MaterialIcons name="settings" size={24} color={colors.white} />
                             </TouchableOpacity>
                         }
@@ -295,6 +298,7 @@ const ChangePasswordScreen = () => {
                             <TouchableOpacity
                                 style={changePasswordScreenStyleSheet.showHidePass}
                                 onPress={() => setShowNewPassword(!showNewPassword)}
+                                touchSoundDisabled={true}
                             >
                                 <Icon
                                     name={showNewPassword ? "eye-off-sharp" : "eye-sharp"}
@@ -318,6 +322,7 @@ const ChangePasswordScreen = () => {
                             <TouchableOpacity
                                 style={changePasswordScreenStyleSheet.showHidePass}
                                 onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                                touchSoundDisabled={true}
                             >
                                 <Icon
                                     name={showConfirmPassword ? "eye-off-sharp" : "eye-sharp"}
@@ -340,6 +345,7 @@ const ChangePasswordScreen = () => {
                             onPress={() => handleResendCode()}
                             disabled={isRecentPushed}
                             style={changePasswordScreenStyleSheet.resendCodeContainer}
+                            touchSoundDisabled={true}
                         >
                             <Text
                                 style={changePasswordScreenStyleSheet.resendCodeTxt}
@@ -364,6 +370,7 @@ const ChangePasswordScreen = () => {
                             (newPassword === "" && confirmPassword === "") ||
                             (newPassword !== confirmPassword) ||
                             code === ""}
+                        touchSoundDisabled={true}
                     >
                         {
                             !(isRecentPushed ||
@@ -392,6 +399,7 @@ const ChangePasswordScreen = () => {
                         onPress={() => {
                             navigation.replace("Signin");
                         }}
+                        touchSoundDisabled={true}
                     >
                         <Text style={changePasswordScreenStyleSheet.backBtnTxt}>
                             {t("back-login-btn")}

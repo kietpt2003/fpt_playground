@@ -105,6 +105,7 @@ export default function GroupChat() {
                 onPress={() => {
                     playSound();
                 }}
+                touchSoundDisabled={true}
             >
                 <LinearGradient
                     colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
@@ -133,6 +134,7 @@ export default function GroupChat() {
                                 setPage((current) => current - 1);
                             }
                         }}
+                        touchSoundDisabled={true}
                     >
                         <FontAwesome
                             name="chevron-left"
@@ -156,6 +158,7 @@ export default function GroupChat() {
                                 setPage((current) => current + 1);
                             }
                         }}
+                        touchSoundDisabled={true}
                     >
                         <FontAwesome
                             name="chevron-right"

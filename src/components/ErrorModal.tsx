@@ -35,6 +35,7 @@ export default function ErrorModal({ stringErr, isError, setIsError }: errorModa
                         playSound();
                         setIsError(false);
                     }}
+                    touchSoundDisabled={true}
                 >
                     <LinearGradient
                         colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu

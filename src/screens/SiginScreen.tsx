@@ -160,7 +160,10 @@ export default function SiginScreen() {
                     <Menu
                         visible={menuVisible}
                         anchor={
-                            <TouchableOpacity onPress={showMenu}>
+                            <TouchableOpacity
+                                onPress={showMenu}
+                                touchSoundDisabled={true}
+                            >
                                 <MaterialIcons name="settings" size={24} color={colors.white} />
                             </TouchableOpacity>
                         }
@@ -250,6 +253,7 @@ export default function SiginScreen() {
                     onPress={() => {
                         navigation.navigate("HomeScreen");
                     }}
+                    touchSoundDisabled={true}
                 >
                     <LinearGradient
                         colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
@@ -271,6 +275,7 @@ export default function SiginScreen() {
                         onPress={() => {
                             navigation.navigate("Signup");
                         }}
+                        touchSoundDisabled={true}
                     >
                         <Text style={signinStyleSheet.signupTxt}>
                             {t("signup-txt")}
@@ -283,6 +288,7 @@ export default function SiginScreen() {
                         onPress={() => {
                             navigation.navigate("ForgotPassword");
                         }}
+                        touchSoundDisabled={true}
                     >
                         <Text style={signinStyleSheet.forgotPasswordTxt}>
                             {t("forgot-password")}

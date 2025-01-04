@@ -97,20 +97,23 @@ export default function VolumeModal({ openChangeVolume, setOpenChangeVolume }: V
                             maximumTrackTintColor="#ccc"
                             thumbTintColor={reduxTheme === "dark" ? colors.darkBlue : colors.darkOrange}
                         />
-                        <TouchableOpacity onPress={async () => {
-                            let newVolume = 0;
-                            if (localVolumeValue != 0) {
-                                newVolume = 0;
-                                await sound?.setIsMutedAsync(true);
-                            } else {
-                                newVolume = 1;
-                                await sound?.setIsMutedAsync(false);
-                            }
-                            setLocalVolumeValue(newVolume);
-                            setThumbPosition(calculateThumbPosition(newVolume));
-                            // dispatch(changeVolume(newVolume));
-                            setSystemVolumeValue(newVolume);
-                        }}>
+                        <TouchableOpacity
+                            onPress={async () => {
+                                let newVolume = 0;
+                                if (localVolumeValue != 0) {
+                                    newVolume = 0;
+                                    await sound?.setIsMutedAsync(true);
+                                } else {
+                                    newVolume = 1;
+                                    await sound?.setIsMutedAsync(false);
+                                }
+                                setLocalVolumeValue(newVolume);
+                                setThumbPosition(calculateThumbPosition(newVolume));
+                                // dispatch(changeVolume(newVolume));
+                                setSystemVolumeValue(newVolume);
+                            }}
+                            touchSoundDisabled={true}
+                        >
                             {
                                 reduxTheme === "dark" ?
                                     <Ionicons name={getVolumeIcon(localVolumeValue)} size={24} color={localVolumeValue == 10 ? colors.darkBlue : localVolumeValue == 0 ? 'rgba(0, 0, 0, 0.3)' : colors.lightBlue} /> :

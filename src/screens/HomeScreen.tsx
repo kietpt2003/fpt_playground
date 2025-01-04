@@ -16,7 +16,6 @@ import { useNavigation } from '@react-navigation/native';
 import { GroupChatNavigationProp } from './types/groupChatTypes';
 import DailyCheckPoint from '../components/DailyCheckPoint';
 import { StatusBar } from 'expo-status-bar';
-import { scrollToPosition } from '../utils/scrollToPosition';
 import NPCGuideline from '../components/NPCGuideline';
 
 export default function HomeScreen() {
@@ -45,16 +44,15 @@ export default function HomeScreen() {
 
     const [isGuideline, setIsGuideline] = useState<boolean>(true);
     const scrollViewRef = useRef<ScrollView>(null);
+    const [onScrolling, setOnScrolling] = useState(false);
 
-    useEffect(() => {
-        scrollToPosition(scrollViewRef, 0, 500);
-    }, [])
     return (
         <>
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 ref={scrollViewRef}
                 scrollEnabled={!isGuideline}
+                onScrollEndDrag={() => setOnScrolling(false)}
             >
                 <LinearGradient
                     colors={theme === "dark" ? [colors.lightBlue, colors.darkBlue] : [colors.mediumOrange, colors.milkyWhite]} // Hiệu ứng chuyển màu
@@ -81,6 +79,7 @@ export default function HomeScreen() {
                         onPress={() => {
                             playSound();
                         }}
+                        touchSoundDisabled={true}
                     >
                         <LinearGradient
                             colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
@@ -102,7 +101,10 @@ export default function HomeScreen() {
                         <Menu
                             visible={menuVisible}
                             anchor={
-                                <TouchableOpacity onPress={showMenu}>
+                                <TouchableOpacity
+                                    onPress={showMenu}
+                                    touchSoundDisabled={true}
+                                >
                                     <MaterialCommunityIcons name={menuVisible ? "menu-down" : "menu-left"} size={35} color={colors.white} />
                                 </TouchableOpacity>
                             }
@@ -255,6 +257,7 @@ export default function HomeScreen() {
                         <TouchableOpacity
                             style={homeScreenStyleSheet.featureButton}
                             disabled={isGuideline}
+                            touchSoundDisabled={true}
                         >
                             <Text style={{
                                 color: theme === "dark" ? colors.white : colors.black
@@ -271,6 +274,7 @@ export default function HomeScreen() {
 
                     <TouchableOpacity
                         disabled={isGuideline}
+                        touchSoundDisabled={true}
                     >
                         <Image
                             source={require("../../assets/images/checkinBg.png")}
@@ -350,6 +354,7 @@ export default function HomeScreen() {
                         <TouchableOpacity
                             style={homeScreenStyleSheet.featureButton}
                             disabled={isGuideline}
+                            touchSoundDisabled={true}
                         >
                             <Text style={{
                                 color: theme === "dark" ? colors.white : colors.black
@@ -366,6 +371,7 @@ export default function HomeScreen() {
 
                     <TouchableOpacity
                         disabled={isGuideline}
+                        touchSoundDisabled={true}
                     >
                         <Image
                             source={require("../../assets/images/rankingBg.webp")}
@@ -385,9 +391,22 @@ export default function HomeScreen() {
                         setIsOpenDailyCheckPoint={setIsOpenDailyCheckPoint}
                     />
                 }
+
+                {
+                    isGuideline &&
+                    <View style={homeScreenStyleSheet.dummyGuideline} />
+                }
             </ScrollView>
 
-            <NPCGuideline />
+            {
+                isGuideline &&
+                <NPCGuideline
+                    scrollViewRef={scrollViewRef}
+                    setIsGuideline={setIsGuideline}
+                    onScrolling={onScrolling}
+                    setOnScrolling={setOnScrolling}
+                />
+            }
         </>
     )
 }
