@@ -88,13 +88,13 @@ const rankingStyleSheet = StyleSheet.create({
     },
     ribbonTop3: {
         position: "absolute",
-        bottom: 0,
+        bottom: 3,
     },
     ribbonTextTop3: {
         fontWeight: "bold",
         color: "white",
         position: "absolute",
-        bottom: 20,
+        bottom: 18,
         textAlign: "center",
         width: "100%"
     },

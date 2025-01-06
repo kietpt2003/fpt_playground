@@ -103,7 +103,7 @@ export default function Ranking() {
                     }
                 ]}>
                     <LinearGradient
-                        colors={theme === "dark" ? [colors.lightBlue, colors.darkBlue] : [colors.lightOrange, colors.superBlurWhite]} // Hiệu ứng chuyển màu
+                        colors={theme === "dark" ? [colors.darkBlue, colors.superBlurWhite2] : [colors.lightOrange, colors.superBlurWhite]} // Hiệu ứng chuyển màu
                         style={[
                             rankingStyleSheet.topThreeItemLinear,
                             {
@@ -120,7 +120,7 @@ export default function Ranking() {
                             imageHeight={ScreenWidth / 7.7}
                             imageBorderRadius={50}
                             imageBorderWidth={1}
-                            imageBorderColor={colors.white}
+                            imageBorderColor={colors.rightRibbonLinearRightTop2}
                             loadingIndicatorSize={35}
                         />
                         {/* CustomRibbon */}
@@ -128,12 +128,12 @@ export default function Ranking() {
                             <RankingRibbon
                                 width={ScreenWidth / 4.3}
                                 height={ScreenHeight / 17}
-                                leftRibbonLinearLeft={colors.leftRibbonLinearLeftTop3}
-                                leftRibbonLinearRight={colors.leftRibbonLinearRightTop3}
-                                rightRibbonLinearLeft={colors.rightRibbonLinearLeftTop3}
-                                rightRibbonLinearRight={colors.rightRibbonLinearRightTop3}
-                                centerRibbonLinearLeft={colors.centerRibbonLinearLeftTop3}
-                                centerRibbonLinearRight={colors.centerRibbonLinearRightTop3}
+                                leftRibbonLinearLeft={colors.leftRibbonLinearLeftTop2}
+                                leftRibbonLinearRight={colors.leftRibbonLinearRightTop2}
+                                rightRibbonLinearLeft={colors.rightRibbonLinearLeftTop2}
+                                rightRibbonLinearRight={colors.rightRibbonLinearRightTop2}
+                                centerRibbonLinearLeft={colors.centerRibbonLinearLeftTop2}
+                                centerRibbonLinearRight={colors.centerRibbonLinearRightTop2}
                             />
                             <Text style={[
                                 rankingStyleSheet.ribbonTextTop2,
@@ -157,7 +157,7 @@ export default function Ranking() {
                     }
                 ]}>
                     <LinearGradient
-                        colors={theme === "dark" ? [colors.lightBlue, colors.darkBlue] : [colors.lightOrange, colors.superBlurWhite]} // Hiệu ứng chuyển màu
+                        colors={theme === "dark" ? [colors.darkBlue, colors.superBlurWhite2] : [colors.lightOrange, colors.superBlurWhite]} // Hiệu ứng chuyển màu
                         style={[
                             rankingStyleSheet.topThreeItemLinear,
                             {
@@ -210,7 +210,7 @@ export default function Ranking() {
                     }
                 ]}>
                     <LinearGradient
-                        colors={theme === "dark" ? [colors.lightBlue, colors.darkBlue] : [colors.lightOrange, colors.superBlurWhite]} // Hiệu ứng chuyển màu
+                        colors={theme === "dark" ? [colors.darkBlue, colors.superBlurWhite2] : [colors.lightOrange, colors.superBlurWhite]} // Hiệu ứng chuyển màu
                         style={[
                             rankingStyleSheet.topThreeItemLinear,
                             {
@@ -227,14 +227,14 @@ export default function Ranking() {
                             imageHeight={ScreenWidth / 8.5}
                             imageBorderRadius={50}
                             imageBorderWidth={1}
-                            imageBorderColor={colors.white}
+                            imageBorderColor={colors.rightRibbonLinearRightTop3}
                             loadingIndicatorSize={35}
                         />
                         {/* CustomRibbon */}
                         <View style={rankingStyleSheet.ribbonTop3}>
                             <RankingRibbon
-                                width={ScreenWidth / 4.3}
-                                height={ScreenHeight / 17}
+                                width={ScreenWidth / 4.8}
+                                height={ScreenHeight / 18}
                                 leftRibbonLinearLeft={colors.leftRibbonLinearLeftTop3}
                                 leftRibbonLinearRight={colors.leftRibbonLinearRightTop3}
                                 rightRibbonLinearLeft={colors.rightRibbonLinearLeftTop3}
