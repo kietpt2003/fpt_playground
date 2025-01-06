@@ -15,6 +15,8 @@ import { useFocusEffect } from "@react-navigation/native";
 import messaging from '@react-native-firebase/messaging';
 import HomeScreen from "../screens/HomeScreen";
 import GroupChat from "../screens/GroupChat";
+import { setHomeGuideline, setIsOpenDailyCheckPoint } from "../store/reducers/homeReducer";
+import Ranking from "../screens/Ranking";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -22,6 +24,7 @@ export default function RootNavigator({ onMount }: RootNavigatorProps) {
     const theme = useColorScheme();
     const dispatch = useDispatch();
 
+    // Theme and language setting
     useEffect(() => {
         // Báo rằng RootNavigator đã mount xong
         (async () => {
@@ -52,8 +55,6 @@ export default function RootNavigator({ onMount }: RootNavigatorProps) {
     //get FCM message
     useFocusEffect(
         useCallback(() => {
-
-
             const unsubscribe = messaging().onMessage(async remoteMessage => {
                 console.log("nhận đc noti", remoteMessage);
             });
@@ -61,6 +62,18 @@ export default function RootNavigator({ onMount }: RootNavigatorProps) {
             return unsubscribe;
         }, [])
     );
+
+    // homeGuideline + isOpenDailyCheckPoint
+    useEffect(() => {
+        (async () => {
+            const homeGuideline = await AsyncStorage.getItem("homeGuideline");
+
+            dispatch(setHomeGuideline(homeGuideline === "true" || homeGuideline == null))
+
+            const isOpenDailyCheckPoint = await AsyncStorage.getItem("isOpenDailyCheckPoint");
+            dispatch(setIsOpenDailyCheckPoint(isOpenDailyCheckPoint === "true" || isOpenDailyCheckPoint == null))
+        })();
+    }, []);
 
     return (
         <Stack.Navigator
@@ -75,6 +88,7 @@ export default function RootNavigator({ onMount }: RootNavigatorProps) {
             <Stack.Screen name="ChangePasswordScreen" component={ChangePasswordScreen} />
             <Stack.Screen name="HomeScreen" component={HomeScreen} />
             <Stack.Screen name="GroupChat" component={GroupChat} />
+            <Stack.Screen name="Ranking" component={Ranking} />
         </Stack.Navigator>
     )
 }

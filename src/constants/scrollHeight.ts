@@ -1,7 +1,5 @@
 import { ScreenHeight } from "@rneui/base";
 
-export const scrollHeight = ScreenHeight / 3.5;
-
 export const homeHeaderImageHeight = ScreenHeight / 3.5;
 
 // export const featureComponentHeight = (ScreenHeight / 9) * 2 + 55;

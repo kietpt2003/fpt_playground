@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import Modal from "react-native-modal";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors } from "../constants/colors";
@@ -16,13 +16,17 @@ import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import dailyCheckPointStyleSheet from "./styles/dailyCheckPointStyleSheet";
 import { DailyCheckPointProps, DailyCheckPointItem } from "./types/dailyCheckPointTypes";
 import { useTranslation } from "react-i18next";
+import { setIsOpenDailyCheckPoint } from "../store/reducers/homeReducer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function DailyCheckPoint({ isOpenDailyCheckPoint, setIsOpenDailyCheckPoint }: DailyCheckPointProps) {
+export default function DailyCheckPoint({ isOpenDailyCheckPoint }: DailyCheckPointProps) {
     const theme = useSelector((state: RootState) => state.theme.theme);
     const { playSound } = useClick();
     const { t } = useTranslation();
     const [data, setData] = useState<DailyCheckPointItem[]>([]);
     const [sundayCheckPoint, setSundayCheckPoint] = useState<DailyCheckPointItem | null>(null);
+
+    const dispatch = useDispatch()
 
     useEffect(() => {
         // Gọi API
@@ -118,7 +122,10 @@ export default function DailyCheckPoint({ isOpenDailyCheckPoint, setIsOpenDailyC
                         style={dailyCheckPointStyleSheet.closeBtnContainer}
                         onPress={() => {
                             playSound();
-                            setIsOpenDailyCheckPoint(false);
+
+                            // TODO: Khúc này mốt nhớ xóa
+                            AsyncStorage.setItem("isOpenDailyCheckPoint", "false");
+                            dispatch(setIsOpenDailyCheckPoint(false));
                         }}
                         touchSoundDisabled={true}
                     >

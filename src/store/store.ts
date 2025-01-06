@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer from '../store/reducers/authReducer';  // Giả sử bạn có một reducer quản lý state auth
+import authReducer from '../store/reducers/authReducer';
 import themeReducer from '../store/reducers/themeReducer';
+import homeReducer from '../store/reducers/homeReducer';
 
 const store = configureStore({
     reducer: {
         auth: authReducer,
-        theme: themeReducer
+        theme: themeReducer,
+        home: homeReducer
     },
 });
 

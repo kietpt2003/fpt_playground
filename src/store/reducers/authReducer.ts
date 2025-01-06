@@ -1,16 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
-
-interface User {
-    name: string; // Các thuộc tính khác nếu có
-    email?: string;
-}
+import { User } from '../../constants/entities/User';
 
 // Tạo một slice để quản lý trạng thái auth
 const authSlice = createSlice({
     name: 'auth',
     initialState: {
         isLoggedIn: false,
-        user: null as any | null,
+        user: null as User | null,
     },
     reducers: {
         login(state, action) {

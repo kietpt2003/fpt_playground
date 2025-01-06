@@ -1,5 +1,5 @@
 import { View, Text, ImageBackground, ScrollView, TouchableOpacity, Image } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { colors } from '../constants/colors';
@@ -28,6 +28,8 @@ export default function HomeScreen() {
 
     const { playSound } = useClick();
 
+    const isOpenDailyCheckPoint = useSelector((state: RootState) => state.home.isOpenDailyCheckPoint);
+
     const showMenu = () => {
         playSound(); // Phát âm thanh khi bấm
         setMenuVisible(true);
@@ -40,9 +42,7 @@ export default function HomeScreen() {
     const [stringErr, setStringErr] = useState<string>("");
     const [isError, setIsError] = useState<boolean>(false);
 
-    const [isOpenDailyCheckPoint, setIsOpenDailyCheckPoint] = useState<boolean>(true);
-
-    const [isGuideline, setIsGuideline] = useState<boolean>(true);
+    const isGuideline = useSelector((state: RootState) => state.home.homeGuideline);
     const scrollViewRef = useRef<ScrollView>(null);
     const [onScrolling, setOnScrolling] = useState(false);
 
@@ -355,6 +355,9 @@ export default function HomeScreen() {
                             style={homeScreenStyleSheet.featureButton}
                             disabled={isGuideline}
                             touchSoundDisabled={true}
+                            onPress={() => {
+                                navigation.navigate("Ranking");
+                            }}
                         >
                             <Text style={{
                                 color: theme === "dark" ? colors.white : colors.black
@@ -372,6 +375,9 @@ export default function HomeScreen() {
                     <TouchableOpacity
                         disabled={isGuideline}
                         touchSoundDisabled={true}
+                        onPress={() => {
+                            navigation.navigate("Ranking");
+                        }}
                     >
                         <Image
                             source={require("../../assets/images/rankingBg.webp")}
@@ -388,7 +394,6 @@ export default function HomeScreen() {
                     !isGuideline &&
                     <DailyCheckPoint
                         isOpenDailyCheckPoint={isOpenDailyCheckPoint}
-                        setIsOpenDailyCheckPoint={setIsOpenDailyCheckPoint}
                     />
                 }
 
@@ -402,7 +407,6 @@ export default function HomeScreen() {
                 isGuideline &&
                 <NPCGuideline
                     scrollViewRef={scrollViewRef}
-                    setIsGuideline={setIsGuideline}
                     onScrolling={onScrolling}
                     setOnScrolling={setOnScrolling}
                 />

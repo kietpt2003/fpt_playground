@@ -2,7 +2,7 @@ import { Pressable, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import npcGuidelineStyleSheet from './styles/npcGuidelineStyleSheet';
 import { Image } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { colors } from '../constants/colors';
 import { AntDesign } from '@expo/vector-icons';
@@ -13,11 +13,12 @@ import { getDialogues } from '../utils/getDialogues';
 import { NPCGuidelineProps } from './types/npcGuidelineTypes';
 import useAudio from '../hooks/useAudio';
 import { scrollToPosition } from '../utils/scrollToPosition';
-import { coveredNumber, dailyCheckPointHeight, featureComponentHeight, homeHeaderImageHeight, scrollHeight } from '../constants/scrollHeight';
-import { checkIfConfigIsValid } from 'react-native-reanimated/lib/typescript/animation/springUtils';
+import { coveredNumber, dailyCheckPointHeight, featureComponentHeight, homeHeaderImageHeight } from '../constants/scrollHeight';
 import { ScreenHeight } from '@rneui/base';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { setHomeGuideline } from '../store/reducers/homeReducer';
 
-export default function NPCGuideline({ scrollViewRef, setIsGuideline, onScrolling, setOnScrolling }: NPCGuidelineProps) {
+export default function NPCGuideline({ scrollViewRef, onScrolling, setOnScrolling }: NPCGuidelineProps) {
     const [isChangeImage, setIsChangeImage] = useState<boolean>(true);
 
     const { t } = useTranslation();
@@ -44,6 +45,8 @@ export default function NPCGuideline({ scrollViewRef, setIsGuideline, onScrollin
     const [showCursor, setShowCursor] = useState(true); // Hiển thị con trỏ nháy
     const [speedRate, setSpeedRate] = useState(1);
 
+    const dispatch = useDispatch();
+
     const [showNextButton, setShowNextButton] = useState(false);
     const {
         loadSound,
@@ -68,7 +71,8 @@ export default function NPCGuideline({ scrollViewRef, setIsGuideline, onScrollin
             if (songSound) {
                 songSound.setVolumeAsync(currentSongVolume);
             }
-            setIsGuideline(false);
+            AsyncStorage.setItem("homeGuideline", "false");
+            dispatch(setHomeGuideline(false));
         }
     }
 
