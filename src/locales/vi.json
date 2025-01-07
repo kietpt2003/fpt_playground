@@ -75,5 +75,10 @@
     "dialogue12": "Bên cạnh đó bạn cũng có thể tham gia các trò chơi và trở thành Top sinh viên.",
     "dialogue13": "Bảng xếp hạng sẽ reset lại sau mỗi 1 tháng, hãy nhanh tay tham gia nào^^",
     "server-quy-nhon": "Quy Nhơn",
-    "server-all": "Việt Nam"
+    "server-all": "Việt Nam",
+    "ranking-no": "Hạng",
+    "ranking-user": "Người dùng",
+    "ranking-diamond": "Kim cương",
+    "format-thousand": "k",
+    "format-million": "tr"
 }

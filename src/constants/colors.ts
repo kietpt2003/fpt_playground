@@ -7,6 +7,7 @@ export const colors = {
     lightOrange: "#FF8A00",
     lighterOrange: "#FFA200",
     darkBlue: "#3B4A9E",
+    darkerBlue: "#1025AA",
     lightBlue: "#435BBE",
     lighterBlue: "#A8B6F1",
     lighterBlue2: "#6E7ED3",
@@ -48,4 +49,9 @@ export const colors = {
     leftRibbonLinearRightTop3: "#D2A167",
     rightRibbonLinearLeftTop3: "#DDAC93",
     rightRibbonLinearRightTop3: "#E1B080",
+    maleGender: "#60E2FA",
+    femaleGender: "#FF6D9D",
+    femaleGender2: "#FC4581",
+    likesColor: "#1877F2",
+    diamond: "#00BFFF"
 };

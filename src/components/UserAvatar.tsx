@@ -15,7 +15,7 @@ export default function UserAvatar({
     const [isLoadAva, setLoadAva] = useState(false);
 
     return (
-        <>
+        <View>
             <Image
                 source={avatarUrl ?
                     {
@@ -27,7 +27,7 @@ export default function UserAvatar({
                     borderRadius: imageBorderRadius,
                     borderWidth: imageBorderWidth,
                     borderColor: imageBorderColor,
-                    display: isLoadAva ? "none" : undefined
+                    opacity: isLoadAva ? 0 : 1
                 }}
                 onLoadStart={() => {
                     setLoadAva(true)
@@ -44,6 +44,9 @@ export default function UserAvatar({
                     borderRadius: imageBorderRadius,
                     borderWidth: imageBorderWidth,
                     borderColor: imageBorderColor,
+                    position: "absolute",
+                    left: 0,
+                    zIndex: 1
                 }}>
                     <Image
                         source={require("../../assets/images/user-default-ava.jpg")}
@@ -67,6 +70,6 @@ export default function UserAvatar({
                     />
                 </View>
             }
-        </>
+        </View>
     )
 }

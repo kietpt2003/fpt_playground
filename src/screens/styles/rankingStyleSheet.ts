@@ -173,7 +173,6 @@ const rankingStyleSheet = StyleSheet.create({
     otherUsersContainer: {
         width: ScreenWidth - 20,
         height: ScreenHeight / 1.35,
-        paddingHorizontal: 10,
         alignSelf: "center",
     },
     serverContainer: {
@@ -217,6 +216,25 @@ const rankingStyleSheet = StyleSheet.create({
         fontWeight: "600",
         color: colors.white,
         textAlign: "center"
+    },
+    faltListFooterStyle: {
+        height: ScreenHeight / 9,
+        backgroundColor: colors.white
+    },
+    currentUserRankingContainer: {
+        width: ScreenWidth,
+        height: ScreenHeight / 10,
+        position: "absolute",
+        bottom: 0,
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    currentUserRankingLinear: {
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        borderTopLeftRadius: 15,
+        borderTopRightRadius: 15,
     }
 });
 

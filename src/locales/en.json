@@ -75,5 +75,10 @@
     "dialogue12": "Besides, you can also join our games and become a Top college student.",
     "dialogue13": "The ranking will reset every 1 month, so play now!^^",
     "server-quy-nhon": "Quy Nhon",
-    "server-all": "Viet Nam"
+    "server-all": "Viet Nam",
+    "ranking-no": "No.",
+    "ranking-user": "Users",
+    "ranking-diamond": "Diamonds",
+    "format-thousand": "k",
+    "format-million": "m"
 }
