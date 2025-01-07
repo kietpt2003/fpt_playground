@@ -121,7 +121,7 @@ export default function Ranking() {
                             imageBorderRadius={50}
                             imageBorderWidth={1}
                             imageBorderColor={colors.rightRibbonLinearRightTop2}
-                            loadingIndicatorSize={35}
+                            loadingIndicatorSize={26}
                         />
                         {/* CustomRibbon */}
                         <View style={rankingStyleSheet.ribbonTop2}>
@@ -176,7 +176,7 @@ export default function Ranking() {
                             imageBorderRadius={50}
                             imageBorderWidth={1}
                             imageBorderColor={colors.rightRibbonLinearRightTop1}
-                            loadingIndicatorSize={35}
+                            loadingIndicatorSize={32}
                         />
                         {/* CustomRibbon */}
                         <View style={rankingStyleSheet.ribbonTop1}>
@@ -222,13 +222,13 @@ export default function Ranking() {
                     {/* Avatar + Ribbon */}
                     <View style={rankingStyleSheet.imageContainer}>
                         <UserAvatar
-                            avatarUrl="https://picsum.photos/id/240/200"
+                            avatarUrl="https://picsum.photos/id/242/200"
                             imageWidth={ScreenWidth / 8.5}
                             imageHeight={ScreenWidth / 8.5}
                             imageBorderRadius={50}
                             imageBorderWidth={1}
                             imageBorderColor={colors.rightRibbonLinearRightTop3}
-                            loadingIndicatorSize={35}
+                            loadingIndicatorSize={24}
                         />
                         {/* CustomRibbon */}
                         <View style={rankingStyleSheet.ribbonTop3}>
