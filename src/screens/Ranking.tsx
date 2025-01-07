@@ -10,13 +10,19 @@ import { useNavigation } from '@react-navigation/native';
 import { ScreenHeight, ScreenWidth } from '@rneui/base';
 import UserAvatar from '../components/UserAvatar';
 import RankingRibbon from '../components/RankingRibbon';
+import { Image } from 'react-native';
+import { ServerNameAll } from '../constants/entities/Server';
+import { useTranslation } from 'react-i18next';
 
 export default function Ranking() {
     const theme = useSelector((state: RootState) => state.theme.theme);
 
+    const { t } = useTranslation();
+
     const navigation = useNavigation();
 
     const [headerSelect, setHeaderSelect] = useState<"CollegeStudent" | "GroupChat">("CollegeStudent");
+    const [serverSelect, setServerSelect] = useState<ServerNameAll>("Xavalo");
 
     return (
         <View style={rankingStyleSheet.container}>
@@ -97,9 +103,7 @@ export default function Ranking() {
                 <View style={[
                     rankingStyleSheet.topThreeItemContainer,
                     {
-                        height: ScreenHeight / 5.5,
-                        borderLeftWidth: 1.5,
-                        borderTopLeftRadius: 10,
+                        height: ScreenHeight / 7,
                     }
                 ]}>
                     <LinearGradient
@@ -112,7 +116,12 @@ export default function Ranking() {
                         ]}
                     />
 
-                    {/* Avatar + Ribbon */}
+                    {/* Custom linear border */}
+                    <View style={rankingStyleSheet.top2BorderContainer}>
+                        <View style={rankingStyleSheet.top2BorderBlur} />
+                    </View>
+
+                    {/* Avatar + Username + Diamond Value + Ribbon */}
                     <View style={rankingStyleSheet.imageContainer}>
                         <UserAvatar
                             avatarUrl="https://picsum.photos/id/238/200"
@@ -134,13 +143,37 @@ export default function Ranking() {
                                 rightRibbonLinearRight={colors.rightRibbonLinearRightTop2}
                                 centerRibbonLinearLeft={colors.centerRibbonLinearLeftTop2}
                                 centerRibbonLinearRight={colors.centerRibbonLinearRightTop2}
+                                textContent="Top 2"
                             />
-                            <Text style={[
-                                rankingStyleSheet.ribbonTextTop2,
-                                {
-                                    fontSize: 13
-                                }
-                            ]}>Top 2</Text>
+                        </View>
+
+                        {/* Username + Diamond Value */}
+                        <View style={[
+                            rankingStyleSheet.rankingContentContainer,
+                            {
+                                bottom: -65
+                            }
+                        ]}>
+                            <Text
+                                style={rankingStyleSheet.userName}
+                                numberOfLines={1}
+                            >
+                                Quang Kiệt
+                            </Text>
+
+                            <View style={rankingStyleSheet.diamondDetailContainer}>
+                                <Text
+                                    style={rankingStyleSheet.diamondValue}
+                                    numberOfLines={1}
+                                >
+                                    13200
+
+                                </Text>
+                                <Image
+                                    source={require("../../assets/images/ptk-diamond-pool.png")}
+                                    style={rankingStyleSheet.rankingContentImage}
+                                />
+                            </View>
                         </View>
                     </View>
                 </View>
@@ -149,11 +182,7 @@ export default function Ranking() {
                 <View style={[
                     rankingStyleSheet.topThreeItemContainer,
                     {
-                        height: ScreenHeight / 4.5,
-                        borderLeftWidth: 1.5,
-                        borderRightWidth: 1.5,
-                        borderTopLeftRadius: 10,
-                        borderTopRightRadius: 10
+                        height: ScreenHeight / 6,
                     }
                 ]}>
                     <LinearGradient
@@ -167,7 +196,12 @@ export default function Ranking() {
                         ]}
                     />
 
-                    {/* Avatar + Ribbon */}
+                    {/* Custom linear border */}
+                    <View style={rankingStyleSheet.top1BorderContainer}>
+                        <View style={rankingStyleSheet.top1BorderBlur} />
+                    </View>
+
+                    {/* Avatar + Username + Diamond Value + Ribbon */}
                     <View style={rankingStyleSheet.imageContainer}>
                         <UserAvatar
                             avatarUrl="https://picsum.photos/id/237/200"
@@ -189,13 +223,36 @@ export default function Ranking() {
                                 rightRibbonLinearRight={colors.rightRibbonLinearRightTop1}
                                 centerRibbonLinearLeft={colors.centerRibbonLinearLeftTop1}
                                 centerRibbonLinearRight={colors.centerRibbonLinearRightTop1}
+                                textContent="Top 1"
                             />
-                            <Text style={[
-                                rankingStyleSheet.ribbonTextTop1,
-                                {
-                                    fontSize: 14
-                                }
-                            ]}>Top 1</Text>
+                        </View>
+
+                        {/* Username + Diamond Value */}
+                        <View style={[
+                            rankingStyleSheet.rankingContentContainer,
+                            {
+                                bottom: -70
+                            }
+                        ]}>
+                            <Text
+                                style={rankingStyleSheet.userName}
+                                numberOfLines={1}
+                            >
+                                Tuấn Kiệt
+                            </Text>
+
+                            <View style={rankingStyleSheet.diamondDetailContainer}>
+                                <Text
+                                    style={rankingStyleSheet.diamondValue}
+                                    numberOfLines={1}
+                                >
+                                    15700
+                                </Text>
+                                <Image
+                                    source={require("../../assets/images/ptk-diamond-pool.png")}
+                                    style={rankingStyleSheet.rankingContentImage}
+                                />
+                            </View>
                         </View>
                     </View>
                 </View>
@@ -204,9 +261,7 @@ export default function Ranking() {
                 <View style={[
                     rankingStyleSheet.topThreeItemContainer,
                     {
-                        height: ScreenHeight / 6.5,
-                        borderRightWidth: 1.5,
-                        borderTopRightRadius: 10
+                        height: ScreenHeight / 8.5,
                     }
                 ]}>
                     <LinearGradient
@@ -219,10 +274,15 @@ export default function Ranking() {
                         ]}
                     />
 
-                    {/* Avatar + Ribbon */}
+                    {/* Custom linear border */}
+                    <View style={rankingStyleSheet.top3BorderContainer}>
+                        <View style={rankingStyleSheet.top3BorderBlur} />
+                    </View>
+
+                    {/* Avatar + Username + Diamond Value + Ribbon */}
                     <View style={rankingStyleSheet.imageContainer}>
                         <UserAvatar
-                            avatarUrl="https://picsum.photos/id/242/200"
+                            avatarUrl="https://picsum.photos/id/236/200"
                             imageWidth={ScreenWidth / 8.5}
                             imageHeight={ScreenWidth / 8.5}
                             imageBorderRadius={50}
@@ -241,14 +301,109 @@ export default function Ranking() {
                                 rightRibbonLinearRight={colors.rightRibbonLinearRightTop3}
                                 centerRibbonLinearLeft={colors.centerRibbonLinearLeftTop3}
                                 centerRibbonLinearRight={colors.centerRibbonLinearRightTop3}
+                                textContent="Top 3"
                             />
-                            <Text style={[
-                                rankingStyleSheet.ribbonTextTop3,
-                                {
-                                    fontSize: 13
-                                }
-                            ]}>Top 3</Text>
                         </View>
+
+                        {/* Username + Diamond Value */}
+                        <View style={rankingStyleSheet.rankingContentContainer}>
+                            <Text
+                                style={rankingStyleSheet.userName}
+                                numberOfLines={1}
+                            >
+                                Hữu Thuần
+                            </Text>
+
+                            <View style={rankingStyleSheet.diamondDetailContainer}>
+                                <Text
+                                    style={rankingStyleSheet.diamondValue}
+                                    numberOfLines={1}
+                                >
+                                    12300
+                                </Text>
+                                <Image
+                                    source={require("../../assets/images/ptk-diamond-pool.png")}
+                                    style={rankingStyleSheet.rankingContentImage}
+                                />
+                            </View>
+                        </View>
+                    </View>
+                </View>
+            </View>
+
+            <View style={rankingStyleSheet.otherUsersContainer}>
+                {/* Server selection */}
+                <View style={rankingStyleSheet.serverContainer}>
+                    <TouchableOpacity
+                        style={rankingStyleSheet.serverSelectionBtn}
+                        touchSoundDisabled={true}
+                        onPress={() => {
+                            setServerSelect("Xavalo");
+                        }}
+                    >
+                        <LinearGradient
+                            colors={theme === "dark" ? [colors.lightBlue, colors.lighterBlue2] : [colors.lightOrange, colors.lighterOrange]} // Hiệu ứng chuyển màu
+                            style={[
+                                rankingStyleSheet.serverSelectionBtnLinear,
+                                {
+                                    borderTopLeftRadius: 15,
+                                    opacity: serverSelect === "Xavalo" ? 0.5 : 1
+                                }
+                            ]}
+                        />
+                        <Text style={[
+                            rankingStyleSheet.serverSelectName,
+                            {
+                                display: serverSelect === "Xavalo" ? "none" : undefined
+                            }
+                        ]}>
+                            Xavalo
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={rankingStyleSheet.serverSelectionBtn}
+                        touchSoundDisabled={true}
+                        onPress={() => {
+                            setServerSelect("All");
+                        }}
+                    >
+                        <LinearGradient
+                            colors={theme === "dark" ? [colors.lightBlue, colors.lighterBlue2] : [colors.lightOrange, colors.lighterOrange]} // Hiệu ứng chuyển màu
+                            style={[
+                                rankingStyleSheet.serverSelectionBtnLinear,
+                                {
+                                    borderTopRightRadius: 15,
+                                    opacity: serverSelect === "All" ? 0.5 : 1
+                                }
+                            ]}
+                        />
+                        <Text style={[
+                            rankingStyleSheet.serverSelectName,
+                            {
+                                display: serverSelect === "All" ? "none" : undefined
+                            }
+                        ]}>
+                            {t("server-all")}
+                        </Text>
+                    </TouchableOpacity>
+                    <View style={[
+                        rankingStyleSheet.serverSelectedBg,
+                        {
+                            left: serverSelect === "Xavalo" ? 0 : undefined,
+                            right: serverSelect === "All" ? 0 : undefined
+                        }
+                    ]}>
+                        <LinearGradient
+                            colors={theme === "dark" ? [colors.darkBlue, colors.superBlurWhite] : [colors.darkOrange, colors.superBlurWhite]} // Hiệu ứng chuyển màu
+                            style={rankingStyleSheet.serverSelectedBgLinear}
+                        />
+                        <Text style={rankingStyleSheet.serverSelectedName}>
+                            {
+                                serverSelect === "All" ? t("server-all") :
+                                    serverSelect === "Quy Nhơn" ? t("server-quy-nhon") :
+                                        serverSelect
+                            }
+                        </Text>
                     </View>
                 </View>
             </View>

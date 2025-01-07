@@ -7,4 +7,5 @@ export type RankingRibbonProps = {
     leftRibbonLinearRight: string;
     rightRibbonLinearLeft: string;
     rightRibbonLinearRight: string;
+    textContent: string;
 }

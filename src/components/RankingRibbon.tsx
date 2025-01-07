@@ -1,6 +1,7 @@
 import React from 'react'
-import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg'
+import Svg, { Defs, LinearGradient, Path, Stop, Text } from 'react-native-svg'
 import { RankingRibbonProps } from './types/rankingRibbonTypes';
+import { colors } from '../constants/colors';
 
 export default function RankingRibbon({
     width,
@@ -11,6 +12,7 @@ export default function RankingRibbon({
     rightRibbonLinearRight,
     centerRibbonLinearLeft,
     centerRibbonLinearRight,
+    textContent,
 }: RankingRibbonProps) {
     return (
         <Svg
@@ -53,6 +55,18 @@ export default function RankingRibbon({
                 d="M20 13 C30 0,85 0, 90 13 V33 C85 20, 30 20, 20 33 Z"
                 fill={"url(#ribbonCenterBackground)"}
             />
+
+            <Text
+                x="56.5" // Vị trí ngang (tâm x)
+                y="14" // Vị trí dọc (tâm y)
+                fill={colors.white} // Màu chữ
+                fontSize="15" // Kích thước chữ
+                fontWeight="bold" // Độ dày chữ
+                textAnchor="middle" // Căn giữa theo chiều ngang
+                alignmentBaseline="middle" // Căn giữa theo chiều dọc
+            >
+                {textContent}
+            </Text>
         </Svg>
     )
 }
