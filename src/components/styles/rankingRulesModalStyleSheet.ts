@@ -69,6 +69,13 @@ const rankingRulesModalStyleSheet = StyleSheet.create({
         color: colors.lightBlue,
         paddingLeft: 30,
         marginRight: 15,
+    },
+    rulesSubContent: {
+        fontSize: 16,
+        fontWeight: "500",
+        color: colors.lightBlue,
+        paddingLeft: 45,
+        marginRight: 15,
     }
 });
 

@@ -12,6 +12,7 @@ export const colors = {
     lighterBlue: "#A8B6F1",
     lighterBlue2: "#6E7ED3",
     grey: "rgba(0, 0, 0, 0.5)",
+    disabled: "#AFA79E",
     blurBlack: "rgba(0, 0, 0, 0.3)",
     black: "black",
     pastelDark: "#B3CFBD",
@@ -31,6 +32,8 @@ export const colors = {
     superBlurWhite: "rgba(255,255,255,0.02)",
     superBlurWhite2: "rgba(255,255,255,0.01)",
     brown: "#E5C09A",
+    darkBrown: "#58381E",
+    mediumBrown: "#6A4627",
     centerRibbonLinearLeftTop1: "#FDE07B",
     centerRibbonLinearRightTop1: "#FFCE68",
     leftRibbonLinearLeftTop1: "#F8DD65",
@@ -53,5 +56,7 @@ export const colors = {
     femaleGender: "#FF6D9D",
     femaleGender2: "#FC4581",
     likesColor: "#1877F2",
-    diamond: "#00BFFF"
+    diamond: "#00BFFF",
+    diamond1: "#94D4F5",
+    diamond2: "#3868A4"
 };

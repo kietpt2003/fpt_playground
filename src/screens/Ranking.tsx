@@ -20,6 +20,7 @@ import RankingCurrentUser from '../components/RankingCurrentUser';
 import { Menu, MenuItem } from 'react-native-material-menu';
 import useClick from '../hooks/useClick';
 import RankingRulesModal from '../components/RankingRulesModal';
+import { StatusBar } from 'expo-status-bar';
 
 const rankingUsers: RankingUser[] = [
     {
@@ -745,6 +746,10 @@ export default function Ranking() {
                     user={currentUserRank.user}
                 />
             </View>
+
+            <StatusBar backgroundColor={
+                isOpenRules ? "rgba(0,0,0,0.7)" : undefined
+            } />
 
             <RankingRulesModal
                 isOpenRules={isOpenRules}

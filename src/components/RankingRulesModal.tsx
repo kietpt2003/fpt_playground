@@ -114,6 +114,7 @@ export default function RankingRulesModal({ isOpenRules, setOpenRules }: Ranking
                     onContentSizeChange={handleContentSizeChange}
                     scrollEventThrottle={16}
                 >
+                    {/* Top 100 SV */}
                     <Text style={[
                         rankingRulesModalStyleSheet.rulesHeader,
                         {
@@ -122,48 +123,108 @@ export default function RankingRulesModal({ isOpenRules, setOpenRules }: Ranking
                     ]}>
                         {t("ranking-rules-header1")}
                     </Text>
-                    <Text style={[
-                        rankingRulesModalStyleSheet.rulesSubHeader,
-                        {
-                            color: theme === "dark" ? colors.darkBlue : colors.darkOrange
-                        }
-                    ]}>
-                        {t("ranking-rules-subheader1-1")}
-                    </Text>
-                    <Text style={[
-                        rankingRulesModalStyleSheet.rulesContent,
-                        {
-                            color: theme === "dark" ? colors.darkBlue : colors.lightOrange
-                        }
-                    ]}>
-                        {t("ranking-rules-content-1-1-1")}
-                    </Text>
-                    <Text style={[
-                        rankingRulesModalStyleSheet.rulesContent,
-                        {
-                            color: theme === "dark" ? colors.darkBlue : colors.lightOrange
-                        }
-                    ]}>
-                        {t("ranking-rules-content-1-1-2")}
-                    </Text>
 
-                    <Text style={[
-                        rankingRulesModalStyleSheet.rulesSubHeader,
-                        {
-                            color: theme === "dark" ? colors.darkBlue : colors.darkOrange
-                        }
-                    ]}>
-                        {t("ranking-rules-subheader1-2")}
-                    </Text>
-                    <Text style={[
-                        rankingRulesModalStyleSheet.rulesContent,
-                        {
-                            color: theme === "dark" ? colors.darkBlue : colors.lightOrange
-                        }
-                    ]}>
-                        {t("ranking-rules-content-1-2-1")}
-                    </Text>
+                    {/* Top 100 SV - Rule 1 */}
+                    <>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesSubHeader,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.darkOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-subheader1-1")}
+                        </Text>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesContent,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-content-1-1-1")}
+                        </Text>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesContent,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-content-1-1-2")}
+                        </Text>
+                    </>
 
+                    {/* Top 100 SV - Rule 2 */}
+                    <>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesSubHeader,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.darkOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-subheader1-2")}
+                        </Text>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesContent,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-content-1-2-1")}
+                        </Text>
+                    </>
+
+                    {/* Top 100 SV - Rule 3 */}
+                    <>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesSubHeader,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.darkOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-subheader1-3")}
+                        </Text>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesContent,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-content-1-3-1")}
+                        </Text>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesContent,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-content-1-3-2")}
+                        </Text>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesContent,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-content-1-3-3")}
+                        </Text>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesContent,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-content-1-3-4")}
+                        </Text>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesContent,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-content-1-3-5")}
+                        </Text>
+                    </>
+
+                    {/* Top 100 Group */}
                     <Text style={[
                         rankingRulesModalStyleSheet.rulesHeader,
                         {
@@ -172,64 +233,221 @@ export default function RankingRulesModal({ isOpenRules, setOpenRules }: Ranking
                     ]}>
                         {t("ranking-rules-header2")}
                     </Text>
-                    <Text style={[
-                        rankingRulesModalStyleSheet.rulesSubHeader,
+
+                    {/* Top 100 Group - Rule 1 */}
+                    <>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesSubHeader,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.darkOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-subheader2-1")}
+                        </Text>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesContent,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-content-2-1-1")}
+                        </Text>
+                    </>
+
+                    {/* Top 100 Group - Rule 2 */}
+                    <>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesSubHeader,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.darkOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-subheader2-2")}
+                        </Text>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesContent,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-content-2-2-1")}
+                        </Text>
+                    </>
+
+                    {/* Top 100 Group - Rule 3 */}
+                    <>
+                        <Text style={[rankingRulesModalStyleSheet.rulesSubHeader,
                         {
                             color: theme === "dark" ? colors.darkBlue : colors.darkOrange
                         }
-                    ]}>
-                        {t("ranking-rules-subheader2-1")}
-                    </Text>
-                    <Text style={[
-                        rankingRulesModalStyleSheet.rulesContent,
-                        {
-                            color: theme === "dark" ? colors.darkBlue : colors.lightOrange
-                        }
-                    ]}>
-                        {t("ranking-rules-content-2-1-1")}
-                    </Text>
+                        ]}>
+                            {t("ranking-rules-subheader2-3")}
+                        </Text>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesContent,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-content-2-3-1")}
+                        </Text>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesContent,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-content-2-3-2")}
+                        </Text>
+                    </>
 
-                    <Text style={[
-                        rankingRulesModalStyleSheet.rulesSubHeader,
+                    {/* Top 100 Group - Rule 4 */}
+                    <>
+                        <Text style={[rankingRulesModalStyleSheet.rulesSubHeader,
                         {
                             color: theme === "dark" ? colors.darkBlue : colors.darkOrange
                         }
-                    ]}>
-                        {t("ranking-rules-subheader2-2")}
-                    </Text>
-                    <Text style={[
-                        rankingRulesModalStyleSheet.rulesContent,
-                        {
-                            color: theme === "dark" ? colors.darkBlue : colors.lightOrange
-                        }
-                    ]}>
-                        {t("ranking-rules-content-2-2-1")}
-                    </Text>
+                        ]}>
+                            {t("ranking-rules-subheader2-4")}
+                        </Text>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesContent,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-content-2-4-1")}
+                        </Text>
+                        {/* Sub content */}
+                        <>
+                            <Text style={[
+                                rankingRulesModalStyleSheet.rulesSubContent,
+                                {
+                                    color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                                }
+                            ]}>
+                                {t("ranking-rules-subcontent-2-4-1-1")}
+                            </Text>
+                            <Text style={[
+                                rankingRulesModalStyleSheet.rulesSubContent,
+                                {
+                                    color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                                }
+                            ]}>
+                                {t("ranking-rules-subcontent-2-4-1-2")}
+                            </Text>
+                        </>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesContent,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-content-2-4-2")}
+                        </Text>
+                        {/* Sub content */}
+                        <>
+                            <Text style={[
+                                rankingRulesModalStyleSheet.rulesSubContent,
+                                {
+                                    color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                                }
+                            ]}>
+                                {t("ranking-rules-subcontent-2-4-2-1")}
+                            </Text>
+                            <Text style={[
+                                rankingRulesModalStyleSheet.rulesSubContent,
+                                {
+                                    color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                                }
+                            ]}>
+                                {t("ranking-rules-subcontent-2-4-2-2")}
+                            </Text>
+                        </>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesContent,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-content-2-4-3")}
+                        </Text>
+                        {/* Sub content */}
+                        <>
+                            <Text style={[
+                                rankingRulesModalStyleSheet.rulesSubContent,
+                                {
+                                    color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                                }
+                            ]}>
+                                {t("ranking-rules-subcontent-2-4-3-1")}
+                            </Text>
+                            <Text style={[
+                                rankingRulesModalStyleSheet.rulesSubContent,
+                                {
+                                    color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                                }
+                            ]}>
+                                {t("ranking-rules-subcontent-2-4-3-2")}
+                            </Text>
+                        </>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesContent,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-content-2-4-4")}
+                        </Text>
+                        {/* Sub content */}
+                        <>
+                            <Text style={[
+                                rankingRulesModalStyleSheet.rulesSubContent,
+                                {
+                                    color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                                }
+                            ]}>
+                                {t("ranking-rules-subcontent-2-4-4-1")}
+                            </Text>
+                            <Text style={[
+                                rankingRulesModalStyleSheet.rulesSubContent,
+                                {
+                                    color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                                }
+                            ]}>
+                                {t("ranking-rules-subcontent-2-4-4-2")}
+                            </Text>
+                        </>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesContent,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-content-2-4-5")}
+                        </Text>
+                        {/* Sub content */}
+                        <>
+                            <Text style={[
+                                rankingRulesModalStyleSheet.rulesSubContent,
+                                {
+                                    color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                                }
+                            ]}>
+                                {t("ranking-rules-subcontent-2-4-5-1")}
+                            </Text>
+                            <Text style={[
+                                rankingRulesModalStyleSheet.rulesSubContent,
+                                {
+                                    color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                                }
+                            ]}>
+                                {t("ranking-rules-subcontent-2-4-5-2")}
+                            </Text>
+                        </>
+                    </>
 
-                    <Text style={[rankingRulesModalStyleSheet.rulesSubHeader,
-                    {
-                        color: theme === "dark" ? colors.darkBlue : colors.darkOrange
-                    }
-                    ]}>
-                        {t("ranking-rules-subheader2-3")}
-                    </Text>
-                    <Text style={[
-                        rankingRulesModalStyleSheet.rulesContent,
-                        {
-                            color: theme === "dark" ? colors.darkBlue : colors.lightOrange
-                        }
-                    ]}>
-                        {t("ranking-rules-content-2-3-1")}
-                    </Text>
-                    <Text style={[
-                        rankingRulesModalStyleSheet.rulesContent,
-                        {
-                            color: theme === "dark" ? colors.darkBlue : colors.lightOrange
-                        }
-                    ]}>
-                        {t("ranking-rules-content-2-3-2")}
-                    </Text>
-
+                    {/* Notice */}
                     <Text style={[rankingRulesModalStyleSheet.rulesHeader,
                     {
                         color: theme === "dark" ? colors.darkBlue : colors.darkOrange
@@ -237,14 +455,42 @@ export default function RankingRulesModal({ isOpenRules, setOpenRules }: Ranking
                     ]}>
                         {t("ranking-rules-header3")}
                     </Text>
-                    <Text style={[
-                        rankingRulesModalStyleSheet.rulesContent,
-                        {
-                            color: theme === "dark" ? colors.darkBlue : colors.lightOrange
-                        }
-                    ]}>
-                        {t("ranking-rules-content-3")}
-                    </Text>
+
+                    {/* Notice - Content */}
+                    <>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesContent,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-content-3")}
+                        </Text>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesContent,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-content-3-1")}
+                        </Text>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesContent,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-content-3-2")}
+                        </Text>
+                        <Text style={[
+                            rankingRulesModalStyleSheet.rulesContent,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.lightOrange
+                            }
+                        ]}>
+                            {t("ranking-rules-content-3-3")}
+                        </Text>
+                    </>
                 </ScrollView>
             </View>
         </Modal>

@@ -65,8 +65,7 @@ export default function HomeScreen() {
                             require('../../assets/images/home-light-header.webp')
                     }
                     style={homeScreenStyleSheet.backgroundImage}
-                >
-                </ImageBackground>
+                />
 
                 {/* Header left */}
                 <HeaderLeft />
