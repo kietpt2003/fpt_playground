@@ -9,6 +9,7 @@ export type RootStackParamList = {
     HomeScreen: undefined;
     GroupChat: { firstFilter: number };
     Ranking: undefined;
+    RankingReward: undefined;
 };
 
 export type NavigationProps = StackNavigationProp<RootStackParamList>;

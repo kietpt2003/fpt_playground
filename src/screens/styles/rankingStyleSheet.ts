@@ -235,7 +235,22 @@ const rankingStyleSheet = StyleSheet.create({
         height: "100%",
         borderTopLeftRadius: 15,
         borderTopRightRadius: 15,
-    }
+    },
+    menuItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: "space-between",
+        paddingVertical: 6, // Giảm padding dọc
+        backgroundColor: colors.milkyWhite,
+        height: ScreenHeight / 8
+    },
+    menuItemTxt: {
+        fontSize: 16,
+        flex: 0.9,
+        textAlign: 'left',
+        flexWrap: "nowrap", // Ngăn xuống dòng
+        overflow: "hidden", // Ngăn tràn nội dung
+    },
 });
 
 export default rankingStyleSheet;

@@ -1,4 +1,6 @@
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ServerName } from "../../constants/entities/Server";
+import { RootStackParamList } from "../../navigation/types/types";
 
 export type RankingUser = {
     userId: string;
@@ -15,3 +17,5 @@ export type RankingUser = {
 export type RankingUserProps = {
     user: RankingUser;
 }
+
+export type RankingNavigationProp = NativeStackNavigationProp<RootStackParamList, 'RankingReward'>;

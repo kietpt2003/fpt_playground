@@ -124,7 +124,7 @@ export default function HomeScreen() {
                                 }}
                             >
                                 <View style={homeScreenStyleSheet.menuItem}>
-                                    <Ionicons name={"person-circle-outline"} size={24} color={"black"} />
+                                    <Ionicons name={"person-circle-outline"} size={24} color={colors.black} />
                                     <Text style={homeScreenStyleSheet.menuItemTxt}>
                                         {t("profile")}
                                     </Text>
@@ -138,7 +138,7 @@ export default function HomeScreen() {
                                 }}
                             >
                                 <View style={homeScreenStyleSheet.menuItem}>
-                                    <Ionicons name={"settings-outline"} size={21} color={"black"} />
+                                    <Ionicons name={"settings-outline"} size={21} color={colors.black} />
                                     <Text style={homeScreenStyleSheet.menuItemTxt}>
                                         {t("settings")}
                                     </Text>
@@ -169,7 +169,7 @@ export default function HomeScreen() {
                                 }}
                             >
                                 <View style={homeScreenStyleSheet.menuItem}>
-                                    <MaterialIcons name={"logout"} size={20} color={"black"} />
+                                    <MaterialIcons name={"logout"} size={20} color={colors.black} />
                                     <Text style={homeScreenStyleSheet.menuItemTxt}>
                                         {t("signout")}
                                     </Text>

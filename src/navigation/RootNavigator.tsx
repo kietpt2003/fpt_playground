@@ -17,6 +17,7 @@ import HomeScreen from "../screens/HomeScreen";
 import GroupChat from "../screens/GroupChat";
 import { setHomeGuideline, setIsOpenDailyCheckPoint } from "../store/reducers/homeReducer";
 import Ranking from "../screens/Ranking";
+import RankingRewards from "../screens/RankingRewards";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -89,6 +90,7 @@ export default function RootNavigator({ onMount }: RootNavigatorProps) {
             <Stack.Screen name="HomeScreen" component={HomeScreen} />
             <Stack.Screen name="GroupChat" component={GroupChat} />
             <Stack.Screen name="Ranking" component={Ranking} />
+            <Stack.Screen name="RankingReward" component={RankingRewards} />
         </Stack.Navigator>
     )
 }

@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, FlatList } from 'react-native'
 import React, { useState } from 'react'
 import { colors } from '../constants/colors'
-import { AntDesign, Ionicons } from '@expo/vector-icons';
+import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient'
 import { useSelector } from 'react-redux'
 import { RootState } from '../store/store'
@@ -13,10 +13,13 @@ import RankingRibbon from '../components/RankingRibbon';
 import { Image } from 'react-native';
 import { ServerNameAll } from '../constants/entities/Server';
 import { useTranslation } from 'react-i18next';
-import { RankingUser, RankingUserProps } from './types/rankingTypes';
+import { RankingNavigationProp, RankingUser, RankingUserProps } from './types/rankingTypes';
 import RankingUserItem from '../components/RankingUserItem';
 import RankingFlatListHeader from '../components/RankingFlatListHeader';
 import RankingCurrentUser from '../components/RankingCurrentUser';
+import { Menu, MenuItem } from 'react-native-material-menu';
+import useClick from '../hooks/useClick';
+import RankingRulesModal from '../components/RankingRulesModal';
 
 const rankingUsers: RankingUser[] = [
     {
@@ -258,12 +261,26 @@ const currentUserRank: RankingUserProps = {
 export default function Ranking() {
     const theme = useSelector((state: RootState) => state.theme.theme);
 
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
-    const navigation = useNavigation();
+    const navigation = useNavigation<RankingNavigationProp>();
 
     const [headerSelect, setHeaderSelect] = useState<"CollegeStudent" | "GroupChat">("CollegeStudent");
     const [serverSelect, setServerSelect] = useState<ServerNameAll>("Xavalo");
+
+    const { playSound } = useClick();
+
+    const [menuVisible, setMenuVisible] = useState<boolean>(false);
+    const showMenu = () => {
+        playSound(); // Phát âm thanh khi bấm
+        setMenuVisible(true);
+    };
+    const hideMenu = () => {
+        playSound(); // Phát âm thanh khi bấm
+        setMenuVisible(false);
+    };
+
+    const [isOpenRules, setOpenRules] = useState<boolean>(false);
 
     return (
         <View style={rankingStyleSheet.container}>
@@ -288,6 +305,7 @@ export default function Ranking() {
                     />
                 </TouchableOpacity>
 
+                {/* College student */}
                 <TouchableOpacity
                     style={[
                         rankingStyleSheet.headerButton,
@@ -308,6 +326,7 @@ export default function Ranking() {
                     }
                 </TouchableOpacity>
 
+                {/* Group */}
                 <TouchableOpacity
                     style={[
                         rankingStyleSheet.headerButton,
@@ -327,15 +346,63 @@ export default function Ranking() {
                     }
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                    touchSoundDisabled={true}
+                <Menu
+                    visible={menuVisible}
+                    anchor={
+                        <TouchableOpacity
+                            onPress={showMenu}
+                            touchSoundDisabled={true}
+                        >
+                            <Ionicons
+                                name="ellipsis-horizontal"
+                                size={28}
+                                color={colors.white}
+                            />
+                        </TouchableOpacity>
+                    }
+                    onRequestClose={hideMenu}
+                    style={{
+                        position: "absolute",
+                        top: 35,
+                        borderRadius: 10,
+                        width: i18n.language === "vi" ? 170 : 220,
+                        backgroundColor: colors.milkyWhite,
+                    }}
                 >
-                    <Ionicons
-                        name="ellipsis-horizontal"
-                        size={28}
-                        color={colors.white}
-                    />
-                </TouchableOpacity>
+                    {/* Rules */}
+                    <MenuItem
+                        onPress={() => {
+                            hideMenu();
+                            setOpenRules(true);
+                        }}
+                    >
+                        <View style={rankingStyleSheet.menuItem}>
+                            <FontAwesome
+                                name="question-circle-o"
+                                size={24}
+                                color={colors.black}
+                            />
+                            <Text style={rankingStyleSheet.menuItemTxt}>
+                                {t("rules")}
+                            </Text>
+                        </View>
+                    </MenuItem>
+
+                    {/* Rewards */}
+                    <MenuItem
+                        onPress={() => {
+                            hideMenu();
+                            navigation.navigate("RankingReward");
+                        }}
+                    >
+                        <View style={rankingStyleSheet.menuItem}>
+                            <Ionicons name={"gift-outline"} size={21} color={colors.black} />
+                            <Text style={rankingStyleSheet.menuItemTxt}>
+                                {t("rewards")}
+                            </Text>
+                        </View>
+                    </MenuItem>
+                </Menu>
             </View>
 
             {/* Top 3 users */}
@@ -678,6 +745,11 @@ export default function Ranking() {
                     user={currentUserRank.user}
                 />
             </View>
+
+            <RankingRulesModal
+                isOpenRules={isOpenRules}
+                setOpenRules={setOpenRules}
+            />
         </View>
     )
 }
