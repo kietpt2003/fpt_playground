@@ -257,6 +257,9 @@ export default function HomeScreen() {
                             style={homeScreenStyleSheet.featureButton}
                             disabled={isGuideline}
                             touchSoundDisabled={true}
+                            onPress={() => {
+                                navigation.navigate("DailyCheckPointScreen");
+                            }}
                         >
                             <Text style={{
                                 color: theme === "dark" ? colors.white : colors.black
@@ -274,6 +277,9 @@ export default function HomeScreen() {
                     <TouchableOpacity
                         disabled={isGuideline}
                         touchSoundDisabled={true}
+                        onPress={() => {
+                            navigation.navigate("DailyCheckPointScreen");
+                        }}
                     >
                         <Image
                             source={require("../../assets/images/checkinBg.png")}

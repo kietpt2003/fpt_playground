@@ -14,24 +14,25 @@ import { colors } from "../constants/colors";
 import useClick from "../hooks/useClick";
 import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import dailyCheckPointStyleSheet from "./styles/dailyCheckPointStyleSheet";
-import { DailyCheckPointProps, DailyCheckPointItem } from "./types/dailyCheckPointTypes";
+import { DailyCheckPointProps, DailyCheckPointItemProps } from "./types/dailyCheckPointTypes";
 import { useTranslation } from "react-i18next";
 import { setIsOpenDailyCheckPoint } from "../store/reducers/homeReducer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import DailyCheckPointItem from "./DailyCheckPointItem";
 
 export default function DailyCheckPoint({ isOpenDailyCheckPoint }: DailyCheckPointProps) {
     const theme = useSelector((state: RootState) => state.theme.theme);
     const { playSound } = useClick();
     const { t } = useTranslation();
-    const [data, setData] = useState<DailyCheckPointItem[]>([]);
-    const [sundayCheckPoint, setSundayCheckPoint] = useState<DailyCheckPointItem | null>(null);
+    const [data, setData] = useState<DailyCheckPointItemProps[]>([]);
+    const [sundayCheckPoint, setSundayCheckPoint] = useState<DailyCheckPointItemProps | null>(null);
 
     const dispatch = useDispatch()
 
     useEffect(() => {
         // Gọi API
         const fetchDailyCheckPoint = async () => {
-            const response: DailyCheckPointItem[] = [
+            const response: DailyCheckPointItemProps[] = [
                 {
                     date: t("monday"),
                     dayStatus: "Past",
@@ -137,78 +138,18 @@ export default function DailyCheckPoint({ isOpenDailyCheckPoint }: DailyCheckPoi
                     </TouchableOpacity>
 
                     <View style={dailyCheckPointStyleSheet.flatListContainer}>
-                        <FlatList<DailyCheckPointItem>
+                        <FlatList<DailyCheckPointItemProps>
                             data={data}
                             scrollEnabled={false}
                             showsHorizontalScrollIndicator={false}
                             showsVerticalScrollIndicator={false}
                             renderItem={({ item }) => (
-                                <TouchableOpacity
-                                    style={dailyCheckPointStyleSheet.checkPointItemContainer}
-                                    disabled={item.status === "Checked" || item.dayStatus !== "Today"}
-                                    touchSoundDisabled={true}
-                                >
-                                    <LinearGradient
-                                        colors={[colors.lightYellow, colors.darkYellow]} // Hiệu ứng chuyển màu
-                                        style={dailyCheckPointStyleSheet.checkPointItemBgLinear}
-                                    />
-
-                                    <View style={dailyCheckPointStyleSheet.dateItemContainer}>
-                                        <LinearGradient
-                                            colors={[colors.icyWhite, colors.white]} // Hiệu ứng chuyển màu
-                                            style={dailyCheckPointStyleSheet.dateItemContainerLinear}
-                                        />
-                                        <Text style={dailyCheckPointStyleSheet.dateItemTxt}>
-                                            {item.date}
-                                        </Text>
-                                    </View>
-
-                                    {/* Hết hạn ở quá khứ */}
-                                    {
-                                        (item.dayStatus !== "Future" && item.dayStatus !== "Today" && item.status === "Not checked") &&
-                                        <View style={dailyCheckPointStyleSheet.notCheckedContainer}>
-                                            <Text style={dailyCheckPointStyleSheet.notCheckedTxt}>
-                                                {t("daily-expired")}
-                                            </Text>
-                                        </View>
-                                    }
-
-                                    {/* Đã nhận ở quá khứ và hiện tại */}
-                                    {
-                                        (item.dayStatus !== "Future" && item.status === "Checked") &&
-                                        <View style={dailyCheckPointStyleSheet.checkedContainer}>
-                                            <Text style={dailyCheckPointStyleSheet.checkedTxt}>
-                                                {t("daily-checked")}
-                                            </Text>
-                                        </View>
-                                    }
-
-                                    {/* Tương lai thì khóa */}
-                                    {
-                                        (item.dayStatus !== "Today") &&
-                                        <View style={dailyCheckPointStyleSheet.lockContainer}>
-                                            {
-                                                (item.dayStatus === "Future") &&
-                                                <MaterialCommunityIcons name="lock" size={50} color={colors.brown} />
-                                            }
-                                        </View>
-                                    }
-
-                                    <Image
-                                        source={require("../../assets/images/ptk-coin.png")}
-                                        style={dailyCheckPointStyleSheet.coinImage}
-                                    />
-                                    <Text style={
-                                        [
-                                            dailyCheckPointStyleSheet.valueTxt,
-                                            {
-                                                color: colors.black,
-                                            }
-                                        ]
-                                    }>
-                                        +{item.value} {t("coin")}
-                                    </Text>
-                                </TouchableOpacity>
+                                <DailyCheckPointItem
+                                    date={item.date}
+                                    value={item.value}
+                                    dayStatus={item.dayStatus}
+                                    status={item.status}
+                                />
                             )}
                             keyExtractor={(item, index) => index.toString()}
                             numColumns={3} // Hiển thị 2 cột
@@ -220,7 +161,6 @@ export default function DailyCheckPoint({ isOpenDailyCheckPoint }: DailyCheckPoi
                                 justifyContent: "space-evenly", // Giãn đều theo trục dọc
                             }}
                         />
-
                     </View>
 
                     <TouchableOpacity

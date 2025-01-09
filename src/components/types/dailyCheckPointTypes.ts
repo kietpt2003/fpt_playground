@@ -2,7 +2,7 @@ export type DailyCheckPointProps = {
     isOpenDailyCheckPoint: boolean,
 }
 
-export type DailyCheckPointItem = {
+export type DailyCheckPointItemProps = {
     date: string,
     dayStatus: "Past" | "Today" | "Future",
     value: number,

@@ -10,6 +10,7 @@ export type RootStackParamList = {
     GroupChat: { firstFilter: number };
     Ranking: undefined;
     RankingReward: undefined;
+    DailyCheckPointScreen: undefined;
 };
 
 export type NavigationProps = StackNavigationProp<RootStackParamList>;
