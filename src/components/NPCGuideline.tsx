@@ -30,7 +30,8 @@ export default function NPCGuideline({ scrollViewRef, onScrolling, setOnScrollin
     const user: User = {
         id: "userId1",
         name: "Huu Thuan",
-        gender: "Male"
+        gender: "Male",
+        imageUrl: "https://picsum.photos/id/237/200"
     }
 
     const [showBlurBg, setShowBlurBg] = useState(true);

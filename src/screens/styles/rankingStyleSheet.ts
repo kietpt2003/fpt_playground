@@ -25,7 +25,8 @@ const rankingStyleSheet = StyleSheet.create({
     headerText: {
         fontSize: 20,
         fontWeight: "600",
-        color: colors.white
+        color: colors.white,
+        fontFamily: "Roboto"
     },
     headerButtonUnderline: {
         width: "35%",
@@ -151,7 +152,8 @@ const rankingStyleSheet = StyleSheet.create({
         fontSize: 18,
         color: colors.icyWhite,
         fontWeight: "500",
-        textAlign: "center"
+        textAlign: "center",
+        fontFamily: "Roboto"
     },
     diamondDetailContainer: {
         flexDirection: "row",
@@ -165,6 +167,7 @@ const rankingStyleSheet = StyleSheet.create({
         textShadowColor: "rgba(0, 0, 0, 0.3)", // Viền đen rõ
         textShadowOffset: { width: -1, height: -1 }, // Viền trái/trên
         textShadowRadius: 1,
+        fontFamily: "Roboto"
     },
     rankingContentImage: {
         width: ScreenHeight / 39,
@@ -209,13 +212,15 @@ const rankingStyleSheet = StyleSheet.create({
         fontSize: 16,
         fontWeight: "600",
         color: colors.white,
-        textAlign: "center"
+        textAlign: "center",
+        fontFamily: "Roboto"
     },
     serverSelectedName: {
         fontSize: 18,
         fontWeight: "600",
         color: colors.white,
-        textAlign: "center"
+        textAlign: "center",
+        fontFamily: "Roboto"
     },
     faltListFooterStyle: {
         height: ScreenHeight / 9,
@@ -250,6 +255,7 @@ const rankingStyleSheet = StyleSheet.create({
         textAlign: 'left',
         flexWrap: "nowrap", // Ngăn xuống dòng
         overflow: "hidden", // Ngăn tràn nội dung
+        fontFamily: "Roboto"
     },
 });
 

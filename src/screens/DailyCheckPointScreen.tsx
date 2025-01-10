@@ -8,7 +8,7 @@ import { AntDesign, Entypo, FontAwesome, Ionicons, MaterialCommunityIcons } from
 import { colors } from '../constants/colors';
 import useClick from '../hooks/useClick';
 import { useNavigation } from '@react-navigation/native';
-import StarSVGLinear from '../components/starSVGLinear';
+import StarSVGLinear from '../components/StarSVGLinear';
 import { ScreenHeight } from '@rneui/base';
 import { useTranslation } from 'react-i18next';
 import { DailyCheckPointItemProps } from '../components/types/dailyCheckPointTypes';

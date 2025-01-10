@@ -28,7 +28,7 @@
     "signup-title": "Đăng Ký FPT Playground",
     "settings": "Cài đặt",
     "hello": "Chào",
-    "ptk-coin": "PTK Xu",
+    "change-coin": "Đổi Xu",
     "signout": "Đăng xuất",
     "profile": "Cá nhân",
     "member-since": "Thành viên từ ",
@@ -137,5 +137,7 @@
     "achievements": "Thành tựu",
     "achievements-decriptive": "Chạm mốc thành tựu và nhận những phần quà thú vị.",
     "games": "Thú cưng Playground",
-    "games-content": "Nuôi thú cưng nhận xu lưng lưng."
+    "games-content": "Nuôi thú cưng nhận xu lưng lưng.",
+    "chat-title-header": "Tin nhắn",
+    "search-friend-placeholder": "Tìm kiếm"
 }

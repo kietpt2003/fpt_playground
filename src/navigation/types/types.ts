@@ -11,6 +11,7 @@ export type RootStackParamList = {
     Ranking: undefined;
     RankingReward: undefined;
     DailyCheckPointScreen: undefined;
+    FriendsScreen: undefined;
 };
 
 export type NavigationProps = StackNavigationProp<RootStackParamList>;

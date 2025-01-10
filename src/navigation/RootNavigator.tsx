@@ -19,6 +19,7 @@ import { setHomeGuideline, setIsOpenDailyCheckPoint } from "../store/reducers/ho
 import Ranking from "../screens/Ranking";
 import RankingRewards from "../screens/RankingRewards";
 import DailyCheckPointScreen from "../screens/DailyCheckPointScreen";
+import FriendsScreen from "../screens/FriendsScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -93,6 +94,7 @@ export default function RootNavigator({ onMount }: RootNavigatorProps) {
             <Stack.Screen name="Ranking" component={Ranking} />
             <Stack.Screen name="RankingReward" component={RankingRewards} />
             <Stack.Screen name="DailyCheckPointScreen" component={DailyCheckPointScreen} />
+            <Stack.Screen name="FriendsScreen" component={FriendsScreen} />
         </Stack.Navigator>
     )
 }

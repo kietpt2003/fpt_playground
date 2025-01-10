@@ -28,6 +28,7 @@ const languageStyleSheet = StyleSheet.create({
     },
     modalOptionText: {
         fontSize: 16,
+        fontFamily: "Roboto"
     },
 });
 

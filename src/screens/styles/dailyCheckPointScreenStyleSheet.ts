@@ -88,7 +88,8 @@ const dailyCheckpointScreenStyleSheet = StyleSheet.create({
         textAlignVertical: "center",
         marginRight: 3,
         color: colors.white,
-        fontSize: 13
+        fontSize: 13,
+        fontFamily: "Roboto"
     },
     plusMoneyButton: {
         width: 18,
@@ -127,11 +128,13 @@ const dailyCheckpointScreenStyleSheet = StyleSheet.create({
     myCoinTxt: {
         fontSize: 17,
         color: colors.grey,
-        fontWeight: "500"
+        fontWeight: "500",
+        fontFamily: "Roboto"
     },
     coinValueTxt: {
         fontSize: 35,
-        fontWeight: "700"
+        fontWeight: "700",
+        fontFamily: "Roboto"
     },
     coinButtonContainer: {
         flexDirection: "row",
@@ -153,7 +156,8 @@ const dailyCheckpointScreenStyleSheet = StyleSheet.create({
         color: colors.white,
         textAlign: "center",
         fontSize: 15,
-        fontWeight: "500"
+        fontWeight: "500",
+        fontFamily: "Roboto"
     },
     checkedContainer: {
         position: "absolute",
@@ -171,15 +175,18 @@ const dailyCheckpointScreenStyleSheet = StyleSheet.create({
         fontWeight: "bold",
         transform: [{ rotate: "-45deg" }],
         textAlign: "center",
-        fontSize: 20
+        fontSize: 20,
+        fontFamily: "Roboto"
     },
     valueTxt: {
         textAlign: "center",
+        fontFamily: "Roboto"
     },
     dateItemTxt: {
         textAlign: "center",
         marginVertical: 2,
-        fontSize: 11.5
+        fontSize: 11.5,
+        fontFamily: "Roboto"
     },
     dailyCheckpointContainer: {
         width: ScreenWidth - 40,
@@ -197,13 +204,15 @@ const dailyCheckpointScreenStyleSheet = StyleSheet.create({
         fontSize: 20,
         paddingLeft: 10,
         marginTop: 5,
-        fontWeight: "700"
+        fontWeight: "700",
+        fontFamily: "Roboto"
     },
     dailyCheckpointSubHeaderTxt: {
         fontSize: 16,
         paddingLeft: 10,
         marginTop: 5,
-        fontWeight: "500"
+        fontWeight: "500",
+        fontFamily: "Roboto"
     },
     flatListContainer: {
         height: ScreenHeight / 9,
@@ -271,7 +280,8 @@ const dailyCheckpointScreenStyleSheet = StyleSheet.create({
         marginLeft: 20,
         marginVertical: 10,
         fontSize: 18,
-        fontWeight: "500"
+        fontWeight: "500",
+        fontFamily: "Roboto"
     },
     functionContainer: {
         width: ScreenWidth - 40,
@@ -313,11 +323,13 @@ const dailyCheckpointScreenStyleSheet = StyleSheet.create({
     },
     functionTitle: {
         fontSize: 16,
-        fontWeight: "600"
+        fontWeight: "600",
+        fontFamily: "Roboto"
     },
     functionDescription: {
         fontSize: 14,
-        color: colors.grey
+        color: colors.grey,
+        fontFamily: "Roboto"
     },
     functionRightIcon: {
         marginRight: 10,

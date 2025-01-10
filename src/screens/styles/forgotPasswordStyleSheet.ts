@@ -70,13 +70,16 @@ const forgotPasswordStyleSheet = StyleSheet.create({
         textAlign: 'left',
         flexWrap: "nowrap", // Ngăn xuống dòng
         overflow: "hidden", // Ngăn tràn nội dung
+        fontFamily: "Roboto"
     },
     formTitlte: {
         alignSelf: "center",
         fontWeight: "bold",
+        fontFamily: "Roboto"
     },
     formGuide: {
         fontSize: 16,
+        fontFamily: "Roboto"
     },
     mailInput: {
         backgroundColor: "white",
@@ -86,6 +89,7 @@ const forgotPasswordStyleSheet = StyleSheet.create({
         fontSize: 17,
         borderColor: "rgba(0, 0, 0, 0.3)",
         borderWidth: 0.5,
+        fontFamily: "Roboto"
     },
     requestCodeBtnContainer: {
         width: '100%',
@@ -111,7 +115,8 @@ const forgotPasswordStyleSheet = StyleSheet.create({
         fontWeight: "bold",
         letterSpacing: 1,
         fontSize: 18,
-        color: colors.white
+        color: colors.white,
+        fontFamily: "Roboto"
     },
     backBtnContainer: {
         marginTop: -10
@@ -121,12 +126,14 @@ const forgotPasswordStyleSheet = StyleSheet.create({
         fontSize: 15,
         fontWeight: 500,
         letterSpacing: 1,
+        fontFamily: "Roboto"
     },
     versionControl: {
         position: "absolute",
         bottom: 10,
         right: 10,
-        color: colors.white
+        color: colors.white,
+        fontFamily: "Roboto"
     }
 });
 

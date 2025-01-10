@@ -7,8 +7,9 @@ const featureComponentStyleSheet = StyleSheet.create({
         gap: 10
     },
     functionTitle: {
-        fontSize: 19,
-        fontWeight: "bold"
+        fontSize: 20,
+        fontWeight: "bold",
+        fontFamily: "Roboto"
     },
     functionContainerGroup: {
         height: ScreenHeight / 4.5,

@@ -24,7 +24,7 @@ export default function SlotItem({ item }: SlotItemProps) {
                             }}
                             style={slotItemStyleSheet.image}
                         />
-                        <Text>
+                        <Text style={slotItemStyleSheet.groupName}>
                             {item.groupName}
                         </Text>
                     </>
@@ -37,7 +37,7 @@ export default function SlotItem({ item }: SlotItemProps) {
                                 color={theme === "dark" ? colors.darkBlue : colors.darkOrange}
                             />
                         </View>
-                        <Text>Trống</Text>
+                        <Text style={slotItemStyleSheet.emptyTxt}>Trống</Text>
                     </>
             }
         </TouchableOpacity>

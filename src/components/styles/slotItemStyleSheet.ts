@@ -10,6 +10,9 @@ export const slotItemStyleSheet = StyleSheet.create({
         borderRadius: 25,
         gap: 10,
     },
+    groupName: {
+        fontFamily: "Roboto"
+    },
     image: {
         width: ScreenHeight / 14,
         height: ScreenHeight / 14,
@@ -21,6 +24,9 @@ export const slotItemStyleSheet = StyleSheet.create({
         alignItems: "center",
         width: ScreenHeight / 14,
         height: ScreenHeight / 14,
+    },
+    emptyTxt: {
+        fontFamily: "Roboto"
     }
 })
 

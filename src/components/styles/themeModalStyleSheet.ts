@@ -28,6 +28,7 @@ const themeModalStyleSheet = StyleSheet.create({
     },
     modalOptionText: {
         fontSize: 16,
+        fontFamily: "Roboto"
     },
 });
 

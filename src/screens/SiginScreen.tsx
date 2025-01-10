@@ -103,7 +103,7 @@ export default function SiginScreen() {
             const userInfo = await GoogleSignin.signIn();
             console.log(userInfo);
 
-            if (!userInfo.data) {
+            if (!userInfo.user) {
                 return;
             }
 

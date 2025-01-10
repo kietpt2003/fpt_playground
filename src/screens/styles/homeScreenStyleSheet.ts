@@ -68,6 +68,7 @@ const homeScreenStyleSheet = StyleSheet.create({
         textAlign: 'left',
         flexWrap: "nowrap", // Ngăn xuống dòng
         overflow: "hidden", // Ngăn tràn nội dung
+        fontFamily: "Roboto"
     },
     coinContainer: {
         borderWidth: 1.1,
@@ -79,6 +80,7 @@ const homeScreenStyleSheet = StyleSheet.create({
     coinTxt: {
         fontWeight: "500",
         fontSize: 12,
+        fontFamily: "Roboto"
     },
     functionContainer: {
         padding: 15,
@@ -86,7 +88,8 @@ const homeScreenStyleSheet = StyleSheet.create({
     },
     functionTitle: {
         fontSize: 19,
-        fontWeight: "bold"
+        fontWeight: "bold",
+        fontFamily: "Roboto"
     },
     functionContainerGroup: {
         height: ScreenHeight / 5.5,
@@ -127,6 +130,7 @@ const homeScreenStyleSheet = StyleSheet.create({
     featureTilte: {
         fontSize: 19,
         fontWeight: "bold",
+        fontFamily: "Roboto"
     },
     featureButton: {
         flexDirection: "row",

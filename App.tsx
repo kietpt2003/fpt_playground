@@ -13,6 +13,7 @@ import { useCallback, useEffect, useState } from 'react';
 import messaging from '@react-native-firebase/messaging';
 import { ClickProvider } from './src/context/ClickContext';
 import { NonPlayerCharacterProvider } from './src/context/NonPlayerCharacterContext';
+import * as Font from 'expo-font';
 
 // Register background handler
 messaging().setBackgroundMessageHandler(async remoteMessage => {
@@ -39,6 +40,15 @@ export default function App() {
       SplashScreen.hideAsync();
     }
   }, [isMounted]);
+
+  useEffect(() => {
+    async function loadFonts() {
+      await Font.loadAsync({
+        Roboto: require('./assets/fonts/Roboto.ttf'),
+      });
+    }
+    loadFonts();
+  }, []);
 
   return (
     <SafeAreaProvider>

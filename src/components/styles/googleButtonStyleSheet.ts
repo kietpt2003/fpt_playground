@@ -19,6 +19,7 @@ const googleButtonStyleSheet = StyleSheet.create({
     buttonText: {
         fontSize: 18,
         fontWeight: 600,
+        fontFamily: "Roboto"
     },
 });
 

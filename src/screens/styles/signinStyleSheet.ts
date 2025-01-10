@@ -52,12 +52,14 @@ const signinStyleSheet = StyleSheet.create({
         textAlign: 'left',
         flexWrap: "nowrap", // Ngăn xuống dòng
         overflow: "hidden", // Ngăn tràn nội dung
+        fontFamily: "Roboto"
     },
     title: {
         fontSize: 32,
         fontWeight: 'bold',
         color: colors.white,
         marginBottom: 40,
+        fontFamily: "Roboto"
     },
     input: {
         width: '100%',
@@ -68,7 +70,8 @@ const signinStyleSheet = StyleSheet.create({
         fontSize: 16,
         marginBottom: 20,
         borderWidth: 1,
-        borderColor: "rgba(0,0,0.5)"
+        borderColor: "rgba(0,0,0.5)",
+        fontFamily: "Roboto"
     },
     button: {
         width: '100%',
@@ -86,6 +89,7 @@ const signinStyleSheet = StyleSheet.create({
         fontSize: 18,
         color: colors.white,
         fontWeight: 'bold',
+        fontFamily: "Roboto"
     },
     signupForgotPassBtn: {
         width: '50%',
@@ -97,13 +101,15 @@ const signinStyleSheet = StyleSheet.create({
         opacity: 0.9,
         letterSpacing: 1,
         fontWeight: "bold",
-        color: colors.white
+        color: colors.white,
+        fontFamily: "Roboto"
     },
     versionControl: {
         position: "absolute",
         bottom: 10,
         right: 10,
-        color: colors.white
+        color: colors.white,
+        fontFamily: "Roboto"
     },
     signupTxt: {
         alignSelf: "flex-start",
@@ -111,7 +117,8 @@ const signinStyleSheet = StyleSheet.create({
         opacity: 0.9,
         letterSpacing: 1,
         fontWeight: "bold",
-        color: colors.white
+        color: colors.white,
+        fontFamily: "Roboto"
     },
     signupForgotPassContainer: {
         flexDirection: "row",

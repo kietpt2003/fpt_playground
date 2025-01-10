@@ -26,7 +26,8 @@ const functionItemStyleSheet = StyleSheet.create({
     },
     txt: {
         textAlign: "center",
-        fontSize: 13
+        fontSize: 14,
+        fontFamily: "Roboto"
     }
 });
 

@@ -10,7 +10,8 @@ const circularProgressStyleSheet = StyleSheet.create({
         position: "absolute",
         fontSize: 12,
         fontWeight: "bold",
-        color: colors.white
+        color: colors.white,
+        fontFamily: "Roboto"
     },
 });
 

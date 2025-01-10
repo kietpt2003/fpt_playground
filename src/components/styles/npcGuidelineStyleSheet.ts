@@ -32,10 +32,12 @@ const npcGuidelineStyleSheet = StyleSheet.create({
         width: ScreenWidth / 1.8,
         color: colors.white,
         overflow: "hidden",
-        marginTop: 25
+        marginTop: 25,
+        fontFamily: "Roboto"
     },
     textCursor: {
-        fontWeight: "bold"
+        fontWeight: "bold",
+        fontFamily: "Roboto"
     },
     nextButton: {
         position: "absolute",

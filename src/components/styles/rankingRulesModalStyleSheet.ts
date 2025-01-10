@@ -23,6 +23,7 @@ const rankingRulesModalStyleSheet = StyleSheet.create({
     rankingRulesTitle: {
         fontSize: 24,
         fontWeight: "700",
+        fontFamily: "Roboto"
     },
     closeBtnContainer: {
         borderRadius: 30,
@@ -57,11 +58,13 @@ const rankingRulesModalStyleSheet = StyleSheet.create({
     rulesHeader: {
         fontSize: 18,
         fontWeight: "600",
+        fontFamily: "Roboto"
     },
     rulesSubHeader: {
         fontSize: 16,
         fontWeight: "600",
-        paddingLeft: 15
+        paddingLeft: 15,
+        fontFamily: "Roboto"
     },
     rulesContent: {
         fontSize: 16,
@@ -69,6 +72,7 @@ const rankingRulesModalStyleSheet = StyleSheet.create({
         color: colors.lightBlue,
         paddingLeft: 30,
         marginRight: 15,
+        fontFamily: "Roboto"
     },
     rulesSubContent: {
         fontSize: 16,
@@ -76,6 +80,7 @@ const rankingRulesModalStyleSheet = StyleSheet.create({
         color: colors.lightBlue,
         paddingLeft: 45,
         marginRight: 15,
+        fontFamily: "Roboto"
     }
 });
 

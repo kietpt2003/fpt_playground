@@ -33,7 +33,8 @@ const rewardRankingItemStyleSheet = StyleSheet.create({
         bottom: 0,
         textAlign: "right",
         color: colors.milkyWhite,
-        fontWeight: "600"
+        fontWeight: "600",
+        fontFamily: "Roboto"
     },
     blurBg: {
         width: ScreenHeight * 0.05,

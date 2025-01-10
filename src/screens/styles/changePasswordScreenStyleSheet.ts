@@ -70,16 +70,20 @@ const changePasswordScreenStyleSheet = StyleSheet.create({
         textAlign: 'left',
         flexWrap: "nowrap", // Ngăn xuống dòng
         overflow: "hidden", // Ngăn tràn nội dung
+        fontFamily: "Roboto"
     },
     formTitlte: {
         alignSelf: "center",
         fontWeight: "bold",
+        fontFamily: "Roboto"
     },
     formGuide: {
         fontSize: 16,
+        fontFamily: "Roboto"
     },
     formGuideMail: {
         fontWeight: "500",
+        fontFamily: "Roboto"
     },
     inputContainer: {
         position: "relative"
@@ -92,6 +96,7 @@ const changePasswordScreenStyleSheet = StyleSheet.create({
         fontSize: 17,
         borderColor: "rgba(0, 0, 0, 0.3)",
         borderWidth: 0.5,
+        fontFamily: "Roboto"
     },
     showHidePass: {
         position: "absolute",
@@ -106,7 +111,8 @@ const changePasswordScreenStyleSheet = StyleSheet.create({
         fontSize: 12,
         letterSpacing: 1,
         fontWeight: "bold",
-        color: colors.grey
+        color: colors.grey,
+        fontFamily: "Roboto"
     },
     changePassBtnContainer: {
         width: '100%',
@@ -131,7 +137,8 @@ const changePasswordScreenStyleSheet = StyleSheet.create({
         fontWeight: "bold",
         letterSpacing: 1,
         fontSize: 18,
-        color: colors.white
+        color: colors.white,
+        fontFamily: "Roboto"
     },
     backBtnContainer: {
         marginTop: -10
@@ -141,12 +148,14 @@ const changePasswordScreenStyleSheet = StyleSheet.create({
         fontSize: 15,
         fontWeight: 500,
         letterSpacing: 1,
+        fontFamily: "Roboto"
     },
     versionControl: {
         position: "absolute",
         bottom: 10,
         right: 10,
-        color: colors.white
+        color: colors.white,
+        fontFamily: "Roboto"
     }
 });
 

@@ -17,14 +17,16 @@ export const rankingFlatListHeaderStyleSheet = StyleSheet.create({
         textAlign: "center",
         color: colors.grey,
         fontWeight: "600",
-        fontSize: 15
+        fontSize: 15,
+        fontFamily: "Roboto"
     },
     rankingUser: {
         flex: 1,
         paddingLeft: ScreenHeight / 20 + 10,
         color: colors.grey,
         fontWeight: "600",
-        fontSize: 15
+        fontSize: 15,
+        fontFamily: "Roboto"
     },
     rankingDiamond: {
         width: (ScreenWidth - 20) / 3,
@@ -32,6 +34,7 @@ export const rankingFlatListHeaderStyleSheet = StyleSheet.create({
         color: colors.grey,
         fontWeight: "600",
         fontSize: 15,
+        fontFamily: "Roboto"
     }
 })
 

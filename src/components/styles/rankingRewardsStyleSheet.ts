@@ -82,7 +82,8 @@ const rankingRewardsStyleSheet = StyleSheet.create({
         textAlignVertical: "center",
         marginRight: 3,
         color: colors.white,
-        fontSize: 13
+        fontSize: 13,
+        fontFamily: "Roboto"
     },
     plusMoneyButton: {
         width: 18,

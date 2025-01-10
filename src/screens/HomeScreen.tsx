@@ -144,7 +144,7 @@ export default function HomeScreen() {
                                 </View>
                             </MenuItem>
 
-                            {/* PTK Coin */}
+                            {/* Change Coin */}
                             <MenuItem
                                 onPress={() => {
                                     hideMenu();
@@ -156,7 +156,7 @@ export default function HomeScreen() {
                                         textStyle={homeScreenStyleSheet.coinTxt}
                                     />
                                     <Text style={homeScreenStyleSheet.menuItemTxt}>
-                                        {t("ptk-coin")}
+                                        {t("change-coin")}
                                     </Text>
                                 </View>
                             </MenuItem>
@@ -312,7 +312,7 @@ export default function HomeScreen() {
                             lottieSrc: require("../../assets/animations/friends.json"),
                             linearColors: [colors.lightOcean, colors.darkGreen],
                             onPress: () => {
-                                // navigation.navigate("GroupChat");
+                                navigation.navigate("FriendsScreen");
                             }
                         },
                         {

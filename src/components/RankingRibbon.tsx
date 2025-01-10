@@ -64,6 +64,7 @@ export default function RankingRibbon({
                 fontWeight="bold" // Độ dày chữ
                 textAnchor="middle" // Căn giữa theo chiều ngang
                 alignmentBaseline="middle" // Căn giữa theo chiều dọc
+                fontFamily="Roboto"
             >
                 {textContent}
             </Text>

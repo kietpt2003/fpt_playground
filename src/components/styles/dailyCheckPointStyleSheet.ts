@@ -76,7 +76,8 @@ const dailyCheckPointStyleSheet = StyleSheet.create({
     dateItemTxt: {
         textAlign: "center",
         marginVertical: 2,
-        fontSize: 11.5
+        fontSize: 11.5,
+        fontFamily: "Roboto"
     },
     checkedContainer: {
         position: "absolute",
@@ -94,10 +95,12 @@ const dailyCheckPointStyleSheet = StyleSheet.create({
         fontWeight: "bold",
         transform: [{ rotate: "-45deg" }],
         textAlign: "center",
-        fontSize: 20
+        fontSize: 20,
+        fontFamily: "Roboto"
     },
     valueTxt: {
         textAlign: "center",
+        fontFamily: "Roboto"
     },
     checkPointFinalDateContainer: {
         width: ScreenWidth * 0.82,

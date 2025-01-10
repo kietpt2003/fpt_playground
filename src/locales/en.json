@@ -28,7 +28,7 @@
     "signup-title": "Signup to FPT Playground",
     "settings": "Settings",
     "hello": "Hi",
-    "ptk-coin": "PTK Coin",
+    "change-coin": "Change Coin",
     "signout": "Signout",
     "profile": "Personal Profile",
     "member-since": "Member since ",
@@ -137,5 +137,7 @@
     "achievements": "Achievements",
     "achievements-decriptive": "Reach milestones and receive exciting rewards.",
     "games": "Pet Playground",
-    "games-content": "Raise pets and earn coins."
+    "games-content": "Raise pets and earn coins.",
+    "chat-title-header": "Messages",
+    "search-friend-placeholder": "Search friends"
 }

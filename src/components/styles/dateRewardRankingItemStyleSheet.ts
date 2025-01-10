@@ -35,7 +35,8 @@ const dateRewardRankingItemStyleSheet = StyleSheet.create({
         paddingLeft: 10,
         fontSize: 15,
         color: colors.icyWhite,
-        fontWeight: "600"
+        fontWeight: "600",
+        fontFamily: "Roboto"
     },
     contentContainer: {
         position: "absolute",
@@ -78,7 +79,8 @@ const dateRewardRankingItemStyleSheet = StyleSheet.create({
         textAlign: "center",
         fontSize: 16,
         fontWeight: "600",
-        color: colors.white
+        color: colors.white,
+        fontFamily: "Roboto"
     }
 });
 

@@ -40,6 +40,7 @@ const errorModalStyleSheet = StyleSheet.create({
     errorTxt: {
         fontSize: 15,
         width: ScreenWidth / 1.5,
+        fontFamily: "Roboto"
     },
     closeBtnContainer: {
         borderRadius: 30,
