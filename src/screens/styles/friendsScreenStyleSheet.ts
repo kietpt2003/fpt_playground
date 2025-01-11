@@ -6,7 +6,7 @@ import { statusBarHeight } from "../../constants/statusBarHeight";
 const friendsScreenStyleSheet = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.white
+        backgroundColor: colors.milkyWhite
     },
     headerContainer: {
         width: ScreenWidth,
@@ -77,7 +77,11 @@ const friendsScreenStyleSheet = StyleSheet.create({
         fontSize: 16,
         overflow: "hidden",
         color: colors.black
-    }
+    },
+    flatListContainer: {
+        width: ScreenWidth,
+        height: ScreenHeight - ScreenHeight / 5.5 + statusBarHeight,
+    },
 });
 
 export default friendsScreenStyleSheet;

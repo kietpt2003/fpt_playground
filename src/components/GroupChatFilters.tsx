@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from 'react'
 import { colors } from '../constants/colors';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
-import { MotiView } from 'moti';
 import { GroupChatFilterProps } from './types/groupChatFilterTypes';
 
 const _spacing = 10;
@@ -62,21 +61,16 @@ export default function GroupChatFilters({ firstFilter }: GroupChatFilterProps) 
                     }}
                     touchSoundDisabled={true}
                 >
-                    <MotiView
-                        animate={{
-                            backgroundColor: (theme === "dark" && fIndex === index) ? colors.darkBlue :
-                                (theme === "light" && fIndex === index) ? colors.darkOrange : colors.icyWhite,
-                            opacity: fIndex === index ? 1 : 0.6
-                        }}
-                        transition={{
-                            duration: 500
-                        }}
+                    <View
                         style={{
                             marginRight: _spacing,
                             padding: _spacing,
                             borderWidth: 2,
                             borderColor: theme === "dark" ? colors.darkBlue : colors.darkOrange,
-                            borderRadius: 12
+                            borderRadius: 12,
+                            backgroundColor: (theme === "dark" && fIndex === index) ? colors.darkBlue :
+                                (theme === "light" && fIndex === index) ? colors.darkOrange : colors.icyWhite,
+                            opacity: fIndex === index ? 1 : 0.6
                         }}
                     >
                         <Text style={{
@@ -87,7 +81,7 @@ export default function GroupChatFilters({ firstFilter }: GroupChatFilterProps) 
                         }}>
                             {item}
                         </Text>
-                    </MotiView>
+                    </View>
                 </TouchableOpacity>
             )}
             keyExtractor={(item, index) => index.toString()}
