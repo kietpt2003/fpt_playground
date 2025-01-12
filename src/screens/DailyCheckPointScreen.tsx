@@ -416,7 +416,7 @@ export default function DailyCheckPointScreen() {
 
                 <Entypo
                     name="chevron-right"
-                    size={28}
+                    size={20}
                     color={colors.grey}
                     style={dailyCheckPointScreenStyleSheet.functionRightIcon}
                 />
@@ -456,7 +456,7 @@ export default function DailyCheckPointScreen() {
 
                 <Entypo
                     name="chevron-right"
-                    size={28}
+                    size={20}
                     color={colors.grey}
                     style={dailyCheckPointScreenStyleSheet.functionRightIcon}
                 />

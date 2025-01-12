@@ -43,14 +43,12 @@ const headerLeftStyleSheet = StyleSheet.create({
         width: ScreenHeight / 7
     },
     nameTxt: {
-        fontWeight: "600",
         color: colors.white,
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     yearTxt: {
         fontSize: 12,
         color: colors.white,
-        fontWeight: "500",
         fontFamily: "Roboto"
     },
     levelContainer: {
@@ -61,7 +59,6 @@ const headerLeftStyleSheet = StyleSheet.create({
     levelTxt: {
         fontSize: 12,
         color: colors.white,
-        fontWeight: "500",
         fontFamily: "Roboto"
     }
 });

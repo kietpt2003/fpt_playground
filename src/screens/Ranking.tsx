@@ -301,7 +301,7 @@ export default function Ranking() {
                 >
                     <AntDesign
                         name="left"
-                        size={28}
+                        size={ScreenWidth > 350 ? 28 : 24}
                         color={colors.white}
                     />
                 </TouchableOpacity>
@@ -356,7 +356,7 @@ export default function Ranking() {
                         >
                             <Ionicons
                                 name="ellipsis-horizontal"
-                                size={28}
+                                size={ScreenWidth > 350 ? 28 : 27}
                                 color={colors.white}
                             />
                         </TouchableOpacity>

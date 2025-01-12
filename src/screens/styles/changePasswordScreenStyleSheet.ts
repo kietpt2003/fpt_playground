@@ -74,15 +74,13 @@ const changePasswordScreenStyleSheet = StyleSheet.create({
     },
     formTitlte: {
         alignSelf: "center",
-        fontWeight: "bold",
-        fontFamily: "Roboto"
+        fontFamily: "RobotoSemiBold",
     },
     formGuide: {
-        fontSize: 16,
-        fontFamily: "Roboto"
+        fontSize: 15,
+        fontFamily: "RobotoLight"
     },
     formGuideMail: {
-        fontWeight: "500",
         fontFamily: "Roboto"
     },
     inputContainer: {
@@ -93,10 +91,9 @@ const changePasswordScreenStyleSheet = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 10,
-        fontSize: 17,
         borderColor: "rgba(0, 0, 0, 0.3)",
         borderWidth: 0.5,
-        fontFamily: "Roboto"
+        fontFamily: "RobotoLight"
     },
     showHidePass: {
         position: "absolute",
@@ -108,11 +105,10 @@ const changePasswordScreenStyleSheet = StyleSheet.create({
     },
     resendCodeTxt: {
         alignSelf: "flex-end",
-        fontSize: 12,
+        fontSize: 13,
         letterSpacing: 1,
-        fontWeight: "bold",
         color: colors.grey,
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     changePassBtnContainer: {
         width: '100%',
@@ -134,21 +130,19 @@ const changePasswordScreenStyleSheet = StyleSheet.create({
         justifyContent: "center"
     },
     changePassTxt: {
-        fontWeight: "bold",
         letterSpacing: 1,
-        fontSize: 18,
+        fontSize: 16,
         color: colors.white,
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     backBtnContainer: {
         marginTop: -10
     },
     backBtnTxt: {
         alignSelf: "center",
-        fontSize: 15,
-        fontWeight: 500,
+        fontSize: 14.5,
         letterSpacing: 1,
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     versionControl: {
         position: "absolute",

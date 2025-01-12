@@ -45,6 +45,10 @@ export default function App() {
     async function loadFonts() {
       await Font.loadAsync({
         Roboto: require('./assets/fonts/Roboto.ttf'),
+        RobotoBold: require('./assets/fonts/Roboto-Bold.ttf'),
+        RobotoSemiBold: require('./assets/fonts/Roboto-SemiBold.ttf'),
+        RobotoMedium: require('./assets/fonts/Roboto-Medium.ttf'),
+        RobotoLight: require('./assets/fonts/Roboto-Light.ttf'),
       });
     }
     loadFonts();

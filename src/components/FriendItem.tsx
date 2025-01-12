@@ -2,51 +2,59 @@ import { View, Text, Animated, Image } from 'react-native'
 import React from 'react'
 import { FriendItemProps } from './types/friendItemTypes'
 import { colors } from '../constants/colors'
+import UserAvatar from './UserAvatar'
+import { formatDistanceToNowStrict } from 'date-fns';
+import { vi, enUS } from "date-fns/locale";
+import { useTranslation } from 'react-i18next'
+import friendItemStyleSheet from './styles/friendItemStyleSheet'
 
-export default function FriendItem({ item, SPACING, opacity, AVATAR_SIZE, scale }: FriendItemProps) {
+export default function FriendItem({ item, opacity, AVATAR_SIZE, scale }: FriendItemProps) {
+    const { t, i18n } = useTranslation();
+
     return (
-        <Animated.View style={{
-            flexDirection: "row",
-            padding: SPACING,
-            marginBottom: SPACING,
-            borderRadius: 12,
-            backgroundColor: colors.blurWhite,
-            shadowColor: "#000",
-            shadowOffset: {
-                width: 0,
-                height: 10
-            },
-            shadowOpacity: 0.3,
-            shadowRadius: 20,
-            transform: [{ scale }],
-            opacity
-        }}>
-            <Image
-                source={{ uri: item.sender.imageUrl }}
-                style={{
-                    width: AVATAR_SIZE,
-                    height: AVATAR_SIZE,
-                    borderRadius: AVATAR_SIZE,
-                    marginRight: SPACING,
-
-                }}
+        <Animated.View style={[
+            friendItemStyleSheet.container,
+            {
+                transform: [{ scale }],
+                opacity
+            }
+        ]}>
+            <UserAvatar
+                avatarUrl={item.sender.imageUrl}
+                imageBorderWidth={0}
+                imageWidth={AVATAR_SIZE}
+                imageHeight={AVATAR_SIZE}
+                loadingIndicatorSize={AVATAR_SIZE / 3}
+                imageBorderRadius={AVATAR_SIZE}
+                imageBorderColor={undefined}
             />
 
             <View>
-                <Text style={{
-                    fontSize: 22,
-                    fontWeight: "700",
-                    fontFamily: "Roboto"
-                }}>{item.sender.name}</Text>
-                <Text
-                    style={{
-                        fontSize: 18,
-                        opacity: .7,
-                    }}
-                    numberOfLines={1}
-                >
-                    {item.content}
+                <Text style={friendItemStyleSheet.username}>
+                    {item.sender.name}
                 </Text>
+                <View style={friendItemStyleSheet.contentContainer}>
+                    <Text
+                        style={[
+                            friendItemStyleSheet.contentTxt,
+                            {
+                                fontFamily: item.status !== "Read" ? "RobotoBold" : "RobotoLight"
+                            }
+                        ]}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                    >
+                        {item.content}
+                    </Text>
+                    <Text
+                        style={friendItemStyleSheet.dateTxt}
+                    >
+                        {formatDistanceToNowStrict(item.createdAt, {
+                            addSuffix: true,
+                            locale: i18n.language === "vi" ? vi : enUS,
+                        })}
+                    </Text>
+                </View>
             </View>
         </Animated.View>
     )

@@ -13,10 +13,9 @@ export const rankingUserItemStyleSheet = StyleSheet.create({
         width: (ScreenWidth - 20) / 6,
         textAlign: "center",
         color: colors.grey,
-        fontWeight: "600",
         fontSize: 18,
         textAlignVertical: "center",
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     rankingUserContainer: {
         flex: 1,
@@ -29,8 +28,7 @@ export const rankingUserItemStyleSheet = StyleSheet.create({
         alignItems: "center"
     },
     userName: {
-        fontSize: 16,
-        fontWeight: "500",
+        fontSize: 15,
         color: colors.black,
         opacity: 0.7,
         fontFamily: "Roboto"
@@ -44,32 +42,30 @@ export const rankingUserItemStyleSheet = StyleSheet.create({
         height: 20,
         justifyContent: "center",
         alignItems: "center",
-        borderWidth: 1,
+        borderWidth: 1.5,
         borderColor: colors.likesColor,
         borderRadius: 15,
         paddingHorizontal: 5
     },
     likeTxt: {
-        fontSize: 13,
+        fontSize: 12,
         color: colors.likesColor,
-        fontWeight: "500",
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     specializedCodeContainer: {
         width: 35,
         height: 20,
         justifyContent: "center",
         alignItems: "center",
-        borderWidth: 1,
+        borderWidth: 1.5,
         borderColor: colors.approve,
         borderRadius: 15,
         paddingHorizontal: 5
     },
     specializedCodeTxt: {
-        fontSize: 13,
+        fontSize: 12,
         color: colors.approve,
-        fontWeight: "500",
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     rankingDiamondContainer: {
         width: (ScreenWidth - 20) / 3,
@@ -80,9 +76,8 @@ export const rankingUserItemStyleSheet = StyleSheet.create({
     },
     rankingDiamondTxt: {
         color: colors.diamond,
-        fontWeight: "600",
-        fontSize: 15,
-        fontFamily: "Roboto"
+        fontSize: 14,
+        fontFamily: "RobotoMedium"
     },
     diamondImage: {
         width: ScreenHeight / 50,

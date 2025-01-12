@@ -13,6 +13,7 @@ import GroupChatFilters from '../components/GroupChatFilters';
 import { useRoute } from '@react-navigation/native';
 import { GroupChatRouteProp } from './types/groupChatTypes';
 import useClick from '../hooks/useClick';
+import { ScreenWidth } from '@rneui/base';
 
 export default function GroupChat() {
     const route = useRoute<GroupChatRouteProp>();
@@ -138,7 +139,7 @@ export default function GroupChat() {
                     >
                         <FontAwesome
                             name="chevron-left"
-                            size={30}
+                            size={ScreenWidth > 350 ? 26 : 20}
                             color={theme === "dark" ? colors.darkBlue : colors.darkOrange}
                         />
                     </TouchableOpacity>
@@ -162,7 +163,7 @@ export default function GroupChat() {
                     >
                         <FontAwesome
                             name="chevron-right"
-                            size={30}
+                            size={ScreenWidth > 350 ? 26 : 20}
                             color={theme === "dark" ? colors.darkBlue : colors.darkOrange}
                         />
                     </TouchableOpacity>

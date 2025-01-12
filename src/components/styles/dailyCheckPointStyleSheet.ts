@@ -92,11 +92,10 @@ const dailyCheckPointStyleSheet = StyleSheet.create({
     },
     checkedTxt: {
         color: colors.approve,
-        fontWeight: "bold",
         transform: [{ rotate: "-45deg" }],
         textAlign: "center",
         fontSize: 20,
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     valueTxt: {
         textAlign: "center",

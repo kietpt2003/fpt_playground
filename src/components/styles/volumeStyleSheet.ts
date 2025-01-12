@@ -28,9 +28,8 @@ const volumeStyleSheet = StyleSheet.create({
         top: 15
     },
     sliderValue: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        fontFamily: "Roboto"
+        fontSize: 15.5,
+        fontFamily: "RobotoMedium"
     },
 })
 

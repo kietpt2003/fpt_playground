@@ -44,9 +44,8 @@ export const groupChatStyleSheet = StyleSheet.create({
         paddingTop: 30
     },
     paginationTxt: {
-        fontSize: 25,
-        fontWeight: "bold",
-        fontFamily: "Roboto"
+        fontSize: ScreenWidth > 350 ? 24 : 18,
+        fontFamily: "RobotoBold"
     },
     headerRightNoti: {
         position: "absolute",

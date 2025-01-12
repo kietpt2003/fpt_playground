@@ -1,4 +1,4 @@
-import { ScreenHeight } from "@rneui/base";
+import { ScreenHeight, ScreenWidth } from "@rneui/base";
 import { StyleSheet } from "react-native";
 import { colors } from "../../constants/colors";
 
@@ -55,11 +55,10 @@ const signinStyleSheet = StyleSheet.create({
         fontFamily: "Roboto"
     },
     title: {
-        fontSize: 32,
-        fontWeight: 'bold',
+        fontSize: ScreenWidth > 350 ? 32 : 30,
         color: colors.white,
         marginBottom: 40,
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     input: {
         width: '100%',
@@ -67,11 +66,11 @@ const signinStyleSheet = StyleSheet.create({
         backgroundColor: colors.white,
         borderRadius: 8,
         paddingHorizontal: 15,
-        fontSize: 16,
+        fontSize: ScreenWidth > 350 ? 16 : 14,
         marginBottom: 20,
         borderWidth: 1,
         borderColor: "rgba(0,0,0.5)",
-        fontFamily: "Roboto"
+        fontFamily: "RobotoLight"
     },
     button: {
         width: '100%',
@@ -86,10 +85,9 @@ const signinStyleSheet = StyleSheet.create({
         borderRadius: 8,
     },
     buttonText: {
-        fontSize: 18,
+        fontSize: ScreenWidth > 350 ? 18 : 16,
         color: colors.white,
-        fontWeight: 'bold',
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     signupForgotPassBtn: {
         width: '50%',
@@ -97,12 +95,11 @@ const signinStyleSheet = StyleSheet.create({
     },
     forgotPasswordTxt: {
         alignSelf: "flex-end",
-        fontSize: 12,
+        fontSize: ScreenWidth > 350 ? 14 : 13,
         opacity: 0.9,
         letterSpacing: 1,
-        fontWeight: "bold",
         color: colors.white,
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     versionControl: {
         position: "absolute",
@@ -113,12 +110,11 @@ const signinStyleSheet = StyleSheet.create({
     },
     signupTxt: {
         alignSelf: "flex-start",
-        fontSize: 12,
+        fontSize: ScreenWidth > 350 ? 14 : 13,
         opacity: 0.9,
         letterSpacing: 1,
-        fontWeight: "bold",
         color: colors.white,
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     signupForgotPassContainer: {
         flexDirection: "row",

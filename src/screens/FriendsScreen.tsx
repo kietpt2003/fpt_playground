@@ -1,4 +1,4 @@
-import { View, Text, Image, TextInput, FlatList, Animated } from 'react-native'
+import { View, Text, Image, TextInput, Animated } from 'react-native'
 import React, { useRef, useState } from 'react'
 import { User } from '../constants/entities/User'
 import friendsScreenStyleSheet from './styles/friendsScreenStyleSheet'
@@ -12,22 +12,13 @@ import { faker } from '@faker-js/faker';
 import { FriendItemData } from '../components/types/friendItemTypes'
 import { Message } from '../constants/entities/Message'
 import FriendItem from '../components/FriendItem'
+import UserAvatar from '../components/UserAvatar'
 
-faker.seed(10);
-
-const DATA = [...Array(30).keys()].map((_, i) => {
-    return {
-        key: faker.string.uuid(),
-        image: `https://picsum.photos/id/${faker.number.int({ min: 200, max: 300 })}/200`,
-        name: faker.person.firstName(),
-        jobTitle: faker.person.jobTitle(),
-        email: faker.internet.email(),
-    }
-})
+faker.seed(20);
 
 const SPACING = 20;
-const AVATAR_SIZE = 70;
-const ITEM_SIZE = AVATAR_SIZE + SPACING * 3;
+const AVATAR_SIZE = 55;
+const ITEM_SIZE = AVATAR_SIZE + SPACING;
 
 const statuses: Message["status"][] = ["Inactive", "Unsend", "Sent", "Received", "Read"];
 
@@ -64,7 +55,7 @@ export default function FriendsScreen() {
         id: "abc",
         gender: "Male",
         name: "Tuan Kiet",
-        imageUrl: "https://picsum.photos/id/237/200"
+        imageUrl: faker.image.urlPicsumPhotos({ width: 200, height: 200 })
     }
     const theme = useSelector((state: RootState) => state.theme.theme);
     const { t } = useTranslation();
@@ -84,11 +75,14 @@ export default function FriendsScreen() {
 
                 <View style={friendsScreenStyleSheet.headerTopContainer}>
                     <View style={friendsScreenStyleSheet.imageContainer}>
-                        <Image
-                            source={{
-                                uri: user.imageUrl
-                            }}
-                            style={friendsScreenStyleSheet.userImage}
+                        <UserAvatar
+                            avatarUrl={user.imageUrl}
+                            imageBorderWidth={0}
+                            imageWidth={friendsScreenStyleSheet.userImage.width}
+                            imageHeight={friendsScreenStyleSheet.userImage.height}
+                            loadingIndicatorSize={friendsScreenStyleSheet.userImage.width / 3}
+                            imageBorderRadius={friendsScreenStyleSheet.userImage.borderRadius}
+                            imageBorderColor={undefined}
                         />
                         {
                             isHaveNoti &&
@@ -164,7 +158,6 @@ export default function FriendsScreen() {
 
                         return <FriendItem
                             AVATAR_SIZE={AVATAR_SIZE}
-                            SPACING={SPACING}
                             opacity={opacity}
                             scale={scale}
                             item={item.item}

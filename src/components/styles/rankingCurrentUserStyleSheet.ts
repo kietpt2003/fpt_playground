@@ -11,10 +11,9 @@ export const rankingCurrentUserStyleSheet = StyleSheet.create({
         width: (ScreenWidth - 20) / 6,
         textAlign: "center",
         color: colors.white,
-        fontWeight: "600",
-        fontSize: 20,
+        fontSize: 19,
         textAlignVertical: "center",
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     rankingUserContainer: {
         flex: 1,
@@ -28,7 +27,6 @@ export const rankingCurrentUserStyleSheet = StyleSheet.create({
     },
     userName: {
         fontSize: 18,
-        fontWeight: "500",
         color: colors.white,
         fontFamily: "Roboto"
     },
@@ -48,8 +46,7 @@ export const rankingCurrentUserStyleSheet = StyleSheet.create({
     likeTxt: {
         fontSize: 15,
         color: colors.likesColor,
-        fontWeight: "500",
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     specializedCodeContainer: {
         width: 38,
@@ -63,8 +60,7 @@ export const rankingCurrentUserStyleSheet = StyleSheet.create({
     specializedCodeTxt: {
         fontSize: 15,
         color: colors.approve,
-        fontWeight: "500",
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     rankingDiamondContainer: {
         width: (ScreenWidth - 20) / 3,
@@ -75,9 +71,8 @@ export const rankingCurrentUserStyleSheet = StyleSheet.create({
     },
     rankingDiamondTxt: {
         color: colors.white,
-        fontWeight: "600",
-        fontSize: 18,
-        fontFamily: "Roboto"
+        fontSize: 17,
+        fontFamily: "RobotoMedium"
     },
     diamondImage: {
         width: ScreenHeight / 45,

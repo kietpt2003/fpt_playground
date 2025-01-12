@@ -72,11 +72,10 @@ const dailyCheckPointItemStyleSheet = StyleSheet.create({
     },
     checkedTxt: {
         color: colors.approve,
-        fontWeight: "bold",
         transform: [{ rotate: "-45deg" }],
         textAlign: "center",
         fontSize: 20,
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     notCheckedContainer: {
         position: "absolute",
@@ -91,10 +90,9 @@ const dailyCheckPointItemStyleSheet = StyleSheet.create({
     },
     notCheckedTxt: {
         color: colors.disapprove,
-        fontWeight: "bold",
         transform: [{ rotate: "-45deg" }],
         fontSize: 20,
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     valueTxt: {
         textAlign: "center",

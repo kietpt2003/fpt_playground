@@ -65,7 +65,7 @@ export default function GroupChatFilters({ firstFilter }: GroupChatFilterProps) 
                         style={{
                             marginRight: _spacing,
                             padding: _spacing,
-                            borderWidth: 2,
+                            borderWidth: 1,
                             borderColor: theme === "dark" ? colors.darkBlue : colors.darkOrange,
                             borderRadius: 12,
                             backgroundColor: (theme === "dark" && fIndex === index) ? colors.darkBlue :
@@ -76,7 +76,6 @@ export default function GroupChatFilters({ firstFilter }: GroupChatFilterProps) 
                         <Text style={{
                             color: fIndex === index ? colors.white :
                                 theme === "light" ? colors.darkOrange : colors.darkBlue,
-                            fontWeight: "700",
                             fontFamily: "Roboto"
                         }}>
                             {item}

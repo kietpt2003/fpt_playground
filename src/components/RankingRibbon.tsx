@@ -61,10 +61,9 @@ export default function RankingRibbon({
                 y="14" // Vị trí dọc (tâm y)
                 fill={colors.white} // Màu chữ
                 fontSize="15" // Kích thước chữ
-                fontWeight="bold" // Độ dày chữ
                 textAnchor="middle" // Căn giữa theo chiều ngang
                 alignmentBaseline="middle" // Căn giữa theo chiều dọc
-                fontFamily="Roboto"
+                fontFamily="RobotoBold"
             >
                 {textContent}
             </Text>

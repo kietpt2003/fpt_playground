@@ -113,6 +113,9 @@ export default function RankingRulesModal({ isOpenRules, setOpenRules }: Ranking
                     )}
                     onContentSizeChange={handleContentSizeChange}
                     scrollEventThrottle={16}
+                    contentContainerStyle={{
+                        paddingRight: 10,
+                    }}
                 >
                     {/* Top 100 SV */}
                     <Text style={[

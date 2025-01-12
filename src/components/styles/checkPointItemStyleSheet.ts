@@ -29,8 +29,8 @@ const checkPointItemStyleSheet = StyleSheet.create({
     dateItemTxt: {
         textAlign: "center",
         color: colors.grey,
-        fontSize: 13,
-        fontFamily: "Roboto",
+        fontSize: 12,
+        fontFamily: "RobotoLight",
     },
     lockContainer: {
         position: "absolute",
@@ -64,11 +64,10 @@ const checkPointItemStyleSheet = StyleSheet.create({
     },
     checkedTxt: {
         color: colors.approve,
-        fontWeight: "bold",
         transform: [{ rotate: "-60deg" }],
         textAlign: "center",
-        fontSize: 13,
-        fontFamily: "Roboto"
+        fontSize: ScreenWidth > 350 ? 13 : 8,
+        fontFamily: "RobotoMedium"
     },
     notCheckedContainer: {
         position: "absolute",
@@ -83,11 +82,10 @@ const checkPointItemStyleSheet = StyleSheet.create({
     },
     notCheckedTxt: {
         color: colors.disapprove,
-        fontWeight: "bold",
         transform: [{ rotate: "-60deg" }],
         textAlign: "center",
-        fontSize: 13,
-        fontFamily: "Roboto"
+        fontSize: ScreenWidth > 350 ? 13 : 8,
+        fontFamily: "RobotoMedium"
     },
     valueTxt: {
         textAlign: "center",

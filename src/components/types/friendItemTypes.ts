@@ -13,7 +13,6 @@ export interface FriendItemData {
 
 export interface FriendItemProps extends FriendItemData {
     item: FriendMessageData;
-    SPACING: number;
     opacity: Animated.AnimatedInterpolation<string | number>;
     AVATAR_SIZE: number;
     scale: Animated.AnimatedInterpolation<string | number>;

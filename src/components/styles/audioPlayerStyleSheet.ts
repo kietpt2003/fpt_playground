@@ -48,7 +48,7 @@ const audioPlayerStyleSheet = StyleSheet.create({
         color: "black",
         width: ScreenWidth,
         fontFamily: "Roboto",
-        fontSize: 16
+        fontSize: ScreenWidth > 350 ? 16 : 14
     },
 });
 

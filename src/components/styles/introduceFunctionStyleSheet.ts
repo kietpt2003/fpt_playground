@@ -45,9 +45,7 @@ const introduceFunctionScreenStyleSheet = StyleSheet.create({
     },
     text: {
         textAlignVertical: "center",
-        fontWeight: "bold",
-        fontSize: 15,
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     }
 });
 

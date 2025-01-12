@@ -74,22 +74,20 @@ const forgotPasswordStyleSheet = StyleSheet.create({
     },
     formTitlte: {
         alignSelf: "center",
-        fontWeight: "bold",
-        fontFamily: "Roboto"
+        fontFamily: "RobotoSemiBold"
     },
     formGuide: {
-        fontSize: 16,
-        fontFamily: "Roboto"
+        fontSize: 15,
+        fontFamily: "RobotoLight"
     },
     mailInput: {
         backgroundColor: "white",
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 10,
-        fontSize: 17,
         borderColor: "rgba(0, 0, 0, 0.3)",
         borderWidth: 0.5,
-        fontFamily: "Roboto"
+        fontFamily: "RobotoLight"
     },
     requestCodeBtnContainer: {
         width: '100%',
@@ -112,21 +110,19 @@ const forgotPasswordStyleSheet = StyleSheet.create({
         gap: 5
     },
     requestCodeTxt: {
-        fontWeight: "bold",
         letterSpacing: 1,
-        fontSize: 18,
+        fontSize: 16,
         color: colors.white,
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     backBtnContainer: {
         marginTop: -10
     },
     backBtnTxt: {
         alignSelf: "center",
-        fontSize: 15,
-        fontWeight: 500,
+        fontSize: 14.5,
         letterSpacing: 1,
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     versionControl: {
         position: "absolute",

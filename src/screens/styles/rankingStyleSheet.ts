@@ -23,10 +23,9 @@ const rankingStyleSheet = StyleSheet.create({
         paddingBottom: 5
     },
     headerText: {
-        fontSize: 20,
-        fontWeight: "600",
+        fontSize: ScreenWidth > 350 ? 20 : 18,
         color: colors.white,
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     headerButtonUnderline: {
         width: "35%",
@@ -150,10 +149,9 @@ const rankingStyleSheet = StyleSheet.create({
     userName: {
         width: ScreenWidth / 3.7,
         fontSize: 18,
-        color: colors.icyWhite,
-        fontWeight: "500",
+        color: colors.white,
         textAlign: "center",
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     diamondDetailContainer: {
         flexDirection: "row",
@@ -162,12 +160,11 @@ const rankingStyleSheet = StyleSheet.create({
     },
     diamondValue: {
         color: colors.white,
-        fontSize: 20,
-        fontWeight: "bold",
+        fontSize: ScreenWidth > 350 ? 18 : 17,
         textShadowColor: "rgba(0, 0, 0, 0.3)", // Viền đen rõ
         textShadowOffset: { width: -1, height: -1 }, // Viền trái/trên
         textShadowRadius: 1,
-        fontFamily: "Roboto"
+        fontFamily: "RobotoBold"
     },
     rankingContentImage: {
         width: ScreenHeight / 39,
@@ -210,17 +207,15 @@ const rankingStyleSheet = StyleSheet.create({
     },
     serverSelectName: {
         fontSize: 16,
-        fontWeight: "600",
         color: colors.white,
         textAlign: "center",
-        fontFamily: "Roboto"
+        fontFamily: "RobotoBold"
     },
     serverSelectedName: {
         fontSize: 18,
-        fontWeight: "600",
         color: colors.white,
         textAlign: "center",
-        fontFamily: "Roboto"
+        fontFamily: "RobotoBold"
     },
     faltListFooterStyle: {
         height: ScreenHeight / 9,
@@ -250,7 +245,7 @@ const rankingStyleSheet = StyleSheet.create({
         height: ScreenHeight / 8
     },
     menuItemTxt: {
-        fontSize: 16,
+        fontSize: 14.5,
         flex: 0.9,
         textAlign: 'left',
         flexWrap: "nowrap", // Ngăn xuống dòng

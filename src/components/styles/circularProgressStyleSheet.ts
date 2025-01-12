@@ -9,9 +9,8 @@ const circularProgressStyleSheet = StyleSheet.create({
     levelTxt: {
         position: "absolute",
         fontSize: 12,
-        fontWeight: "bold",
         color: colors.white,
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
 });
 

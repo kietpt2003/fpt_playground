@@ -35,8 +35,7 @@ const dateRewardRankingItemStyleSheet = StyleSheet.create({
         paddingLeft: 10,
         fontSize: 15,
         color: colors.icyWhite,
-        fontWeight: "600",
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     },
     contentContainer: {
         position: "absolute",
@@ -56,7 +55,7 @@ const dateRewardRankingItemStyleSheet = StyleSheet.create({
         paddingBottom: 10
     },
     collectButton: {
-        width: ScreenWidth * 0.95 - ScreenWidth * 0.7,
+        width: ScreenWidth * 0.93 - ScreenWidth * 0.7,
         height: 35,
         marginRight: 10,
         backgroundColor: colors.disabled,
@@ -77,10 +76,8 @@ const dateRewardRankingItemStyleSheet = StyleSheet.create({
     },
     collectButtonTxt: {
         textAlign: "center",
-        fontSize: 16,
-        fontWeight: "600",
         color: colors.white,
-        fontFamily: "Roboto"
+        fontFamily: "RobotoMedium"
     }
 });
 

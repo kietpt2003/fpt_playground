@@ -36,8 +36,7 @@ const npcGuidelineStyleSheet = StyleSheet.create({
         fontFamily: "Roboto"
     },
     textCursor: {
-        fontWeight: "bold",
-        fontFamily: "Roboto"
+        fontFamily: "RobotoBold"
     },
     nextButton: {
         position: "absolute",

@@ -18,7 +18,7 @@ export default function VolumeModal({ openChangeVolume, setOpenChangeVolume }: V
 
     const defaultVolumeValue = reduxVolumeValue * 10;
     const [localVolumeValue, setLocalVolumeValue] = useState(reduxVolumeValue * 10);
-    const [thumbPosition, setThumbPosition] = useState(0); // Vị trí thumb trên thanh trượt
+    const [thumbPosition, setThumbPosition] = useState(sliderWidth / 2 - 18); // Vị trí thumb trên thanh trượt
 
     const reduxTheme = useSelector((state: RootState) => state.theme.theme);
 

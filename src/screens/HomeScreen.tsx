@@ -5,10 +5,9 @@ import { RootState } from '../store/store';
 import { colors } from '../constants/colors';
 import { LinearGradient } from 'expo-linear-gradient';
 import homeScreenStyleSheet from './styles/homeScreenStyleSheet';
-import { Entypo, Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { EvilIcons, Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { Menu, MenuItem } from 'react-native-material-menu';
 import { useTranslation } from 'react-i18next';
-import PTKCoin from '../components/PTKCoin';
 import useClick from '../hooks/useClick';
 import FeatureComponent from '../components/FeatureComponent';
 import HeaderLeft from '../components/HeaderLeft';
@@ -17,6 +16,8 @@ import { GroupChatNavigationProp } from './types/groupChatTypes';
 import DailyCheckPoint from '../components/DailyCheckPoint';
 import { StatusBar } from 'expo-status-bar';
 import NPCGuideline from '../components/NPCGuideline';
+import PTKCoinIcon from '../components/PTKCoinIcon';
+import { ScreenWidth } from '@rneui/base';
 
 export default function HomeScreen() {
     const theme = useSelector((state: RootState) => state.theme.theme);
@@ -151,9 +152,9 @@ export default function HomeScreen() {
                                 }}
                             >
                                 <View style={homeScreenStyleSheet.menuItem}>
-                                    <PTKCoin
-                                        style={homeScreenStyleSheet.coinContainer}
-                                        textStyle={homeScreenStyleSheet.coinTxt}
+                                    <PTKCoinIcon
+                                        coinColor={colors.black}
+                                        size={20}
                                     />
                                     <Text style={homeScreenStyleSheet.menuItemTxt}>
                                         {t("change-coin")}
@@ -261,14 +262,17 @@ export default function HomeScreen() {
                                 navigation.navigate("DailyCheckPointScreen");
                             }}
                         >
-                            <Text style={{
-                                color: theme === "dark" ? colors.white : colors.black
-                            }}>
+                            <Text style={[
+                                homeScreenStyleSheet.findoutTxt,
+                                {
+                                    color: theme === "dark" ? colors.white : colors.black,
+                                },
+                            ]}>
                                 {t("find-out")}
                             </Text>
-                            <Entypo
-                                name="chevron-small-right"
-                                size={20}
+                            <EvilIcons
+                                name="chevron-right"
+                                size={ScreenWidth > 350 ? 24 : 20}
                                 color={theme === "dark" ? colors.white : colors.black}
                             />
                         </TouchableOpacity>
@@ -364,14 +368,17 @@ export default function HomeScreen() {
                                 navigation.navigate("Ranking");
                             }}
                         >
-                            <Text style={{
-                                color: theme === "dark" ? colors.white : colors.black
-                            }}>
+                            <Text style={[
+                                homeScreenStyleSheet.findoutTxt,
+                                {
+                                    color: theme === "dark" ? colors.white : colors.black,
+                                },
+                            ]}>
                                 {t("find-out-now")}
                             </Text>
-                            <Entypo
-                                name="chevron-small-right"
-                                size={20}
+                            <EvilIcons
+                                name="chevron-right"
+                                size={ScreenWidth > 350 ? 24 : 20}
                                 color={theme === "dark" ? colors.white : colors.black}
                             />
                         </TouchableOpacity>

@@ -49,9 +49,8 @@ const friendsScreenStyleSheet = StyleSheet.create({
         borderRadius: 10
     },
     headerTitle: {
-        fontSize: 24,
-        fontWeight: "700",
-        fontFamily: "Roboto"
+        fontSize: 20,
+        fontFamily: "RobotoSemiBold"
     },
     searhContainer: {
         width: ScreenWidth - 40,
