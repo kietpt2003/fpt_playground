@@ -41,14 +41,14 @@ const data: FriendItemData[] = Array.from({ length: 20 }).map((_, index) => {
             sender: {
                 id: senderId,
                 name: faker.person.firstName(),
-                imageUrl: faker.image.avatar(),
+                imageUrl: faker.image.urlPicsumPhotos({ width: 200, height: 200 }),
                 gender: faker.helpers.arrayElement(["Male", "Female"]),
             },
             senderId,
             receiver: {
                 id: receiverId,
                 name: faker.person.firstName(),
-                imageUrl: faker.image.avatar(),
+                imageUrl: faker.image.urlPicsumPhotos({ width: 200, height: 200 }),
                 gender: faker.helpers.arrayElement(["Male", "Female"]),
             },
             receiverId,
