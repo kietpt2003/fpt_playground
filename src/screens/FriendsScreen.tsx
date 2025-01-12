@@ -9,6 +9,9 @@ import { RootState } from '../store/store'
 import { colors } from '../constants/colors'
 import { FontAwesome } from '@expo/vector-icons';
 import { faker } from '@faker-js/faker';
+import { FriendItemData } from '../components/types/friendItemTypes'
+import { Message } from '../constants/entities/Message'
+import FriendItem from '../components/FriendItem'
 
 faker.seed(10);
 
@@ -25,6 +28,36 @@ const DATA = [...Array(30).keys()].map((_, i) => {
 const SPACING = 20;
 const AVATAR_SIZE = 70;
 const ITEM_SIZE = AVATAR_SIZE + SPACING * 3;
+
+const statuses: Message["status"][] = ["Inactive", "Unsend", "Sent", "Received", "Read"];
+
+const data: FriendItemData[] = Array.from({ length: 20 }).map((_, index) => {
+    const senderId = faker.string.uuid();
+    const receiverId = faker.string.uuid();
+
+    return {
+        item: {
+            id: faker.string.uuid(),
+            sender: {
+                id: senderId,
+                name: faker.person.firstName(),
+                imageUrl: faker.image.avatar(),
+                gender: faker.helpers.arrayElement(["Male", "Female"]),
+            },
+            senderId,
+            receiver: {
+                id: receiverId,
+                name: faker.person.firstName(),
+                imageUrl: faker.image.avatar(),
+                gender: faker.helpers.arrayElement(["Male", "Female"]),
+            },
+            receiverId,
+            content: faker.lorem.sentence(faker.number.int({ min: 3, max: 8 })),
+            createdAt: faker.date.recent(),
+            status: statuses[index % statuses.length],
+        },
+    };
+});
 
 export default function FriendsScreen() {
     const user: User = {
@@ -94,13 +127,13 @@ export default function FriendsScreen() {
             </View>
 
             <View style={friendsScreenStyleSheet.flatListContainer}>
-                <Animated.FlatList
-                    data={DATA}
+                <Animated.FlatList<FriendItemData>
+                    data={data}
                     onScroll={Animated.event(
                         [{ nativeEvent: { contentOffset: { y: scrollY } } }],
                         { useNativeDriver: true }
                     )}
-                    keyExtractor={item => item.key}
+                    keyExtractor={item => item.item.id}
                     contentContainerStyle={{
                         padding: SPACING
                     }}
@@ -129,51 +162,13 @@ export default function FriendsScreen() {
                             outputRange: [1, 1, 1, 0]
                         })
 
-                        return <Animated.View style={{
-                            flexDirection: "row",
-                            padding: SPACING,
-                            marginBottom: SPACING,
-                            borderRadius: 12,
-                            backgroundColor: colors.blurWhite,
-                            shadowColor: "#000",
-                            shadowOffset: {
-                                width: 0,
-                                height: 10
-                            },
-                            shadowOpacity: 0.3,
-                            shadowRadius: 20,
-                            transform: [{ scale }],
-                            opacity
-                        }}>
-                            <Image
-                                source={{ uri: item.image }}
-                                style={{
-                                    width: AVATAR_SIZE,
-                                    height: AVATAR_SIZE,
-                                    borderRadius: AVATAR_SIZE,
-                                    marginRight: SPACING,
-
-                                }}
-                            />
-
-                            <View>
-                                <Text style={{
-                                    fontSize: 22,
-                                    fontWeight: "700",
-                                    fontFamily: "Roboto"
-                                }}>{item.name}</Text>
-                                <Text style={{
-                                    fontSize: 18,
-                                    opacity: .7
-                                }}>{item.jobTitle}</Text>
-                                <Text style={{
-                                    fontSize: 14,
-                                    opacity: 0.8,
-                                    color: colors.diamond
-                                }}>{item.email}</Text>
-
-                            </View>
-                        </Animated.View>
+                        return <FriendItem
+                            AVATAR_SIZE={AVATAR_SIZE}
+                            SPACING={SPACING}
+                            opacity={opacity}
+                            scale={scale}
+                            item={item.item}
+                        />
                     }}
                 />
             </View>
