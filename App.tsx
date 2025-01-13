@@ -14,6 +14,7 @@ import messaging from '@react-native-firebase/messaging';
 import { ClickProvider } from './src/context/ClickContext';
 import { NonPlayerCharacterProvider } from './src/context/NonPlayerCharacterContext';
 import * as Font from 'expo-font';
+import { PhotoProvider } from './src/context/PhotoContext';
 
 // Register background handler
 messaging().setBackgroundMessageHandler(async remoteMessage => {
@@ -60,12 +61,14 @@ export default function App() {
         <AudioProvider>
           <ClickProvider>
             <NonPlayerCharacterProvider>
-              <NavigationContainer>
-                <GestureHandlerRootView style={{ flex: 1 }}>
-                  <StatusBar backgroundColor={undefined} />
-                  <RootNavigator onMount={() => setIsMounted(true)} />
-                </GestureHandlerRootView>
-              </NavigationContainer>
+              <PhotoProvider>
+                <NavigationContainer>
+                  <GestureHandlerRootView style={{ flex: 1 }}>
+                    <StatusBar backgroundColor={undefined} />
+                    <RootNavigator onMount={() => setIsMounted(true)} />
+                  </GestureHandlerRootView>
+                </NavigationContainer>
+              </PhotoProvider>
             </NonPlayerCharacterProvider>
           </ClickProvider>
         </AudioProvider>

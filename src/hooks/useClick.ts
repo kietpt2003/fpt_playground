@@ -1,7 +1,6 @@
 import { useContext } from "react";
 import { ClickContext } from "../context/ClickContext";
 
-// Hook để sử dụng AudioContext
 const useClick = () => {
     const context = useContext(ClickContext);
     if (!context) {

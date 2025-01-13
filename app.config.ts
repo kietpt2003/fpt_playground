@@ -32,6 +32,20 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         ],
         [
             "@react-native-google-signin/google-signin"
+        ],
+        [
+            "expo-media-library",
+            {
+                photosPermission: "Allow FPT Playground to access your photos.",
+                savePhotosPermission: "Allow FPT Playground to save photos.",
+                isAccessMediaLocationEnabled: true
+            }
+        ],
+        [
+            "expo-image-picker",
+            {
+                photosPermission: "Allow FPT Playground to use your photos."
+            }
         ]
     ],
 });

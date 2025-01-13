@@ -1,4 +1,4 @@
-import { View, Text, ImageBackground, TextInput, TouchableOpacity, Image, Keyboard } from 'react-native';
+import { View, Text, ImageBackground, TextInput, TouchableOpacity, Image, Keyboard, Platform, PermissionsAndroid, Permission } from 'react-native';
 import React, { useCallback, useState } from 'react'
 import signinStyleSheet from './styles/signinStyleSheet';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -27,6 +27,8 @@ import { handleError } from '../utils/handleError';
 import ErrorModal from '../components/ErrorModal';
 import useClick from '../hooks/useClick';
 import { SigninScreenNavigationProp } from './types/signinScreenTypes';
+import * as Location from "expo-location";
+import usePhoto from '../hooks/usePhoto';
 
 export default function SiginScreen() {
     GoogleSignin.configure({
@@ -61,6 +63,8 @@ export default function SiginScreen() {
 
     const [stringErr, setStringErr] = useState<string>("");
     const [isError, setIsError] = useState<boolean>(false);
+
+    const { loadAlbums } = usePhoto();
 
     // const handleLoginGoogle = async (accessToken) => {
     //     try {
@@ -123,6 +127,46 @@ export default function SiginScreen() {
             }
         }
     };
+
+    const checkAndRequestPermission = async (permission: Permission) => {
+        const granted = await PermissionsAndroid.check(permission);
+        if (!granted) {
+            return await PermissionsAndroid.request(permission);
+        }
+        return granted;
+    };
+
+    const getPermissionAndroid = async () => {
+        try {
+            const version = parseInt(Platform.Version.toString(), 10);
+
+            // Android 13 trở lên
+            if (version >= 33) {
+                await checkAndRequestPermission(PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES);
+            } else {
+                // Android dưới 13
+                await checkAndRequestPermission(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
+            }
+
+            // Các quyền khác (tuỳ chọn)
+            await checkAndRequestPermission(PermissionsAndroid.PERMISSIONS.ACCESS_MEDIA_LOCATION);
+        } catch (err) {
+            console.warn('Error requesting permissions: ', err);
+        }
+    };
+
+    //Check user permissions
+    useFocusEffect(
+        useCallback(() => {
+            (async () => {
+                await Location.requestForegroundPermissionsAsync();
+                await loadAlbums();
+                if (Platform.OS === "android") {
+                    await getPermissionAndroid();
+                }
+            })();
+        }, [])
+    );
 
     //Check keyboard open
     useFocusEffect(

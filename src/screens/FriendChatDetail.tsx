@@ -2,18 +2,18 @@ import { View, Text, TouchableOpacity, TextInput, Keyboard, Platform } from 'rea
 import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { FriendChatDetailRouteProp } from '../components/types/friendItemTypes';
-import { User } from '../constants/entities/User';
 import { faker } from '@faker-js/faker/.';
 import friendChatDetailStyleSheet from './styles/friendChatDetailStyleSheet';
 import UserAvatar from '../components/UserAvatar';
-import { AntDesign, Entypo, EvilIcons, Feather, FontAwesome, FontAwesome6, Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { AntDesign, Entypo, FontAwesome, FontAwesome6 } from '@expo/vector-icons';
 import { colors } from '../constants/colors';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from 'react-i18next';
 import { enUS, vi } from 'date-fns/locale';
 import { formatDistanceToNowStrict } from 'date-fns';
+import BottomSheetGallery from '../components/BottomSheetGallery';
+import { ScreenHeight } from '@rneui/base';
 
 export default function FriendChatDetail() {
     const route = useRoute<FriendChatDetailRouteProp>();
@@ -22,6 +22,12 @@ export default function FriendChatDetail() {
     const navigation = useNavigation();
 
     const theme = useSelector((state: RootState) => state.theme.theme);
+
+    const [isGalleryVisible, setGalleryVisible] = useState(false);
+    const photos = Array.from({ length: 20 }, (_, index) => ({
+        id: `${index}`,
+        uri: faker.image.urlPicsumPhotos({ width: 200, height: 200 }),
+    }));
 
     const lastSeen: Date = faker.date.recent();
     const { t, i18n } = useTranslation();
@@ -138,6 +144,14 @@ export default function FriendChatDetail() {
                     {/* Images galery */}
                     <TouchableOpacity
                         style={friendChatDetailStyleSheet.touchableButton}
+                        onPress={() => {
+                            if (!isGalleryVisible) {
+                                setKeyboardHeight(ScreenHeight / 3);
+                            } else {
+                                setKeyboardHeight(0);
+                            }
+                            setGalleryVisible(!isGalleryVisible);
+                        }}
                     >
                         <FontAwesome name={"image"} size={24} color={theme === "dark" ? colors.darkBlue : colors.darkOrange} />
                     </TouchableOpacity>
@@ -165,6 +179,10 @@ export default function FriendChatDetail() {
                     </TouchableOpacity>
                 </View>
             </View>
+            <BottomSheetGallery
+                isVisible={isGalleryVisible}
+                photos={photos}
+            />
         </View>
     )
 }
