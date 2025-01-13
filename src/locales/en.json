@@ -139,5 +139,7 @@
     "games": "Entertainment mode",
     "games-content": "Play games to earn more coins.",
     "chat-title-header": "Messages",
-    "search-friend-placeholder": "Search friends"
+    "search-friend-placeholder": "Search friends",
+    "online-active": "Online ",
+    "chat-input-msg": "Mesage"
 }

@@ -9,9 +9,9 @@ const friendItemStyleSheet = StyleSheet.create({
         gap: 10
     },
     username: {
+        width: ScreenWidth - 55 - 40,
         fontSize: 15,
         fontFamily: "Roboto",
-        overflow: "hidden"
     },
     contentContainer: {
         width: ScreenWidth - 55 - 40,

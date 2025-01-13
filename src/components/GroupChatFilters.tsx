@@ -4,6 +4,8 @@ import { colors } from '../constants/colors';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { GroupChatFilterProps } from './types/groupChatFilterTypes';
+import groupChatFiltersStyleSheet from './styles/groupChatFiltersStyleSheet';
+import GroupChatFilterItem from './GroupChatFilterItem';
 
 const _spacing = 10;
 
@@ -46,49 +48,42 @@ export default function GroupChatFilters({ firstFilter }: GroupChatFilterProps) 
     }, [index])
 
     return (
-        <FlatList
+        <FlatList<string>
             ref={ref}
             initialScrollIndex={index}
-            style={{ flexGrow: 0 }}
+            style={groupChatFiltersStyleSheet.flatListStyle}
             data={data}
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
             horizontal={true}
             renderItem={({ item, index: fIndex }) => (
-                <TouchableOpacity
-                    onPress={() => {
-                        setIndex(fIndex);
-                    }}
-                    touchSoundDisabled={true}
-                >
-                    <View
-                        style={{
+                <GroupChatFilterItem
+                    item={item}
+                    textColor={fIndex === index ? colors.white :
+                        theme === "light" ? colors.darkOrange : colors.darkBlue}
+                    viewStyle={
+                        {
                             marginRight: _spacing,
                             padding: _spacing,
-                            borderWidth: 1,
                             borderColor: theme === "dark" ? colors.darkBlue : colors.darkOrange,
-                            borderRadius: 12,
                             backgroundColor: (theme === "dark" && fIndex === index) ? colors.darkBlue :
                                 (theme === "light" && fIndex === index) ? colors.darkOrange : colors.icyWhite,
                             opacity: fIndex === index ? 1 : 0.6
-                        }}
-                    >
-                        <Text style={{
-                            color: fIndex === index ? colors.white :
-                                theme === "light" ? colors.darkOrange : colors.darkBlue,
-                            fontFamily: "Roboto"
-                        }}>
-                            {item}
-                        </Text>
-                    </View>
-                </TouchableOpacity>
+                        }
+                    }
+                    onPress={() => {
+                        setIndex(fIndex);
+                    }}
+                />
             )}
             keyExtractor={(item, index) => index.toString()}
-            contentContainerStyle={{
-                paddingLeft: _spacing,
-                marginTop: _spacing,
-                marginBottom: 20
-            }}
+            contentContainerStyle={[
+                groupChatFiltersStyleSheet.flatListContentContainerStyle,
+                {
+                    paddingLeft: _spacing,
+                    marginTop: _spacing,
+                }
+            ]}
             onScrollToIndexFailed={(info) => {
                 // Cuộn đến mục gần nhất
                 ref.current?.scrollToIndex({

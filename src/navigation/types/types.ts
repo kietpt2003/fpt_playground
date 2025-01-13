@@ -12,6 +12,10 @@ export type RootStackParamList = {
     RankingReward: undefined;
     DailyCheckPointScreen: undefined;
     FriendsScreen: undefined;
+    FriendChatDetail: {
+        senderId: string;
+        receiverId: string;
+    };
 };
 
 export type NavigationProps = StackNavigationProp<RootStackParamList>;

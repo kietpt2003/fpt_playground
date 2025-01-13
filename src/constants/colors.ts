@@ -58,5 +58,6 @@ export const colors = {
     likesColor: "#1877F2",
     diamond: "#00BFFF",
     diamond1: "#94D4F5",
-    diamond2: "#3868A4"
+    diamond2: "#3868A4",
+    chatBox: "rgba(0,0,0,0.1)"
 };
