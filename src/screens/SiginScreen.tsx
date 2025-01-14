@@ -64,7 +64,7 @@ export default function SiginScreen() {
     const [stringErr, setStringErr] = useState<string>("");
     const [isError, setIsError] = useState<boolean>(false);
 
-    const { loadAlbums } = usePhoto();
+    const { requestMediaLibPermissionWithoutLinking } = usePhoto();
 
     // const handleLoginGoogle = async (accessToken) => {
     //     try {
@@ -160,7 +160,7 @@ export default function SiginScreen() {
         useCallback(() => {
             (async () => {
                 await Location.requestForegroundPermissionsAsync();
-                await loadAlbums();
+                await requestMediaLibPermissionWithoutLinking();
                 if (Platform.OS === "android") {
                     await getPermissionAndroid();
                 }

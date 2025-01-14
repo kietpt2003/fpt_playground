@@ -1,6 +1,8 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import { Pagination, PhotoContextProps, PhotoProviderProps } from './types/photoContextType';
 import * as MediaLibrary from 'expo-media-library';
+import { Linking } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 const PhotoContext = createContext<PhotoContextProps | undefined>(undefined);
 
@@ -9,49 +11,140 @@ function PhotoProvider({ children }: PhotoProviderProps) {
     const [requestPermission, setRequestPermission] = useState(true);
     const [albums, setAlbums] = useState<MediaLibrary.Album[]>([]);
     const [pagination, setPagination] = useState<Record<string, Pagination>>({});
+    const [canAskAgain, setCanAskAgain] = useState(true);
+    const [fullPhotos, setFullPhotos] = useState<MediaLibrary.Asset[]>([]);
+    const [fullPhotoPagination, setFullPhotoPagination] = useState<Pagination | undefined>(undefined);
+    const [totalImages, setTotalImages] = useState<number>(0);
 
     const requestPermissionAsync = async () => {
-        const { status } = await MediaLibrary.requestPermissionsAsync(false, ["photo"]); // Xin quyền truy cập
+        const { status, canAskAgain: expoCanAskAgain } = await MediaLibrary.requestPermissionsAsync(false, ["photo"]); // Xin quyền truy cập
+        if (status === 'granted') {
+            setRequestPermission(false);
+        } else {
+            setRequestPermission(true);
+        }
+        setCanAskAgain(expoCanAskAgain);
+
+        if (!expoCanAskAgain) {
+            await Linking.openSettings();
+        }
         return status;
     }
 
-    const loadAlbums = async () => {
+    const requestPermissionWithoutLinkingAsync = async () => {
+        const { status, canAskAgain: expoCanAskAgain } = await MediaLibrary.requestPermissionsAsync(false, ["photo"]); // Xin quyền truy cập
+        if (status === 'granted') {
+            setRequestPermission(false);
+        } else {
+            setRequestPermission(true);
+        }
+        setCanAskAgain(expoCanAskAgain);
+        return {
+            status,
+            canAskAgain: expoCanAskAgain
+        };
+    }
+
+    const getTotalPhotos = async () => {
         try {
-            const status = await requestPermissionAsync(); // Xin quyền truy cập
+            // Yêu cầu quyền truy cập thư viện ảnh
+            const { status } = await requestPermissionWithoutLinkingAsync(); // Xin quyền truy cập
             if (status === 'granted') {
-                setRequestPermission(false);
-                const fetchedAlbums = await MediaLibrary.getAlbumsAsync({
-                    includeSmartAlbums: true,
+                // Lấy thông tin ảnh với số lượng nhỏ nhất có thể
+                const assets = await MediaLibrary.getAssetsAsync({
+                    mediaType: 'photo',
+                    first: 1, // Chỉ lấy 1 ảnh để giảm tải
                 });
-                setAlbums(fetchedAlbums);
-            } else {
-                setRequestPermission(true);
-                setAlbums([]);
-                setPhotos({});
-                setPagination({});
+
+                // Tổng số ảnh
+                const totalPhotos = assets.totalCount;
+                setTotalImages(totalPhotos)
             }
         } catch (error) {
-            console.error('Error fetching albums: ', error);
+            console.error('Lỗi khi lấy tổng số ảnh:', error);
+            return 0;
         }
     };
 
-    const loadPhotos = async (album: MediaLibrary.Album, after: MediaLibrary.AssetRef | undefined = undefined): Promise<boolean> => {
+    const loadPhotosSortByCreationTime = async (numberPhotoToLoad: number, after: MediaLibrary.AssetRef | undefined = undefined): Promise<boolean> => {
+        const { status } = await requestPermissionWithoutLinkingAsync(); // Xin quyền truy cập
+
+        if (status === 'granted') {
+            setRequestPermission(false);
+            const assets = await MediaLibrary.getAssetsAsync({
+                first: numberPhotoToLoad,
+                mediaType: "photo",
+                after,
+                sortBy: "modificationTime"
+            });
+
+            const existingPhotos = fullPhotos;
+            const newPhotos = existingPhotos.concat(assets.assets);
+
+            setFullPhotos(newPhotos);
+
+            setFullPhotoPagination({
+                hasNextPage: assets.hasNextPage,
+                endCursor: assets.endCursor,
+            });
+
+            return assets.hasNextPage;
+        } else {
+            setRequestPermission(true);
+            setAlbums([]);
+            setPhotos({});
+            setPagination({});
+            setFullPhotos([]);
+            setFullPhotoPagination(undefined);
+            return false;
+        }
+    }
+
+    //Lấy danh sách albums
+    const loadAlbums = async () => {
+        const { status } = await requestPermissionWithoutLinkingAsync();
+
+        if (status === 'granted') {
+            setRequestPermission(false);
+            const fetchedAlbums = await MediaLibrary.getAlbumsAsync({
+                includeSmartAlbums: true,
+            });
+
+            setAlbums(fetchedAlbums);
+        } else {
+            setRequestPermission(true);
+            setAlbums([]);
+            setPhotos({});
+            setPagination({});
+            setFullPhotos([]);
+            setFullPhotoPagination(undefined);
+        }
+    };
+
+    // Lấy danh sách ảnh từ thư mục
+    const loadPhotos = async (album: MediaLibrary.Album, numberPhotoToLoad: number, after: MediaLibrary.AssetRef | undefined = undefined): Promise<boolean> => {
         if (!photos[album.id]) photos[album.id] = [];
 
-        const status = await requestPermissionAsync(); // Xin quyền truy cập
+        const { status } = await requestPermissionWithoutLinkingAsync(); // Xin quyền truy cập
+
         if (status === 'granted') {
             setRequestPermission(false);
             const albumAssets = await MediaLibrary.getAssetsAsync({
                 album,
-                first: 50,
-                after,
-                mediaType: "photo"
+                first: numberPhotoToLoad,
+                mediaType: "photo",
+                after
             });
 
-            setPhotos((prevPhotos) => ({
-                ...prevPhotos,
-                [album.id]: [...(prevPhotos[album.id] || []), ...albumAssets.assets as MediaLibrary.Asset[]],
-            }));
+            const existingPhotos = photos[album.id] || [];
+            const newPhotos = existingPhotos.concat(albumAssets.assets);
+
+            setPhotos((prevPhotos) => {
+                return {
+                    ...prevPhotos,
+                    [album.id]: newPhotos,
+                };
+            });
 
             setPagination((prevPagination) => ({
                 ...prevPagination,
@@ -67,38 +160,41 @@ function PhotoProvider({ children }: PhotoProviderProps) {
             setAlbums([]);
             setPhotos({});
             setPagination({});
+            setFullPhotos([]);
+            setFullPhotoPagination(undefined);
             return false;
         }
     };
 
-    // Lấy danh sách ảnh từ thư viện
-    // const getPhotos = async (isInitialLoad = false) => {
-    //     if (loading || (!isInitialLoad && !hasMore)) return; // Ngừng nếu đang tải hoặc không còn ảnh
-    //     setLoading(true);
-    //     try {
-    //         const { status } = await MediaLibrary.requestPermissionsAsync(false, ["photo"]); // Xin quyền truy cập
-    //         if (status === 'granted') {
-    //             setRequestPermission(false);
-    //             const album = await MediaLibrary.getAssetsAsync({
-    //                 mediaType: 'photo',
-    //                 first: 50, // Tải tối đa 50 ảnh mỗi lần
-    //                 after: lastAssetId, // Chỉ định asset cuối cùng nếu có
+    async function loadPhotosFromAlbum(numberPhotoToLoad: number) {
+        if (albums.length > 0) {
+            albums.forEach(async (album) => {
+                await loadPhotos(album, numberPhotoToLoad, pagination[album.id]?.endCursor);
+            });
+        }
+    }
 
-    //             });
+    //Count total photos
+    useEffect(() => {
+        getTotalPhotos();
+    }, [photos])
 
-    //             setPhotos((prevPhotos) => isInitialLoad ? album.assets : [...prevPhotos, ...album.assets]); // Thêm ảnh mới vào danh sách
-    //             setLastAssetId(album.endCursor || undefined); // Cập nhật asset cuối cùng
-    //             setHasMore(album.hasNextPage); // Cập nhật trạng thái còn ảnh hay không
-    //         } else {
-    //             setRequestPermission(true);
-    //             setPhotos([]);
-    //         }
-    //     } catch (error) {
-    //         console.error('Error fetching photos: ', error);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
+    //Load full photos
+    useEffect(() => {
+        loadPhotosSortByCreationTime(10, fullPhotoPagination?.endCursor);
+    }, [])
+
+    //Load albums
+    useEffect(() => {
+        loadAlbums();
+    }, [])
+
+    //Load photos from album
+    useEffect(() => {
+        if (albums.length > 0) {
+            loadPhotosFromAlbum(10);
+        }
+    }, [albums])
 
     return (
         <PhotoContext.Provider value={{
@@ -108,6 +204,13 @@ function PhotoProvider({ children }: PhotoProviderProps) {
             albums,
             loadAlbums,
             pagination,
+            canAskAgain,
+            requestMediaLibPermissionWithoutLinking: requestPermissionWithoutLinkingAsync,
+            requestMediaLibPermission: requestPermissionAsync,
+            fullPhotos,
+            fullPhotoPagination,
+            loadPhotosSortByCreationTime,
+            totalImages,
         }}>
             {children}
         </PhotoContext.Provider>

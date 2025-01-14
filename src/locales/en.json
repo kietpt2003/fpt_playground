@@ -141,5 +141,7 @@
     "chat-title-header": "Messages",
     "search-friend-placeholder": "Search friends",
     "online-active": "Online ",
-    "chat-input-msg": "Mesage"
+    "chat-input-msg": "Mesage",
+    "no-image": "No images found",
+    "all-images": "All images"
 }

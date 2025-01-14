@@ -141,5 +141,7 @@
     "chat-title-header": "Tin nhắn",
     "search-friend-placeholder": "Tìm kiếm",
     "online-active": "Hoạt động ",
-    "chat-input-msg": "Nhắn tin"
+    "chat-input-msg": "Nhắn tin",
+    "no-image": "Không có hình ảnh để hiển thị",
+    "all-images": "Tất cả ảnh"
 }

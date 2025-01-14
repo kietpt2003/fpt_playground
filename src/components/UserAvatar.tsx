@@ -46,7 +46,6 @@ export default function UserAvatar({
                     borderColor: imageBorderColor,
                     position: "absolute",
                     left: 0,
-                    zIndex: 1
                 }}>
                     <Image
                         source={require("../../assets/images/user-default-ava.jpg")}

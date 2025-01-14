@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, TextInput, Keyboard, Platform } from 'react-native'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { FriendChatDetailRouteProp } from '../components/types/friendItemTypes';
 import { faker } from '@faker-js/faker/.';
@@ -12,8 +12,12 @@ import { RootState } from '../store/store';
 import { useTranslation } from 'react-i18next';
 import { enUS, vi } from 'date-fns/locale';
 import { formatDistanceToNowStrict } from 'date-fns';
-import BottomSheetGallery from '../components/BottomSheetGallery';
 import { ScreenHeight } from '@rneui/base';
+import BottomSheet from '@gorhom/bottom-sheet';
+import { BottomSheetGallery } from '../components/BottomSheetGallery';
+import usePhoto from '../hooks/usePhoto';
+import { Album } from 'expo-media-library';
+import { BottomSheetAlbumFilter } from '../components/BottomSheetAlbumFilter';
 
 export default function FriendChatDetail() {
     const route = useRoute<FriendChatDetailRouteProp>();
@@ -23,11 +27,67 @@ export default function FriendChatDetail() {
 
     const theme = useSelector((state: RootState) => state.theme.theme);
 
+    // bottom sheet
     const [isGalleryVisible, setGalleryVisible] = useState(false);
-    const photos = Array.from({ length: 20 }, (_, index) => ({
-        id: `${index}`,
-        uri: faker.image.urlPicsumPhotos({ width: 200, height: 200 }),
-    }));
+    const bottomSheetRef = useRef<BottomSheet>(null);
+    const [bottomSheetHeight, setBottomSheetHeight] = useState<number>(ScreenHeight / 3);
+    const handleOpenBottomSheet = () => {
+        if (bottomSheetRef.current) {
+            bottomSheetRef.current.snapToIndex(0);
+        }
+    }
+    const handleCloseBottomSheet = () => {
+        if (bottomSheetRef.current) {
+            bottomSheetRef.current.close();
+        }
+        handleCloseAlbumBottomSheetFilter();
+    }
+    const handleOpenPhoneSetting = async () => {
+        if (!canAskAgain) {
+            await requestMediaLibPermission();
+            const { status, canAskAgain } = await requestMediaLibPermissionWithoutLinking();
+            if (canAskAgain && status === "granted") {
+                handleBottomSheet();
+            }
+        }
+    }
+    const handleBottomSheet = () => {
+        if (!isGalleryVisible) {
+            setKeyboardHeight(ScreenHeight / 3);
+            handleOpenBottomSheet();
+        } else {
+            setKeyboardHeight(0);
+            handleCloseBottomSheet();
+        }
+        setGalleryVisible(!isGalleryVisible);
+    }
+
+    // album bottom sheet filter
+    const [showAlbumsList, setShowAlbumsList] = useState<boolean>(false);
+    const albumBottomSheetRef = useRef<BottomSheet>(null);
+    const handleOpenAlbumBottomSheetFilter = () => {
+        if (albumBottomSheetRef.current) {
+            albumBottomSheetRef.current.snapToIndex(0);
+        }
+    }
+    const handleCloseAlbumBottomSheetFilter = () => {
+        if (albumBottomSheetRef.current) {
+            albumBottomSheetRef.current.close();
+        }
+    }
+
+    const {
+        requestPermission,
+        requestMediaLibPermission,
+        canAskAgain,
+        requestMediaLibPermissionWithoutLinking,
+        albums,
+        loadAlbums,
+        photos,
+        loadPhotos,
+        pagination,
+    } = usePhoto();
+    const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
 
     const lastSeen: Date = faker.date.recent();
     const { t, i18n } = useTranslation();
@@ -145,12 +205,11 @@ export default function FriendChatDetail() {
                     <TouchableOpacity
                         style={friendChatDetailStyleSheet.touchableButton}
                         onPress={() => {
-                            if (!isGalleryVisible) {
-                                setKeyboardHeight(ScreenHeight / 3);
+                            if (!requestPermission) {
+                                handleBottomSheet();
                             } else {
-                                setKeyboardHeight(0);
+                                handleOpenPhoneSetting();
                             }
-                            setGalleryVisible(!isGalleryVisible);
                         }}
                     >
                         <FontAwesome name={"image"} size={24} color={theme === "dark" ? colors.darkBlue : colors.darkOrange} />
@@ -180,8 +239,22 @@ export default function FriendChatDetail() {
                 </View>
             </View>
             <BottomSheetGallery
-                isVisible={isGalleryVisible}
-                photos={photos}
+                ref={bottomSheetRef}
+                selectedAlbum={selectedAlbum}
+                handleOpenAlbumBottomSheetFilter={handleOpenAlbumBottomSheetFilter}
+                handleCloseAlbumBottomSheetFilter={handleCloseAlbumBottomSheetFilter}
+                bottomSheetHeight={bottomSheetHeight}
+                setBottomSheetHeight={setBottomSheetHeight}
+                showAlbumsList={showAlbumsList}
+                setShowAlbumsList={setShowAlbumsList}
+            />
+            <BottomSheetAlbumFilter
+                ref={albumBottomSheetRef}
+                bottomSheetAlbumFilterHeight={bottomSheetHeight - 50}
+                setSelectedAlbum={setSelectedAlbum}
+                handleCloseAlbumBottomSheetFilter={handleCloseAlbumBottomSheetFilter}
+                showAlbumsList={showAlbumsList}
+                setShowAlbumsList={setShowAlbumsList}
             />
         </View>
     )
