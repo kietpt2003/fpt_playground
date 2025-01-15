@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, TextInput, Keyboard, Platform } from 'react-native'
+import { View, Text, TouchableOpacity, TextInput, Keyboard, Platform, Animated } from 'react-native'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { FriendChatDetailRouteProp } from '../components/types/friendItemTypes';
@@ -17,7 +17,6 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import { BottomSheetGallery } from '../components/BottomSheetGallery';
 import usePhoto from '../hooks/usePhoto';
 import { Album } from 'expo-media-library';
-import { BottomSheetAlbumFilter } from '../components/BottomSheetAlbumFilter';
 
 export default function FriendChatDetail() {
     const route = useRoute<FriendChatDetailRouteProp>();
@@ -28,6 +27,7 @@ export default function FriendChatDetail() {
     const theme = useSelector((state: RootState) => state.theme.theme);
 
     // bottom sheet
+    const [snapPointIndex, setSnapPointIndex] = useState(-1);
     const [isGalleryVisible, setGalleryVisible] = useState(false);
     const bottomSheetRef = useRef<BottomSheet>(null);
     const [bottomSheetHeight, setBottomSheetHeight] = useState<number>(ScreenHeight / 3);
@@ -35,12 +35,16 @@ export default function FriendChatDetail() {
         if (bottomSheetRef.current) {
             bottomSheetRef.current.snapToIndex(0);
         }
+        setGalleryVisible(true);
+        setShowAlbumsList(false);
     }
     const handleCloseBottomSheet = () => {
         if (bottomSheetRef.current) {
             bottomSheetRef.current.close();
         }
-        handleCloseAlbumBottomSheetFilter();
+        setGalleryVisible(false);
+        // handleCloseAlbumBottomSheetFilter();
+        handleCloseAlbumFilter();
     }
     const handleOpenPhoneSetting = async () => {
         if (!canAskAgain) {
@@ -59,21 +63,45 @@ export default function FriendChatDetail() {
             setKeyboardHeight(0);
             handleCloseBottomSheet();
         }
-        setGalleryVisible(!isGalleryVisible);
     }
 
-    // album bottom sheet filter
+    // album filter
     const [showAlbumsList, setShowAlbumsList] = useState<boolean>(false);
-    const albumBottomSheetRef = useRef<BottomSheet>(null);
-    const handleOpenAlbumBottomSheetFilter = () => {
-        if (albumBottomSheetRef.current) {
-            albumBottomSheetRef.current.snapToIndex(0);
-        }
+    const translateY = useRef(new Animated.Value(ScreenHeight)).current;
+    const handleOpenAlbumFilter = () => {
+        Animated.timing(translateY, {
+            toValue: 0, // Dịch chuyển đến vị trí ban đầu
+            duration: 800, // Thời gian chạy animation (ms)
+            useNativeDriver: true, // Sử dụng native driver để tăng hiệu suất
+        }).start();
+        setShowAlbumsList(true);
+        setBottomSheetHeight(handleSetBottomSheetHeight());
     }
-    const handleCloseAlbumBottomSheetFilter = () => {
-        if (albumBottomSheetRef.current) {
-            albumBottomSheetRef.current.close();
+    const handleCloseAlbumFilter = () => {
+        Animated.timing(translateY, {
+            toValue: ScreenHeight, // Dịch chuyển đến vị trí ban đầu
+            duration: 800, // Thời gian chạy animation (ms)
+            useNativeDriver: true, // Sử dụng native driver để tăng hiệu suất
+        }).start();
+        setShowAlbumsList(false);
+        setBottomSheetHeight(handleSetBottomSheetHeight());
+    }
+    const handleSetBottomSheetHeight = () => {
+        let heightNumber = 0;
+        switch (snapPointIndex) {
+            case -1:
+            case 0:
+                heightNumber = ScreenHeight / 3;
+                break;
+            case 1:
+                heightNumber = ScreenHeight;
+                break;
+
+            default:
+                heightNumber = ScreenHeight / 3;
+                break;
         }
+        return heightNumber;
     }
 
     const {
@@ -81,11 +109,6 @@ export default function FriendChatDetail() {
         requestMediaLibPermission,
         canAskAgain,
         requestMediaLibPermissionWithoutLinking,
-        albums,
-        loadAlbums,
-        photos,
-        loadPhotos,
-        pagination,
     } = usePhoto();
     const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
 
@@ -241,20 +264,15 @@ export default function FriendChatDetail() {
             <BottomSheetGallery
                 ref={bottomSheetRef}
                 selectedAlbum={selectedAlbum}
-                handleOpenAlbumBottomSheetFilter={handleOpenAlbumBottomSheetFilter}
-                handleCloseAlbumBottomSheetFilter={handleCloseAlbumBottomSheetFilter}
                 bottomSheetHeight={bottomSheetHeight}
                 setBottomSheetHeight={setBottomSheetHeight}
                 showAlbumsList={showAlbumsList}
-                setShowAlbumsList={setShowAlbumsList}
-            />
-            <BottomSheetAlbumFilter
-                ref={albumBottomSheetRef}
-                bottomSheetAlbumFilterHeight={bottomSheetHeight - 50}
+                translateY={translateY}
                 setSelectedAlbum={setSelectedAlbum}
-                handleCloseAlbumBottomSheetFilter={handleCloseAlbumBottomSheetFilter}
-                showAlbumsList={showAlbumsList}
-                setShowAlbumsList={setShowAlbumsList}
+                handleOpenAlbumFilter={handleOpenAlbumFilter}
+                handleCloseAlbumFilter={handleCloseAlbumFilter}
+                snapPointIndex={snapPointIndex}
+                setSnapPointIndex={setSnapPointIndex}
             />
         </View>
     )

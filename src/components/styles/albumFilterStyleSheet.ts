@@ -3,16 +3,23 @@ import { StyleSheet } from "react-native";
 import { colors } from "../../constants/colors";
 import { statusBarHeight } from "../../constants/statusBarHeight";
 
-const bottomSheetAlbumFilterStyleSheet = StyleSheet.create({
+const albumFilterStyleSheet = StyleSheet.create({
+    container: {
+        position: "absolute",
+        bottom: 0,
+        width: "100%",
+        height: "100%",
+        paddingHorizontal: 10,
+    },
     handleContainer: {
         alignItems: 'center',
-        paddingVertical: 5, // Tăng chiều cao của panning area
         borderTopLeftRadius: 15,
         borderTopRightRadius: 15,
     },
     contentContainer: {
         flex: 1,
         paddingHorizontal: 15,
+        paddingTop: 5,
         paddingBottom: 15
     },
     selectedAlbumContainer: {
@@ -47,4 +54,4 @@ const bottomSheetAlbumFilterStyleSheet = StyleSheet.create({
     }
 });
 
-export default bottomSheetAlbumFilterStyleSheet;
+export default albumFilterStyleSheet;

@@ -18,6 +18,7 @@ interface PhotoContextProps {
     fullPhotoPagination: Pagination | undefined;
     loadPhotosSortByCreationTime: (numberPhotoToLoad: number, after?: MediaLibrary.AssetRef | undefined) => Promise<boolean>;
     totalImages: number;
+    changeStateFriendsScreen: () => void;
 }
 
 interface PhotoProviderProps {

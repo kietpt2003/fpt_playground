@@ -25,6 +25,7 @@ function AudioProvider({ children }: AudioProviderProps) {
 
         setSound(newSound);
         await newSound.playAsync();
+        setIsPlaying(true);
     };
 
     // Xử lý chuyển bài hát

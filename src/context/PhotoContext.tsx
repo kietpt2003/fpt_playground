@@ -2,7 +2,6 @@ import React, { createContext, useEffect, useState } from 'react';
 import { Pagination, PhotoContextProps, PhotoProviderProps } from './types/photoContextType';
 import * as MediaLibrary from 'expo-media-library';
 import { Linking } from 'react-native';
-import { useTranslation } from 'react-i18next';
 
 const PhotoContext = createContext<PhotoContextProps | undefined>(undefined);
 
@@ -15,6 +14,8 @@ function PhotoProvider({ children }: PhotoProviderProps) {
     const [fullPhotos, setFullPhotos] = useState<MediaLibrary.Asset[]>([]);
     const [fullPhotoPagination, setFullPhotoPagination] = useState<Pagination | undefined>(undefined);
     const [totalImages, setTotalImages] = useState<number>(0);
+
+    const [isFriendsScreen, setIsFriendsScreen] = useState(false);
 
     const requestPermissionAsync = async () => {
         const { status, canAskAgain: expoCanAskAgain } = await MediaLibrary.requestPermissionsAsync(false, ["photo"]); // Xin quyền truy cập
@@ -174,27 +175,37 @@ function PhotoProvider({ children }: PhotoProviderProps) {
         }
     }
 
+    function changeStateFriendsScreen() {
+        setIsFriendsScreen(!isFriendsScreen);
+    }
+
     //Count total photos
     useEffect(() => {
-        getTotalPhotos();
-    }, [photos])
+        if (isFriendsScreen) {
+            getTotalPhotos();
+        }
+    }, [photos, isFriendsScreen])
 
     //Load full photos
     useEffect(() => {
-        loadPhotosSortByCreationTime(10, fullPhotoPagination?.endCursor);
-    }, [])
+        if (isFriendsScreen) {
+            loadPhotosSortByCreationTime(9, fullPhotoPagination?.endCursor);
+        }
+    }, [isFriendsScreen])
 
     //Load albums
     useEffect(() => {
-        loadAlbums();
-    }, [])
+        if (isFriendsScreen) {
+            loadAlbums();
+        }
+    }, [isFriendsScreen])
 
     //Load photos from album
     useEffect(() => {
         if (albums.length > 0) {
-            loadPhotosFromAlbum(10);
+            loadPhotosFromAlbum(3);
         }
-    }, [albums])
+    }, [albums, isFriendsScreen])
 
     return (
         <PhotoContext.Provider value={{
@@ -211,6 +222,7 @@ function PhotoProvider({ children }: PhotoProviderProps) {
             fullPhotoPagination,
             loadPhotosSortByCreationTime,
             totalImages,
+            changeStateFriendsScreen
         }}>
             {children}
         </PhotoContext.Provider>

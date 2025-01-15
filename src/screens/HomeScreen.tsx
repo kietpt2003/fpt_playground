@@ -1,5 +1,5 @@
 import { View, Text, ImageBackground, ScrollView, TouchableOpacity, Image } from 'react-native'
-import React, { useRef, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { colors } from '../constants/colors';
@@ -11,13 +11,14 @@ import { useTranslation } from 'react-i18next';
 import useClick from '../hooks/useClick';
 import FeatureComponent from '../components/FeatureComponent';
 import HeaderLeft from '../components/HeaderLeft';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { GroupChatNavigationProp } from './types/groupChatTypes';
 import DailyCheckPoint from '../components/DailyCheckPoint';
 import { StatusBar } from 'expo-status-bar';
 import NPCGuideline from '../components/NPCGuideline';
 import PTKCoinIcon from '../components/PTKCoinIcon';
 import { ScreenWidth } from '@rneui/base';
+import useAudio from '../hooks/useAudio';
 
 export default function HomeScreen() {
     const theme = useSelector((state: RootState) => state.theme.theme);
@@ -28,6 +29,7 @@ export default function HomeScreen() {
     const [menuVisible, setMenuVisible] = useState<boolean>(false);
 
     const { playSound } = useClick();
+    const { resumeSong } = useAudio();
 
     const isOpenDailyCheckPoint = useSelector((state: RootState) => state.home.isOpenDailyCheckPoint);
 
@@ -46,6 +48,12 @@ export default function HomeScreen() {
     const isGuideline = useSelector((state: RootState) => state.home.homeGuideline);
     const scrollViewRef = useRef<ScrollView>(null);
     const [onScrolling, setOnScrolling] = useState(false);
+
+    useFocusEffect(
+        useCallback(() => {
+            resumeSong();
+        }, [])
+    );
 
     return (
         <>

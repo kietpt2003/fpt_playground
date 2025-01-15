@@ -1,5 +1,5 @@
-import { View, Text, Image, TextInput, Animated } from 'react-native'
-import React, { useRef, useState } from 'react'
+import { View, Text, TextInput, Animated, BackHandler } from 'react-native'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { User } from '../constants/entities/User'
 import friendsScreenStyleSheet from './styles/friendsScreenStyleSheet'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -13,6 +13,9 @@ import { FriendItemData } from '../components/types/friendItemTypes'
 import { Message } from '../constants/entities/Message'
 import FriendItem from '../components/FriendItem'
 import UserAvatar from '../components/UserAvatar'
+import usePhoto from '../hooks/usePhoto'
+import useAudio from '../hooks/useAudio'
+import { useFocusEffect } from '@react-navigation/native'
 
 faker.seed(20);
 
@@ -60,9 +63,38 @@ export default function FriendsScreen() {
     const theme = useSelector((state: RootState) => state.theme.theme);
     const { t } = useTranslation();
 
+    const { changeStateFriendsScreen } = usePhoto();
+    const { pauseSong, resumeSong } = useAudio();
+
     const [isHaveNoti, setIsHaveNoti] = useState(true);
 
     const scrollY = useRef(new Animated.Value(0)).current;
+
+    //Cập nhật state để biết đang ở screen này
+    useEffect(() => {
+        const handleChangeState = async () => {
+            await pauseSong();
+            changeStateFriendsScreen();
+        }
+        handleChangeState();
+    }, []);
+
+    //Handle back press to resume song
+    useFocusEffect(
+        useCallback(() => {
+            // Hàm xử lý khi nút Back được nhấn
+            const onBackPress = () => {
+                resumeSong();
+                return false; // Không ngăn hành động mặc định
+            };
+
+            // Thêm listener
+            BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+            // Cleanup: Xóa listener khi component bị unmount
+            return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+        }, [])
+    );
 
     return (
         <View style={friendsScreenStyleSheet.container}>
@@ -128,6 +160,7 @@ export default function FriendsScreen() {
                         { useNativeDriver: true }
                     )}
                     keyExtractor={item => item.item.id}
+                    showsVerticalScrollIndicator={false}
                     contentContainerStyle={{
                         padding: SPACING
                     }}

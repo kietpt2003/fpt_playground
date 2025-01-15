@@ -37,7 +37,16 @@ const bottomSheetGalleryStyleSheet = StyleSheet.create({
         fontFamily: "RobotoMedium",
         fontSize: 18,
         color: colors.milkyWhite
-    }
+    },
+    row: {
+        justifyContent: 'space-between',
+    },
+    image: {
+        width: (ScreenWidth - 20) / 3,
+        height: (ScreenWidth - 20) / 3,
+        borderRadius: 8,
+        marginBottom: 5,
+    },
 });
 
 export default bottomSheetGalleryStyleSheet;
