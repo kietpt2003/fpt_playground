@@ -7,6 +7,7 @@ export type AlbumFilterProps = {
     setSelectedAlbum: Dispatch<SetStateAction<Album | null>>;
     handleCloseAlbumFilter: () => void;
     translateY: Animated.Value;
+    enableScrolling: boolean;
 }
 
 export type AlbumHeaderFilterProps = {

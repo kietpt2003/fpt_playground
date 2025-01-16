@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, TextInput, Keyboard, Platform, Animated } from 'react-native'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { FriendChatDetailRouteProp } from '../components/types/friendItemTypes';
 import { faker } from '@faker-js/faker/.';
@@ -14,9 +14,11 @@ import { enUS, vi } from 'date-fns/locale';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { ScreenHeight } from '@rneui/base';
 import BottomSheet from '@gorhom/bottom-sheet';
-import { BottomSheetGallery } from '../components/BottomSheetGallery';
 import usePhoto from '../hooks/usePhoto';
 import { Album } from 'expo-media-library';
+import BottomSheetFlatList, { BottomSheetMethods } from '../components/BottomSheetGallery';
+import { statusBarHeight } from '../constants/statusBarHeight';
+import TestAlbum, { BottomSheetAlbumFilterMethods } from '../components/TestAlbum';
 
 export default function FriendChatDetail() {
     const route = useRoute<FriendChatDetailRouteProp>();
@@ -46,24 +48,24 @@ export default function FriendChatDetail() {
         // handleCloseAlbumBottomSheetFilter();
         handleCloseAlbumFilter();
     }
-    const handleOpenPhoneSetting = async () => {
-        if (!canAskAgain) {
-            await requestMediaLibPermission();
-            const { status, canAskAgain } = await requestMediaLibPermissionWithoutLinking();
-            if (canAskAgain && status === "granted") {
-                handleBottomSheet();
-            }
-        }
-    }
-    const handleBottomSheet = () => {
-        if (!isGalleryVisible) {
-            setKeyboardHeight(ScreenHeight / 3);
-            handleOpenBottomSheet();
-        } else {
-            setKeyboardHeight(0);
-            handleCloseBottomSheet();
-        }
-    }
+    // const handleOpenPhoneSetting = async () => {
+    //     if (!canAskAgain) {
+    //         await requestMediaLibPermission();
+    //         const { status, canAskAgain } = await requestMediaLibPermissionWithoutLinking();
+    //         if (canAskAgain && status === "granted") {
+    //             handleBottomSheet();
+    //         }
+    //     }
+    // }
+    // const handleBottomSheet = () => {
+    //     if (!isGalleryVisible) {
+    //         setKeyboardHeight(ScreenHeight / 3);
+    //         handleOpenBottomSheet();
+    //     } else {
+    //         setKeyboardHeight(0);
+    //         handleCloseBottomSheet();
+    //     }
+    // }
 
     // album filter
     const [showAlbumsList, setShowAlbumsList] = useState<boolean>(false);
@@ -147,6 +149,35 @@ export default function FriendChatDetail() {
             keyboardDidHideListener.remove();
         };
     }, []);
+
+
+    const bottomSheetRef4 = useRef<BottomSheetMethods>(null);
+    const pressHandler4 = useCallback(() => {
+        bottomSheetRef4.current?.expand();
+    }, []);
+    const pressHandler4Close = useCallback(() => {
+        bottomSheetRef4.current?.close();
+    }, []);
+    const handleOpenPhoneSetting = async () => {
+        if (!canAskAgain) {
+            await requestMediaLibPermission();
+            const { status, canAskAgain } = await requestMediaLibPermissionWithoutLinking();
+            if (canAskAgain && status === "granted") {
+                handleBottomSheet();
+            }
+        }
+    }
+    const handleBottomSheet = () => {
+        if (!isGalleryVisible) {
+            setKeyboardHeight(ScreenHeight / 3);
+            handleOpenBottomSheet();
+            pressHandler4();
+        } else {
+            setKeyboardHeight(0);
+            handleCloseBottomSheet();
+            pressHandler4Close();
+        }
+    }
 
     return (
         <View>
@@ -261,8 +292,10 @@ export default function FriendChatDetail() {
                     </TouchableOpacity>
                 </View>
             </View>
-            <BottomSheetGallery
-                ref={bottomSheetRef}
+
+            <BottomSheetFlatList
+                ref={bottomSheetRef4}
+                backgroundColor={theme === "dark" ? colors.lighterBlue : colors.lighterOrange}
                 selectedAlbum={selectedAlbum}
                 bottomSheetHeight={bottomSheetHeight}
                 setBottomSheetHeight={setBottomSheetHeight}
@@ -271,8 +304,9 @@ export default function FriendChatDetail() {
                 setSelectedAlbum={setSelectedAlbum}
                 handleOpenAlbumFilter={handleOpenAlbumFilter}
                 handleCloseAlbumFilter={handleCloseAlbumFilter}
-                snapPointIndex={snapPointIndex}
-                setSnapPointIndex={setSnapPointIndex}
+                data={[]}
+                renderItem={() => (<></>)}
+                snapTo={ScreenHeight - (ScreenHeight / 3) + statusBarHeight}
             />
         </View>
     )

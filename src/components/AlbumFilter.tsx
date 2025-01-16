@@ -12,7 +12,8 @@ export const AlbumFilter = ({
     albumFilterHeight,
     handleCloseAlbumFilter,
     setSelectedAlbum,
-    translateY
+    translateY,
+    enableScrolling
 }: AlbumFilterProps
 ) => {
     const { t } = useTranslation();
@@ -44,44 +45,45 @@ export const AlbumFilter = ({
             {(albums.length === 0 || fullPhotos.length === 0 || totalImages === 0) ? (
                 <Text style={albumFilterStyleSheet.noImage}>{t("no-image")}</Text>
             ) : (
-                <View style={{
-                    height: albumFilterHeight, // Adjust height dynamically
-                }}>
-                    <FlatList
-                        data={albums}
-                        keyExtractor={(item) => item.id}
-                        showsVerticalScrollIndicator={false}
-                        renderItem={({ item }) => {
-                            if (!photos[item.id]?.some((value) => {
-                                return value.mediaType == "photo";
-                            })) {
-                                return null;
-                            }
-
-                            return (
-                                <TouchableOpacity
-                                    style={albumFilterStyleSheet.itemContentContainer}
-                                    onPress={() => {
-                                        handleCloseAlbumFilter();
-                                        setSelectedAlbum(item);
-                                    }}
-                                >
-                                    <Image source={{ uri: photos[item.id]?.length ? photos[item.id][0].uri : undefined }} style={albumFilterStyleSheet.albumFirstImage} />
-                                    <View>
-                                        <Text style={albumFilterStyleSheet.albumTitlteTxt}>{item.title}</Text>
-                                        <Text style={albumFilterStyleSheet.assetCountTxt}>{item.assetCount}</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            )
-                        }}
-                        ListHeaderComponent={
-                            <AlbumHeaderFilter
-                                setSelectedAlbum={setSelectedAlbum}
-                                handleCloseAlbumFilter={handleCloseAlbumFilter}
-                            />
+                // <View style={{
+                //     height: albumFilterHeight, // Adjust height dynamically
+                // }}>
+                <FlatList
+                    data={albums}
+                    scrollEnabled={enableScrolling}
+                    keyExtractor={(item) => item.id}
+                    showsVerticalScrollIndicator={false}
+                    renderItem={({ item }) => {
+                        if (!photos[item.id]?.some((value) => {
+                            return value.mediaType == "photo";
+                        })) {
+                            return null;
                         }
-                    />
-                </View>
+
+                        return (
+                            <TouchableOpacity
+                                style={albumFilterStyleSheet.itemContentContainer}
+                                onPress={() => {
+                                    handleCloseAlbumFilter();
+                                    setSelectedAlbum(item);
+                                }}
+                            >
+                                <Image source={{ uri: photos[item.id]?.length ? photos[item.id][0].uri : undefined }} style={albumFilterStyleSheet.albumFirstImage} />
+                                <View>
+                                    <Text style={albumFilterStyleSheet.albumTitlteTxt}>{item.title}</Text>
+                                    <Text style={albumFilterStyleSheet.assetCountTxt}>{item.assetCount}</Text>
+                                </View>
+                            </TouchableOpacity>
+                        )
+                    }}
+                    ListHeaderComponent={
+                        <AlbumHeaderFilter
+                            setSelectedAlbum={setSelectedAlbum}
+                            handleCloseAlbumFilter={handleCloseAlbumFilter}
+                        />
+                    }
+                />
+                // </View>
             )}
         </Animated.View>
     )
