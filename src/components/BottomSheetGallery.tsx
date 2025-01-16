@@ -6,7 +6,6 @@ import React, {
     useState,
     Dispatch,
     SetStateAction,
-    useRef,
 } from 'react';
 import Animated, {
     useSharedValue,
@@ -29,7 +28,6 @@ import { AntDesign } from '@expo/vector-icons';
 import { ScreenHeight } from '@rneui/base';
 import { statusBarHeight } from '../constants/statusBarHeight';
 import { AlbumFilter } from './AlbumFilter';
-import { BottomSheetAlbumFilterMethods } from './TestAlbum';
 
 interface Props extends FlatListProps<any> {
     snapTo: number;
@@ -78,9 +76,7 @@ const BottomSheetFlatList = forwardRef<BottomSheetMethods, Props>(
         const context = useSharedValue(0);
         const timing = useSharedValue(0);
 
-        const flatListAnimation = useSharedValue(closeHeight);
         const scrollY = useSharedValue(0);
-        const flatListHeight = useSharedValue(0);
         const [enableScroll, setEnableScroll] = useState(true);
         const [isPanEnabled, setIsPanEnabled] = useState(true);
         const [isTop, setIsTop] = useState(false);
@@ -125,8 +121,6 @@ const BottomSheetFlatList = forwardRef<BottomSheetMethods, Props>(
                     damping: 100,
                     stiffness: 400,
                 });
-                console.log("jaa");
-
             })
             .onEnd((event) => {
                 const speedRate = 1 / timing.value;
@@ -170,9 +164,6 @@ const BottomSheetFlatList = forwardRef<BottomSheetMethods, Props>(
             onScroll: event => {
                 scrollY.value = event.contentOffset.y;
             },
-            onMomentumEnd: event => {
-                flatListHeight.value = event.contentOffset.y; // Đảm bảo giá trị cuối cùng được lưu sau khi cuộn kết thúc            
-            },
         });
 
         const panScroll = Gesture.Pan()
@@ -183,11 +174,6 @@ const BottomSheetFlatList = forwardRef<BottomSheetMethods, Props>(
             })
             .onUpdate(event => {
                 timing.value++;
-
-                flatListAnimation.value = withSpring(context.value + event.translationY, {
-                    damping: 100,
-                    stiffness: 400,
-                });
 
                 if (event.velocityY > 0 && scrollY.value == 0 && isTop) {
                     runOnJS(setIsPanEnabled)(true);
@@ -204,34 +190,37 @@ const BottomSheetFlatList = forwardRef<BottomSheetMethods, Props>(
                         stiffness: 400,
                     });
                 }
-
             })
             .onEnd((event) => {
-                console.log("vo day");
-
                 runOnJS(setIsPanEnabled)(true);
                 runOnJS(setEnableScroll)(true);
                 const speedRate = 1 / timing.value;
 
                 if (isPanEnabled && isTop) {
-                    if (event.velocityY > 0 && speedRate > 0.11) {
+                    if (event.velocityY > 0 && speedRate > 0.11 && scrollY.value == 0) {
                         topAnimation.value = withSpring(openHeight, {
                             damping: 100,
                             stiffness: 400,
                         });
                         runOnJS(setIsTop)(false);
-                    } else if (event.velocityY > 0 && (topAnimation.value >= ScreenHeight / 2 - statusBarHeight && speedRate <= 0.11)) {
-                        topAnimation.value = withSpring(openHeight, {
-                            damping: 100,
-                            stiffness: 400,
-                        });
-                        runOnJS(setIsTop)(false);
-                    } else {
-                        topAnimation.value = withSpring(statusBarHeight, {
-                            damping: 100,
-                            stiffness: 400,
-                        });
-                    }
+                    } else
+                        if (event.velocityY > 0 && (topAnimation.value >= ScreenHeight / 2 - statusBarHeight && speedRate <= 0.11)) {
+                            topAnimation.value = withSpring(openHeight, {
+                                damping: 100,
+                                stiffness: 400,
+                            });
+                            runOnJS(setIsTop)(false);
+                        } else {
+                            topAnimation.value = withSpring(statusBarHeight, {
+                                damping: 100,
+                                stiffness: 400,
+                            });
+                        }
+                } else if (!isPanEnabled && enableScroll && isTop) {
+                    topAnimation.value = withSpring(statusBarHeight, {
+                        damping: 100,
+                        stiffness: 400,
+                    });
                 }
 
             });
@@ -299,47 +288,52 @@ const BottomSheetFlatList = forwardRef<BottomSheetMethods, Props>(
                                     <Text style={bottomSheetGalleryStyleSheet.noImage}>{t("no-image")}</Text>
                                 </View>
                             ) : (
-                                <>
-                                    <Animated.FlatList
-                                        {...rest}
-                                        data={selectedAlbum == null ? fullPhotos : photos[selectedAlbum.id]}
-                                        scrollEnabled={enableScroll}
-                                        renderItem={({ item }) => (
-                                            <Image
-                                                source={{ uri: item.uri }}
-                                                style={bottomSheetGalleryStyleSheet.image}
-                                            />
-                                        )}
-                                        onScroll={onScroll}
-                                        bounces={false}
-                                        scrollEventThrottle={16}
+                                <Animated.FlatList
+                                    {...rest}
+                                    data={selectedAlbum == null ? fullPhotos : photos[selectedAlbum.id]}
+                                    scrollEnabled={enableScroll}
+                                    renderItem={({ item }) => (
+                                        <Image
+                                            source={{ uri: item.uri }}
+                                            style={bottomSheetGalleryStyleSheet.image}
+                                        />
+                                    )}
+                                    onScroll={onScroll}
+                                    bounces={false}
+                                    scrollEventThrottle={16}
 
-                                        numColumns={3}
-                                        columnWrapperStyle={bottomSheetGalleryStyleSheet.row}
-                                        onEndReached={() => {
-                                            //Load more photos
-                                            if (selectedAlbum == null) {
-                                                loadPhotosSortByCreationTime(10, fullPhotoPagination?.endCursor);
-                                            } else {
-                                                loadPhotos(selectedAlbum, 10, pagination[selectedAlbum.id].endCursor);
-                                            }
-                                        }}
-                                        onEndReachedThreshold={0.5}
-                                        initialNumToRender={9}
-                                        showsVerticalScrollIndicator={false}
-                                        CellRendererComponent={undefined}
-                                    />
-                                    <AlbumFilter
-                                        translateY={translateY}
-                                        albumFilterHeight={bottomSheetHeight - 70}
-                                        handleCloseAlbumFilter={handleCloseAlbumFilter}
-                                        setSelectedAlbum={setSelectedAlbum}
-                                        enableScrolling={enableScroll}
-                                    />
-
-                                </>
+                                    numColumns={3}
+                                    columnWrapperStyle={bottomSheetGalleryStyleSheet.row}
+                                    onEndReached={() => {
+                                        //Load more photos
+                                        if (selectedAlbum == null) {
+                                            loadPhotosSortByCreationTime(10, fullPhotoPagination?.endCursor);
+                                        } else {
+                                            loadPhotos(selectedAlbum, 10, pagination[selectedAlbum.id].endCursor);
+                                        }
+                                    }}
+                                    onEndReachedThreshold={0.5}
+                                    initialNumToRender={9}
+                                    showsVerticalScrollIndicator={false}
+                                    CellRendererComponent={undefined}
+                                />
                             )}
                         </GestureDetector>
+
+
+                        <AlbumFilter
+                            translateY={translateY}
+                            handleCloseAlbumFilter={handleCloseAlbumFilter}
+                            setSelectedAlbum={setSelectedAlbum}
+                            topAnimation={topAnimation}
+                            isPanEnabled={isPanEnabled}
+                            setIsPanEnabled={setIsPanEnabled}
+                            enableScroll={enableScroll}
+                            setEnableScroll={setEnableScroll}
+                            isTop={isTop}
+                            setIsTop={setIsTop}
+                            openHeight={openHeight}
+                        />
 
                     </Animated.View>
                 </GestureDetector>

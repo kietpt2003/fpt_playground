@@ -9,6 +9,7 @@ const bottomSheetGalleryStyleSheet = StyleSheet.create({
         paddingVertical: 10, // Tăng chiều cao của panning area
         borderTopLeftRadius: 15,
         borderTopRightRadius: 15,
+        height: 60,
     },
     handleBar: {
         width: 40,

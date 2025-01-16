@@ -5,11 +5,9 @@ import { statusBarHeight } from "../../constants/statusBarHeight";
 
 const albumFilterStyleSheet = StyleSheet.create({
     container: {
-        position: "absolute",
-        bottom: 0,
-        width: "100%",
-        height: "80%",
+        ...StyleSheet.absoluteFillObject,
         paddingHorizontal: 10,
+        marginTop: 60
     },
     handleContainer: {
         alignItems: 'center',
