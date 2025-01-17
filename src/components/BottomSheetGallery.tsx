@@ -1,11 +1,10 @@
-import { FlatListProps, StyleSheet, Text, View, Animated as RNAnimated, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, View, Animated as RNAnimated, TouchableOpacity, Image } from 'react-native';
 import React, {
     forwardRef,
     useImperativeHandle,
     useCallback,
     useState,
-    Dispatch,
-    SetStateAction,
+    useRef,
 } from 'react';
 import Animated, {
     useSharedValue,
@@ -28,47 +27,38 @@ import { AntDesign } from '@expo/vector-icons';
 import { ScreenHeight } from '@rneui/base';
 import { statusBarHeight } from '../constants/statusBarHeight';
 import { AlbumFilter } from './AlbumFilter';
+import { AlbumFilterMethods } from './types/albumFilterTypes';
+import { BottomSheetGalleryMethods, BottomSheetGalleryProps } from './types/bottomSheetGaleryTypes';
 
-interface Props extends FlatListProps<any> {
-    snapTo: number;
-    backgroundColor: string;
-
-
-    selectedAlbum: Album | null;
-    bottomSheetHeight: number;
-    setBottomSheetHeight: Dispatch<SetStateAction<number>>;
-    showAlbumsList: boolean;
-    translateY: RNAnimated.Value;
-    setSelectedAlbum: Dispatch<SetStateAction<Album | null>>;
-    handleOpenAlbumFilter: () => void;
-    handleCloseAlbumFilter: () => void;
-}
-
-export interface BottomSheetMethods {
-    expand: () => void;
-    close: () => void;
-}
-
-const BottomSheetFlatList = forwardRef<BottomSheetMethods, Props>(
+const BottomSheetGallery = forwardRef<BottomSheetGalleryMethods, BottomSheetGalleryProps>(
     (
         {
             snapTo,
-            // renderItem,
-            backgroundColor,
-            data,
-
-
-            selectedAlbum,
-            bottomSheetHeight,
-            setBottomSheetHeight,
-            showAlbumsList,
-            translateY,
-            setSelectedAlbum,
-            handleOpenAlbumFilter,
-            handleCloseAlbumFilter,
-            ...rest }: Props,
+        }: BottomSheetGalleryProps,
         ref,
     ) => {
+        const theme = useSelector((state: RootState) => state.theme.theme);
+        const { t } = useTranslation();
+
+        const {
+            albums,
+            fullPhotos,
+            fullPhotoPagination,
+            loadPhotosSortByCreationTime,
+            totalImages,
+            photos,
+            loadPhotos,
+            pagination,
+            requestMediaLibPermission,
+            canAskAgain,
+            requestMediaLibPermissionWithoutLinking,
+        } = usePhoto();
+
+        // album filter
+        const albumFilterRef = useRef<AlbumFilterMethods>(null);
+        const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
+        const [showAlbumsList, setShowAlbumsList] = useState<boolean>(false);
+
         const inset = useSafeAreaInsets();
         const closeHeight = ScreenHeight + statusBarHeight;
         const openHeight = snapTo;
@@ -81,26 +71,52 @@ const BottomSheetFlatList = forwardRef<BottomSheetMethods, Props>(
         const [isPanEnabled, setIsPanEnabled] = useState(true);
         const [isTop, setIsTop] = useState(false);
 
+        const [isBottomSheetGalleryOpen, setIsBottomSheetGalleryOpen] = useState<boolean>(false);
+
         const expand = useCallback(() => {
             'worklet';
             topAnimation.value = withTiming(openHeight);
             runOnJS(setIsTop)(false);
+            setIsBottomSheetGalleryOpen(true);
         }, [openHeight, topAnimation]);
 
         const close = useCallback(() => {
             'worklet';
             topAnimation.value = withTiming(closeHeight);
             runOnJS(setIsTop)(false);
+            setIsBottomSheetGalleryOpen(false);
         }, [closeHeight, topAnimation]);
 
-        useImperativeHandle(
-            ref,
-            () => ({
-                expand,
-                close,
-            }),
-            [expand, close],
-        );
+        const [isGalleryVisible, setGalleryVisible] = useState(false);
+        const handleOpenBottomSheet = () => {
+            setGalleryVisible(true);
+            setShowAlbumsList(false);
+        }
+        const handleCloseBottomSheet = () => {
+            setGalleryVisible(false);
+            if (albumFilterRef.current != null) {
+                albumFilterRef.current.handleCloseAlbumFilter();
+            }
+        }
+
+        const handleOpenPhoneSetting = async () => {
+            if (!canAskAgain) {
+                await requestMediaLibPermission();
+                const { status, canAskAgain } = await requestMediaLibPermissionWithoutLinking();
+                if (canAskAgain && status === "granted") {
+                    handleBottomSheetGallery();
+                }
+            }
+        }
+        const handleBottomSheetGallery = () => {
+            if (!isGalleryVisible) {
+                handleOpenBottomSheet();
+                expand();
+            } else {
+                handleCloseBottomSheet();
+                close();
+            }
+        }
 
         const animationStyle = useAnimatedStyle(() => {
             const top = topAnimation.value;
@@ -225,23 +241,16 @@ const BottomSheetFlatList = forwardRef<BottomSheetMethods, Props>(
 
             });
 
-
         const scrollViewGesture = Gesture.Native();
 
-
-        const theme = useSelector((state: RootState) => state.theme.theme);
-        const { t } = useTranslation();
-
-        const {
-            albums,
-            fullPhotos,
-            fullPhotoPagination,
-            loadPhotosSortByCreationTime,
-            totalImages,
-            photos,
-            loadPhotos,
-            pagination,
-        } = usePhoto();
+        useImperativeHandle(
+            ref,
+            () => ({
+                handleBottomSheetGallery,
+                handleOpenPhoneSetting,
+                isBottomSheetGalleryOpen,
+            }),
+        );
 
         return (
             <>
@@ -251,7 +260,7 @@ const BottomSheetFlatList = forwardRef<BottomSheetMethods, Props>(
                             styles.container,
                             animationStyle,
                             {
-                                backgroundColor: backgroundColor,
+                                backgroundColor: theme === "dark" ? colors.lighterBlue : colors.lighterOrange,
                                 paddingBottom: inset.bottom,
                             },
                         ]}>
@@ -267,10 +276,12 @@ const BottomSheetFlatList = forwardRef<BottomSheetMethods, Props>(
                             <TouchableOpacity
                                 style={bottomSheetGalleryStyleSheet.selectedAlbumContainer}
                                 onPress={() => {
-                                    if (!showAlbumsList) {
-                                        handleOpenAlbumFilter();
-                                    } else {
-                                        handleCloseAlbumFilter();
+                                    if (albumFilterRef.current != null) {
+                                        if (!showAlbumsList) {
+                                            albumFilterRef.current.handleOpenAlbumFilter();
+                                        } else {
+                                            albumFilterRef.current.handleCloseAlbumFilter();
+                                        }
                                     }
                                 }}
                                 disabled={albums.length === 0 || fullPhotos.length === 0 || totalImages == 0}
@@ -289,7 +300,6 @@ const BottomSheetFlatList = forwardRef<BottomSheetMethods, Props>(
                                 </View>
                             ) : (
                                 <Animated.FlatList
-                                    {...rest}
                                     data={selectedAlbum == null ? fullPhotos : photos[selectedAlbum.id]}
                                     scrollEnabled={enableScroll}
                                     renderItem={({ item }) => (
@@ -315,15 +325,12 @@ const BottomSheetFlatList = forwardRef<BottomSheetMethods, Props>(
                                     onEndReachedThreshold={0.5}
                                     initialNumToRender={9}
                                     showsVerticalScrollIndicator={false}
-                                    CellRendererComponent={undefined}
                                 />
                             )}
                         </GestureDetector>
 
-
                         <AlbumFilter
-                            translateY={translateY}
-                            handleCloseAlbumFilter={handleCloseAlbumFilter}
+                            ref={albumFilterRef}
                             setSelectedAlbum={setSelectedAlbum}
                             topAnimation={topAnimation}
                             isPanEnabled={isPanEnabled}
@@ -333,8 +340,8 @@ const BottomSheetFlatList = forwardRef<BottomSheetMethods, Props>(
                             isTop={isTop}
                             setIsTop={setIsTop}
                             openHeight={openHeight}
+                            setShowAlbumsList={setShowAlbumsList}
                         />
-
                     </Animated.View>
                 </GestureDetector>
             </>
@@ -342,7 +349,7 @@ const BottomSheetFlatList = forwardRef<BottomSheetMethods, Props>(
     },
 );
 
-export default BottomSheetFlatList;
+export default BottomSheetGallery;
 
 const styles = StyleSheet.create({
     container: {

@@ -13,6 +13,7 @@ import { ScreenHeight } from '@rneui/base';
 import { useTranslation } from 'react-i18next';
 import { DailyCheckPointItemProps } from '../components/types/dailyCheckPointTypes';
 import CheckPointItem from '../components/CheckPointItem';
+import { DailyCheckPointScreenNavigationProp } from './types/dailyCheckPointScreenTypes';
 
 export default function DailyCheckPointScreen() {
     const theme = useSelector((state: RootState) => state.theme.theme);
@@ -21,7 +22,7 @@ export default function DailyCheckPointScreen() {
 
     const { playSound } = useClick();
 
-    const navigation = useNavigation();
+    const navigation = useNavigation<DailyCheckPointScreenNavigationProp>();
 
     const [data, setData] = useState<DailyCheckPointItemProps[]>([]);
     const [sundayCheckPoint, setSundayCheckPoint] = useState<DailyCheckPointItemProps | null>(null);
@@ -423,7 +424,12 @@ export default function DailyCheckPointScreen() {
             </View>
 
             {/* Trò chơi */}
-            <View style={dailyCheckPointScreenStyleSheet.functionContainer}>
+            <TouchableOpacity
+                style={dailyCheckPointScreenStyleSheet.functionContainer}
+                onPress={() => {
+                    navigation.navigate("ChineseChessGame");
+                }}
+            >
                 <LinearGradient
                     colors={[colors.white, colors.icyWhite]}
                     style={dailyCheckPointScreenStyleSheet.functionContainerLinear}
@@ -460,7 +466,7 @@ export default function DailyCheckPointScreen() {
                     color={colors.grey}
                     style={dailyCheckPointScreenStyleSheet.functionRightIcon}
                 />
-            </View>
+            </TouchableOpacity>
         </>
     )
 }

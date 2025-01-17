@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity, TextInput, Keyboard, Platform, Animated } from 'react-native'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { View, Text, TouchableOpacity, TextInput, Keyboard, Platform } from 'react-native'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { FriendChatDetailRouteProp } from '../components/types/friendItemTypes';
 import { faker } from '@faker-js/faker/.';
@@ -13,12 +13,10 @@ import { useTranslation } from 'react-i18next';
 import { enUS, vi } from 'date-fns/locale';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { ScreenHeight } from '@rneui/base';
-import BottomSheet from '@gorhom/bottom-sheet';
 import usePhoto from '../hooks/usePhoto';
-import { Album } from 'expo-media-library';
-import BottomSheetFlatList, { BottomSheetMethods } from '../components/BottomSheetGallery';
+import BottomSheetGallery from '../components/BottomSheetGallery';
 import { statusBarHeight } from '../constants/statusBarHeight';
-import TestAlbum, { BottomSheetAlbumFilterMethods } from '../components/TestAlbum';
+import { BottomSheetGalleryMethods } from '../components/types/bottomSheetGaleryTypes';
 
 export default function FriendChatDetail() {
     const route = useRoute<FriendChatDetailRouteProp>();
@@ -28,91 +26,11 @@ export default function FriendChatDetail() {
 
     const theme = useSelector((state: RootState) => state.theme.theme);
 
-    // bottom sheet
-    const [snapPointIndex, setSnapPointIndex] = useState(-1);
-    const [isGalleryVisible, setGalleryVisible] = useState(false);
-    const bottomSheetRef = useRef<BottomSheet>(null);
-    const [bottomSheetHeight, setBottomSheetHeight] = useState<number>(ScreenHeight / 3);
-    const handleOpenBottomSheet = () => {
-        if (bottomSheetRef.current) {
-            bottomSheetRef.current.snapToIndex(0);
-        }
-        setGalleryVisible(true);
-        setShowAlbumsList(false);
-    }
-    const handleCloseBottomSheet = () => {
-        if (bottomSheetRef.current) {
-            bottomSheetRef.current.close();
-        }
-        setGalleryVisible(false);
-        // handleCloseAlbumBottomSheetFilter();
-        handleCloseAlbumFilter();
-    }
-    // const handleOpenPhoneSetting = async () => {
-    //     if (!canAskAgain) {
-    //         await requestMediaLibPermission();
-    //         const { status, canAskAgain } = await requestMediaLibPermissionWithoutLinking();
-    //         if (canAskAgain && status === "granted") {
-    //             handleBottomSheet();
-    //         }
-    //     }
-    // }
-    // const handleBottomSheet = () => {
-    //     if (!isGalleryVisible) {
-    //         setKeyboardHeight(ScreenHeight / 3);
-    //         handleOpenBottomSheet();
-    //     } else {
-    //         setKeyboardHeight(0);
-    //         handleCloseBottomSheet();
-    //     }
-    // }
-
-    // album filter
-    const [showAlbumsList, setShowAlbumsList] = useState<boolean>(false);
-    const translateY = useRef(new Animated.Value(ScreenHeight)).current;
-    const handleOpenAlbumFilter = () => {
-        Animated.timing(translateY, {
-            toValue: 0, // Dịch chuyển đến vị trí ban đầu
-            duration: 800, // Thời gian chạy animation (ms)
-            useNativeDriver: true, // Sử dụng native driver để tăng hiệu suất
-        }).start();
-        setShowAlbumsList(true);
-        setBottomSheetHeight(handleSetBottomSheetHeight());
-    }
-    const handleCloseAlbumFilter = () => {
-        Animated.timing(translateY, {
-            toValue: ScreenHeight, // Dịch chuyển đến vị trí ban đầu
-            duration: 800, // Thời gian chạy animation (ms)
-            useNativeDriver: true, // Sử dụng native driver để tăng hiệu suất
-        }).start();
-        setShowAlbumsList(false);
-        setBottomSheetHeight(handleSetBottomSheetHeight());
-    }
-    const handleSetBottomSheetHeight = () => {
-        let heightNumber = 0;
-        switch (snapPointIndex) {
-            case -1:
-            case 0:
-                heightNumber = ScreenHeight / 3;
-                break;
-            case 1:
-                heightNumber = ScreenHeight;
-                break;
-
-            default:
-                heightNumber = ScreenHeight / 3;
-                break;
-        }
-        return heightNumber;
-    }
-
     const {
         requestPermission,
-        requestMediaLibPermission,
-        canAskAgain,
-        requestMediaLibPermissionWithoutLinking,
     } = usePhoto();
-    const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
+
+    const bottomSheetGalleryRef = useRef<BottomSheetGalleryMethods>(null);
 
     const lastSeen: Date = faker.date.recent();
     const { t, i18n } = useTranslation();
@@ -149,35 +67,6 @@ export default function FriendChatDetail() {
             keyboardDidHideListener.remove();
         };
     }, []);
-
-
-    const bottomSheetRef4 = useRef<BottomSheetMethods>(null);
-    const pressHandler4 = useCallback(() => {
-        bottomSheetRef4.current?.expand();
-    }, []);
-    const pressHandler4Close = useCallback(() => {
-        bottomSheetRef4.current?.close();
-    }, []);
-    const handleOpenPhoneSetting = async () => {
-        if (!canAskAgain) {
-            await requestMediaLibPermission();
-            const { status, canAskAgain } = await requestMediaLibPermissionWithoutLinking();
-            if (canAskAgain && status === "granted") {
-                handleBottomSheet();
-            }
-        }
-    }
-    const handleBottomSheet = () => {
-        if (!isGalleryVisible) {
-            setKeyboardHeight(ScreenHeight / 3);
-            handleOpenBottomSheet();
-            pressHandler4();
-        } else {
-            setKeyboardHeight(0);
-            handleCloseBottomSheet();
-            pressHandler4Close();
-        }
-    }
 
     return (
         <View>
@@ -259,10 +148,17 @@ export default function FriendChatDetail() {
                     <TouchableOpacity
                         style={friendChatDetailStyleSheet.touchableButton}
                         onPress={() => {
-                            if (!requestPermission) {
-                                handleBottomSheet();
-                            } else {
-                                handleOpenPhoneSetting();
+                            if (bottomSheetGalleryRef.current != null) {
+                                if (!requestPermission) {
+                                    bottomSheetGalleryRef.current.handleBottomSheetGallery();
+                                    if (bottomSheetGalleryRef.current.isBottomSheetGalleryOpen) {
+                                        setKeyboardHeight(0);
+                                    } else {
+                                        setKeyboardHeight(ScreenHeight / 3);
+                                    }
+                                } else {
+                                    bottomSheetGalleryRef.current.handleOpenPhoneSetting();
+                                }
                             }
                         }}
                     >
@@ -293,19 +189,8 @@ export default function FriendChatDetail() {
                 </View>
             </View>
 
-            <BottomSheetFlatList
-                ref={bottomSheetRef4}
-                backgroundColor={theme === "dark" ? colors.lighterBlue : colors.lighterOrange}
-                selectedAlbum={selectedAlbum}
-                bottomSheetHeight={bottomSheetHeight}
-                setBottomSheetHeight={setBottomSheetHeight}
-                showAlbumsList={showAlbumsList}
-                translateY={translateY}
-                setSelectedAlbum={setSelectedAlbum}
-                handleOpenAlbumFilter={handleOpenAlbumFilter}
-                handleCloseAlbumFilter={handleCloseAlbumFilter}
-                data={[]}
-                renderItem={() => (<></>)}
+            <BottomSheetGallery
+                ref={bottomSheetGalleryRef}
                 snapTo={ScreenHeight - (ScreenHeight / 3) + statusBarHeight}
             />
         </View>

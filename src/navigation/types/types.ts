@@ -16,6 +16,7 @@ export type RootStackParamList = {
         senderId: string;
         receiverId: string;
     };
+    ChineseChessGame: undefined
 };
 
 export type NavigationProps = StackNavigationProp<RootStackParamList>;
