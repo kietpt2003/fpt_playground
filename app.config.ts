@@ -46,6 +46,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
             {
                 photosPermission: "Allow FPT Playground to use your photos."
             }
-        ]
+        ],
+        [
+            "expo-camera",
+            {
+                photosPermission: "Allow FPT Playground to access your camera.",
+                isAccessMediaLocationEnabled: true
+            }
+        ],
     ],
 });

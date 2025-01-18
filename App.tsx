@@ -15,6 +15,7 @@ import { ClickProvider } from './src/context/ClickContext';
 import { NonPlayerCharacterProvider } from './src/context/NonPlayerCharacterContext';
 import * as Font from 'expo-font';
 import { PhotoProvider } from './src/context/PhotoContext';
+import { CameraProvider } from './src/context/CameraContext';
 
 // Register background handler
 messaging().setBackgroundMessageHandler(async remoteMessage => {
@@ -62,12 +63,14 @@ export default function App() {
           <ClickProvider>
             <NonPlayerCharacterProvider>
               <PhotoProvider>
-                <NavigationContainer>
-                  <GestureHandlerRootView style={{ flex: 1 }}>
-                    <StatusBar backgroundColor={undefined} />
-                    <RootNavigator onMount={() => setIsMounted(true)} />
-                  </GestureHandlerRootView>
-                </NavigationContainer>
+                <CameraProvider>
+                  <NavigationContainer>
+                    <GestureHandlerRootView style={{ flex: 1 }}>
+                      <StatusBar backgroundColor={undefined} />
+                      <RootNavigator onMount={() => setIsMounted(true)} />
+                    </GestureHandlerRootView>
+                  </NavigationContainer>
+                </CameraProvider>
               </PhotoProvider>
             </NonPlayerCharacterProvider>
           </ClickProvider>

@@ -77,9 +77,11 @@ export const AlbumFilter = forwardRef<AlbumFilterMethods, AlbumFilterProps>(
                 runOnJS(setIsPanEnabled)(true);
                 runOnJS(setEnableScroll)(true);
                 const speedRate = 1 / timing.value;
+                console.log(speedRate, isPanEnabled, isTop);
+
 
                 if (isPanEnabled && isTop) {
-                    if (event.velocityY > 0 && speedRate > 0.11 && scrollY.value == 0) {
+                    if (event.velocityY > 0 && speedRate > 0.07 && scrollY.value == 0) {
                         topAnimation.value = withSpring(openHeight, {
                             damping: 100,
                             stiffness: 400,

@@ -12,7 +12,6 @@
   "dependencies": {
     "@expo/config": "^10.0.6",
     "@faker-js/faker": "^9.3.0",
-    "@gorhom/bottom-sheet": "5.0.6",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/slider": "^4.5.5",
     "@react-native-firebase/app": "^21.6.1",
@@ -31,6 +30,7 @@
     "date-fns": "^4.1.0",
     "expo": "52.0.25",
     "expo-av": "15.0.2",
+    "expo-camera": "16.0.11",
     "expo-font": "13.0.3",
     "expo-image-picker": "16.0.4",
     "expo-linear-gradient": "14.0.2",

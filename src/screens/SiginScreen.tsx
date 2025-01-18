@@ -29,6 +29,7 @@ import useClick from '../hooks/useClick';
 import { SigninScreenNavigationProp } from './types/signinScreenTypes';
 import * as Location from "expo-location";
 import usePhoto from '../hooks/usePhoto';
+import useCamera from '../hooks/useCamera';
 
 export default function SiginScreen() {
     GoogleSignin.configure({
@@ -65,6 +66,7 @@ export default function SiginScreen() {
     const [isError, setIsError] = useState<boolean>(false);
 
     const { requestMediaLibPermissionWithoutLinking } = usePhoto();
+    const { requestCameraPermissionWithoutLinking } = useCamera();
 
     // const handleLoginGoogle = async (accessToken) => {
     //     try {
@@ -161,6 +163,7 @@ export default function SiginScreen() {
             (async () => {
                 await Location.requestForegroundPermissionsAsync();
                 await requestMediaLibPermissionWithoutLinking();
+                await requestCameraPermissionWithoutLinking();
                 if (Platform.OS === "android") {
                     await getPermissionAndroid();
                 }
