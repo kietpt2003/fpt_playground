@@ -75,6 +75,6 @@ export default function ErrorModal({ stringErr, isError, setIsError }: errorModa
                     </LinearGradient>
                 </View>
             </View>
-        </Modal>
+        </Modal >
     );
 };

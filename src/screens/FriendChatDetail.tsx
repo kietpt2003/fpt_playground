@@ -17,18 +17,27 @@ import usePhoto from '../hooks/usePhoto';
 import BottomSheetGallery from '../components/BottomSheetGallery';
 import { statusBarHeight } from '../constants/statusBarHeight';
 import { BottomSheetGalleryMethods } from '../components/types/bottomSheetGaleryTypes';
+import useCamera from '../hooks/useCamera';
+import { FriendChatDetailNavigationProp } from './types/friendChatDetailTypes';
 
 export default function FriendChatDetail() {
     const route = useRoute<FriendChatDetailRouteProp>();
     const params = route.params;
 
-    const navigation = useNavigation();
+    const navigation = useNavigation<FriendChatDetailNavigationProp>();
 
     const theme = useSelector((state: RootState) => state.theme.theme);
 
     const {
         requestPermission,
     } = usePhoto();
+
+    const {
+        isNeedCameraPermission,
+        requestCameraPermission,
+        canAskAgain,
+        requestCameraPermissionWithoutLinking
+    } = useCamera();
 
     const bottomSheetGalleryRef = useRef<BottomSheetGalleryMethods>(null);
 
@@ -50,6 +59,17 @@ export default function FriendChatDetail() {
         name: faker.person.firstName(),
         imageUrl: faker.image.urlPicsumPhotos({ width: 200, height: 200 })
     }), [params.receiverId]);
+
+
+    const handleOpenPhoneSetting = async () => {
+        if (!canAskAgain) {
+            await requestCameraPermission();
+            const { status, canAskAgain } = await requestCameraPermissionWithoutLinking();
+            if (canAskAgain && status === "granted") {
+
+            }
+        }
+    }
 
     //Check keyboard open
     useEffect(() => {
@@ -140,6 +160,13 @@ export default function FriendChatDetail() {
                     {/* Camera */}
                     <TouchableOpacity
                         style={friendChatDetailStyleSheet.touchableButton}
+                        onPress={() => {
+                            if (isNeedCameraPermission) {
+                                handleOpenPhoneSetting();
+                            } else {
+                                navigation.navigate("CameraScreen");
+                            }
+                        }}
                     >
                         <Entypo name={"camera"} size={25} color={theme === "dark" ? colors.darkBlue : colors.darkOrange} />
                     </TouchableOpacity>

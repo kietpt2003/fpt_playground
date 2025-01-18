@@ -143,5 +143,7 @@
     "online-active": "Hoạt động ",
     "chat-input-msg": "Nhắn tin",
     "no-image": "Không có hình ảnh để hiển thị",
-    "all-images": "Tất cả ảnh"
+    "all-images": "Tất cả ảnh",
+    "capture-image-err": "Có lỗi trong quá trình chụp ảnh, vui lòng thử lại sau.",
+    "save-image-err": "Có vấn đề trong quá trình trích xuất hình ảnh, vui lòng thử lại sau."
 }

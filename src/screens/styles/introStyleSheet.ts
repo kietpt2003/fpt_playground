@@ -1,4 +1,4 @@
-import { ScreenHeight, ScreenWidth } from "@rneui/base";
+import { ScreenHeight } from "@rneui/base";
 import { StyleSheet } from "react-native";
 import { colors } from "../../constants/colors";
 
@@ -7,7 +7,7 @@ const introStyleSheet = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: "black"
+        backgroundColor: colors.black
     },
     introVideo: {
         width: '100%',

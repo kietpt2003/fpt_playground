@@ -48,7 +48,8 @@ const errorModalStyleSheet = StyleSheet.create({
         height: ScreenHeight / 22,
         alignItems: "center",
         justifyContent: "center",
-        alignSelf: "flex-end"
+        alignSelf: "flex-end",
+        zIndex: 1
     },
     closeBtnLinear: {
         position: "absolute",

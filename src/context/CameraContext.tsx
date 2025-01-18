@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useState } from 'react';
 import { Linking } from 'react-native';
 import { useCameraPermissions } from 'expo-camera';
 import { CameraContextProps, CameraProviderProps } from './types/cameraContextType';

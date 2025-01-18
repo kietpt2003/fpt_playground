@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Animated as RNAnimated, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import React, {
     forwardRef,
     useImperativeHandle,
