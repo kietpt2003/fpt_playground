@@ -1,4 +1,3 @@
-import { ScreenWidth } from "@rneui/base";
 import { StyleSheet } from "react-native";
 
 const groupChatFilterItemStyleSheet = StyleSheet.create({

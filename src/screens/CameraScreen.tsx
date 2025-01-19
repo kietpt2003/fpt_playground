@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native'
+import { View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import cameraScreenStyleSheet from './styles/cameraScreenStyleSheet'
 import { CameraView } from 'expo-camera'
@@ -6,15 +6,15 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { CameraScreenProps } from './types/cameraScreenTypes'
 import CameraIconButton from '../components/CameraIconButton'
 import { colors } from '../constants/colors'
-import Slider from '@react-native-community/slider'
 import ErrorModal from '../components/ErrorModal'
 import PictureEditor from '../components/PictureEditor'
 import { useTranslation } from 'react-i18next'
+import CameraZoom from '../components/CameraZoom'
 
 export default function CameraScreen() {
     const [cameraProps, setCameraProps] = useState<CameraScreenProps>({
         zoom: 0,
-        facing: "front",
+        facing: "back",
         flash: "on",
         animateShutter: false,
         enableTorch: false,
@@ -39,22 +39,6 @@ export default function CameraScreen() {
             ...current,
             [prop]: current[prop] === option1 ? option2 : option1
         }))
-    }
-
-    function zoomIn() {
-        setZoomValue(Math.min(zoomValue + 0.1, 1));
-        // setCameraProps((current) => ({
-        //     ...current,
-        //     zoom: Math.min(current.zoom + 0.1, 1)
-        // }))
-    }
-
-    function zoomOut() {
-        setZoomValue(Math.max(zoomValue - 0.1, 0));
-        // setCameraProps((current) => ({
-        //     ...current,
-        //     zoom: Math.max(current.zoom - 0.1, 0)
-        // }))
     }
 
     async function takePicture() {
@@ -135,30 +119,11 @@ export default function CameraScreen() {
                             animateShutter={cameraProps.animateShutter}
                             enableTorch={cameraProps.enableTorch}
                         />
-                        <View style={cameraScreenStyleSheet.slideContainer}>
-                            <CameraIconButton
-                                icon={"zoom-out"}
-                                color={colors.white}
-                                size={20}
-                                onPress={zoomOut}
-                            />
-                            <Slider
-                                style={cameraScreenStyleSheet.slider}
-                                minimumValue={0}
-                                maximumValue={1}
-                                value={zoomValue}
-                                onValueChange={(value) => {
-                                    setZoomValue(value);
-                                }}
-                                step={0.1}
-                            />
-                            <CameraIconButton
-                                icon={"zoom-in"}
-                                color={colors.white}
-                                size={20}
-                                onPress={zoomIn}
-                            />
-                        </View>
+
+                        <CameraZoom
+                            zoomValue={zoomValue}
+                            setZoomValue={setZoomValue}
+                        />
 
                         <View style={cameraScreenStyleSheet.bottomControllsContainer}>
                             <CameraIconButton
