@@ -1,159 +1,257 @@
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, Pressable } from 'react-native';
 import DraggablePiece from './DraggablePiece';
-import { isValidMove } from '../utils/checkChineseChessLogic';
+import { checkBishopMove, checkKingMove, checkKnightMove, checkPawnMove, checkQueenMove, checkRookMove, isInCheck, isValidMove } from '../utils/checkChineseChessLogic';
 import { ScreenHeight } from '@rneui/base';
+import { ChineseChessBoardPiece } from '../screens/types/chineseChessTypes';
+import { Xiangqi } from 'xiangqi.js';
 
-export const initialState = [
+
+export const initialState: ChineseChessBoardPiece[][] = [
     // Trạng thái bàn cờ với 10 hàng x 9 cột
     [
-        { piece: 'rook', player: 'red' },
-        { piece: 'knight', player: 'red' },
-        { piece: 'elephant', player: 'red' },
-        { piece: 'advisor', player: 'red' },
-        { piece: 'king', player: 'red' },
-        { piece: 'advisor', player: 'red' },
-        { piece: 'elephant', player: 'red' },
-        { piece: 'knight', player: 'red' },
-        { piece: 'rook', player: 'red' },
+        { piece: 'rook', pieceColor: 'red', row: 0, column: 0, isMoveValid: false },
+        { piece: 'knight', pieceColor: 'red', row: 0, column: 1, isMoveValid: false },
+        { piece: 'elephant', pieceColor: 'red', row: 0, column: 2, isMoveValid: false },
+        { piece: 'advisor', pieceColor: 'red', row: 0, column: 3, isMoveValid: false },
+        { piece: 'king', pieceColor: 'red', row: 0, column: 4, isMoveValid: false },
+        { piece: 'advisor', pieceColor: 'red', row: 0, column: 5, isMoveValid: false },
+        { piece: 'elephant', pieceColor: 'red', row: 0, column: 6, isMoveValid: false },
+        { piece: 'knight', pieceColor: 'red', row: 0, column: 7, isMoveValid: false },
+        { piece: 'rook', pieceColor: 'red', row: 0, column: 8, isMoveValid: false },
+    ],//row0
+    [
+        { piece: '', pieceColor: '', row: 1, column: 0, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 1, column: 1, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 1, column: 2, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 1, column: 3, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 1, column: 4, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 1, column: 5, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 1, column: 6, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 1, column: 7, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 1, column: 8, isMoveValid: false },
     ],//row1
     [
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
+        { piece: '', pieceColor: '', row: 2, column: 0, isMoveValid: false },
+        { piece: 'cannon', pieceColor: 'red', row: 2, column: 1, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 2, column: 2, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 2, column: 3, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 2, column: 4, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 2, column: 5, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 2, column: 6, isMoveValid: false },
+        { piece: 'cannon', pieceColor: 'red', row: 2, column: 7, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 2, column: 8, isMoveValid: false },
     ],//row2
     [
-        { piece: '', player: '' },
-        { piece: 'cannon', player: 'red' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: 'cannon', player: 'red' },
-        { piece: '', player: '' },
+        { piece: 'pawn', pieceColor: 'red', row: 3, column: 0, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 3, column: 1, isMoveValid: false },
+        { piece: 'pawn', pieceColor: 'red', row: 3, column: 2, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 3, column: 3, isMoveValid: false },
+        { piece: 'pawn', pieceColor: 'red', row: 3, column: 4, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 3, column: 5, isMoveValid: false },
+        { piece: 'pawn', pieceColor: 'red', row: 3, column: 6, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 3, column: 7, isMoveValid: false },
+        { piece: 'pawn', pieceColor: 'red', row: 3, column: 8, isMoveValid: false },
     ],//row3
     [
-        { piece: 'pawn', player: 'red' },
-        { piece: '', player: '' },
-        { piece: 'pawn', player: 'red' },
-        { piece: '', player: '' },
-        { piece: 'pawn', player: 'red' },
-        { piece: '', player: '' },
-        { piece: 'pawn', player: 'red' },
-        { piece: '', player: '' },
-        { piece: 'pawn', player: 'red' },
+        { piece: '', pieceColor: '', row: 4, column: 0, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 4, column: 1, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 4, column: 2, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 4, column: 3, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 4, column: 4, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 4, column: 5, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 4, column: 6, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 4, column: 7, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 4, column: 8, isMoveValid: false },
     ],//row4
     [
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
+        { piece: '', pieceColor: '', row: 5, column: 0, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 5, column: 1, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 5, column: 2, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 5, column: 3, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 5, column: 4, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 5, column: 5, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 5, column: 6, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 5, column: 7, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 5, column: 8, isMoveValid: false },
     ],//row5
     [
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
+        { piece: 'pawn', pieceColor: 'black', row: 6, column: 0, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 6, column: 1, isMoveValid: false },
+        { piece: 'pawn', pieceColor: 'black', row: 6, column: 2, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 6, column: 3, isMoveValid: false },
+        { piece: 'pawn', pieceColor: 'black', row: 6, column: 4, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 6, column: 5, isMoveValid: false },
+        { piece: 'pawn', pieceColor: 'black', row: 6, column: 6, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 6, column: 7, isMoveValid: false },
+        { piece: 'pawn', pieceColor: 'black', row: 6, column: 8, isMoveValid: false },
     ],//row6
     [
-        { piece: 'pawn', player: 'blue' },
-        { piece: '', player: '' },
-        { piece: 'pawn', player: 'blue' },
-        { piece: '', player: '' },
-        { piece: 'pawn', player: 'blue' },
-        { piece: '', player: '' },
-        { piece: 'pawn', player: 'blue' },
-        { piece: '', player: '' },
-        { piece: 'pawn', player: 'blue' },
+        { piece: '', pieceColor: '', row: 7, column: 0, isMoveValid: false },
+        { piece: 'cannon', pieceColor: 'black', row: 7, column: 1, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 7, column: 2, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 7, column: 3, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 7, column: 4, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 7, column: 5, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 7, column: 6, isMoveValid: false },
+        { piece: 'cannon', pieceColor: 'black', row: 7, column: 7, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 7, column: 8, isMoveValid: false },
     ],//row7
     [
-        { piece: '', player: '' },
-        { piece: 'cannon', player: 'blue' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: 'cannon', player: 'blue' },
-        { piece: '', player: '' },
+        { piece: '', pieceColor: '', row: 8, column: 0, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 8, column: 1, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 8, column: 2, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 8, column: 3, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 8, column: 4, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 8, column: 5, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 8, column: 6, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 8, column: 7, isMoveValid: false },
+        { piece: '', pieceColor: '', row: 8, column: 8, isMoveValid: false },
     ],//row8
     [
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
-        { piece: '', player: '' },
+        { piece: 'rook', pieceColor: 'black', row: 9, column: 0, isMoveValid: false },
+        { piece: 'knight', pieceColor: 'black', row: 9, column: 1, isMoveValid: false },
+        { piece: 'elephant', pieceColor: 'black', row: 9, column: 2, isMoveValid: false },
+        { piece: 'advisor', pieceColor: 'black', row: 9, column: 3, isMoveValid: false },
+        { piece: 'king', pieceColor: 'black', row: 9, column: 4, isMoveValid: false },
+        { piece: 'advisor', pieceColor: 'black', row: 0, column: 5, isMoveValid: false },
+        { piece: 'elephant', pieceColor: 'black', row: 9, column: 6, isMoveValid: false },
+        { piece: 'knight', pieceColor: 'black', row: 9, column: 7, isMoveValid: false },
+        { piece: 'rook', pieceColor: 'black', row: 9, column: 8, isMoveValid: false },
     ],//row9
-    [
-        { piece: 'rook', player: 'blue' },
-        { piece: 'knight', player: 'blue' },
-        { piece: 'elephant', player: 'blue' },
-        { piece: 'advisor', player: 'blue' },
-        { piece: 'king', player: 'blue' },
-        { piece: 'advisor', player: 'blue' },
-        { piece: 'elephant', player: 'blue' },
-        { piece: 'knight', player: 'blue' },
-        { piece: 'rook', player: 'blue' },
-    ],//row10
 ];
 
 
 const Board = () => {
-    const [board, setBoard] = useState(initialState);
+    const [player, setPlayer] = useState('white');
+    const [isWinner, setIsWinner] = useState('')
+    const [gameState, setGameState] = useState(initialState);
+    const [isCheck, setIsCheck] = useState(false);
+
+    const [game, setGame] = useState(new Xiangqi());
+
+    const handleSquarePress = (from: string, to: string) => {
+        const move = game.move({ from: from, to: to }); // Kiểm tra nước đi
+        if (move) {
+            setGame(new Xiangqi(game.fen())); // Cập nhật trạng thái bàn cờ
+        }
+    };
+
+    useEffect(() => {
+        console.log("p1", game.turn());
+
+        handleSquarePress("e3", "e4");
+        console.log("p2", game.turn());
+        handleSquarePress("e6", "e5");
+        console.log("p3", game.turn());
+        handleSquarePress("e4", "e5");
+        console.log("p4", game.turn());
+        console.log(game.ascii());
+
+    }, [])
+
+    // Checks if the king is in check or not
+    const checkKingState = async () => {
+        setIsCheck(await isInCheck(gameState, player === 'white' ? '#cacaca' : 'black'))
+        // console.log(isCheck)
+    }
 
     const onMove = (from: { row: number; col: number }, to: { x: number; y: number }) => {
+        console.log("x.", to.x / 40, "\ny.", to.y / 40);
         // Tính toán vị trí đích dựa trên tọa độ `to`
         const col = Math.round(to.x / 40); // Mỗi ô cờ có kích thước 40px
         const row = Math.round(to.y / 40);
 
         // Kiểm tra vị trí đích có hợp lệ không
         if (row >= 0 && row < 10 && col >= 0 && col < 9) {
-            const fromCell = board[from.row][from.col];
-            const toCell = board[row][col];
+            // console.log("fromCell", gameState[from.row][from.col], "\nfromRow", from.row, "\n fromCol", from.col);
+            console.log("toCell", gameState[row][col], "\n Col", col, "\nRow", row);
+
+            const fromCell = gameState[from.row][from.col];
+            const toCell = gameState[row][col];
 
             // Kiểm tra xem nước đi có hợp lệ không
-            if (isValidMove(fromCell.piece, fromCell.player, from, { row, col }, board)) {
+            if (isValidMove(fromCell.piece, fromCell.pieceColor, from, { row, col }, gameState)) {
+                console.log("valid");
+
                 // Cập nhật bàn cờ
-                const newBoard = board.map((row) => row.map((cell) => ({ ...cell })));
-                newBoard[row][col] = fromCell; // Đặt quân cờ vào vị trí đích
-                newBoard[from.row][from.col] = { piece: '', player: '' }; // Xóa quân cờ tại vị trí ban đầu
-                setBoard(newBoard);
+                // const newBoard = gameState.map((row) => row.map((cell) => ({ ...cell })));
+                // newBoard[row][col] = fromCell; // Đặt quân cờ vào vị trí đích
+                // newBoard[from.row][from.col] = { piece: '', pieceColor: '' }; // Xóa quân cờ tại vị trí ban đầu
+                // setBoard(newBoard);
             }
+
         }
     };
 
+    // Gives suggetion of the valid moves for the selected piece
+    const onPieceSelected = async ({ piece, pieceColor, row, column, isMoveValid }: ChineseChessBoardPiece) => {
+        let newGameState = [...gameState];
+        if (isWinner) {
+            return
+        }
+
+        checkKingState()
+
+        newGameState.map((innerArray) => {
+            innerArray.map((obj) => {
+                obj.isMoveValid = false
+            })
+        })
+
+
+        switch (piece) {
+            case 'pawn':
+                newGameState = checkPawnMove(gameState, { piece, pieceColor, row, column, isMoveValid })
+                break;
+            case 'rook':
+                newGameState = checkRookMove(gameState, { piece, pieceColor, row, column, isMoveValid })
+                break;
+            case 'knight':
+                newGameState = checkKnightMove(gameState, { piece, pieceColor, row, column, isMoveValid })
+                break;
+            case 'king':
+                newGameState = checkKingMove(gameState, { piece, pieceColor, row, column, isMoveValid })
+                break;
+            default:
+                console.log('Please select valid piece')
+                break;
+        }
+
+
+        setGameState(newGameState)
+        // checkIsWinner(pieceColor,row,column)
+    }
+
     const renderBoard = () => {
-        return board.map((row, rowIndex) => (
+        return gameState.map((row, rowIndex) => (
             <View style={styles.row} key={`row-${rowIndex}`}>
                 {row.map((cell, colIndex) => (
-                    <DraggablePiece
-                        key={`cell-${rowIndex}-${colIndex}`}
-                        piece={cell.piece}
-                        player={cell.player}
-                        position={{ row: rowIndex, col: colIndex }}
-                        onMove={onMove}
-                    />
+                    <Pressable onPress={() => {
+                        if (player == cell.pieceColor || (cell.pieceColor === "red" && player === 'white')) {
+
+                        }
+                        onPieceSelected({
+                            piece: cell.piece,
+                            pieceColor: cell.pieceColor,
+                            row: cell.row,
+                            column: cell.column,
+                            isMoveValid: cell.isMoveValid
+                        })
+
+                    }}
+
+                        key={`${cell.column}+${cell.row}+${colIndex}`}
+                    >
+                        <DraggablePiece
+                            key={`cell-${rowIndex}-${colIndex}`}
+                            piece={cell.piece}
+                            pieceColor={cell.pieceColor}
+                            position={{ row: rowIndex, col: colIndex }}
+                            onMove={onMove}
+                            isValid={cell.isMoveValid}
+                        />
+                    </Pressable>
                 ))}
             </View>
         ));
