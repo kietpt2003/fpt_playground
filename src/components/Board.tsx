@@ -128,13 +128,11 @@ const Board = () => {
     const [gameState, setGameState] = useState(initialState);
     const [isCheck, setIsCheck] = useState(false);
 
-    const [game, setGame] = useState(new Xiangqi());
+    // const [game, setGame] = useState(new Xiangqi());
+    const game = new Xiangqi();
 
     const handleSquarePress = (from: string, to: string) => {
-        const move = game.move({ from: from, to: to }); // Kiểm tra nước đi
-        if (move) {
-            setGame(new Xiangqi(game.fen())); // Cập nhật trạng thái bàn cờ
-        }
+        game.move({ from: from, to: to }); // Kiểm tra nước đi
     };
 
     useEffect(() => {
