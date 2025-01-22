@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 import DraggablePiece from './DraggablePiece';
-import { checkBishopMove, checkKingMove, checkKnightMove, checkPawnMove, checkQueenMove, checkRookMove, isInCheck, isValidMove } from '../utils/checkChineseChessLogic';
+import { checkAdvisorMove, checkBishopMove, checkCannonMove, checkKingMove, checkKnightMove, checkPawnMove, checkPotentialBlockMoves, checkRookMove, checkValidMove, isInCheck, isValidMove } from '../utils/checkChineseChessLogic';
 import { ScreenHeight } from '@rneui/base';
 import { ChineseChessBoardPiece } from '../screens/types/chineseChessTypes';
 import { Xiangqi } from 'xiangqi.js';
@@ -12,11 +12,11 @@ export const initialState: ChineseChessBoardPiece[][] = [
     [
         { piece: 'rook', pieceColor: 'red', row: 0, column: 0, isMoveValid: false },
         { piece: 'knight', pieceColor: 'red', row: 0, column: 1, isMoveValid: false },
-        { piece: 'elephant', pieceColor: 'red', row: 0, column: 2, isMoveValid: false },
+        { piece: 'bishop', pieceColor: 'red', row: 0, column: 2, isMoveValid: false },
         { piece: 'advisor', pieceColor: 'red', row: 0, column: 3, isMoveValid: false },
         { piece: 'king', pieceColor: 'red', row: 0, column: 4, isMoveValid: false },
         { piece: 'advisor', pieceColor: 'red', row: 0, column: 5, isMoveValid: false },
-        { piece: 'elephant', pieceColor: 'red', row: 0, column: 6, isMoveValid: false },
+        { piece: 'bishop', pieceColor: 'red', row: 0, column: 6, isMoveValid: false },
         { piece: 'knight', pieceColor: 'red', row: 0, column: 7, isMoveValid: false },
         { piece: 'rook', pieceColor: 'red', row: 0, column: 8, isMoveValid: false },
     ],//row0
@@ -80,7 +80,7 @@ export const initialState: ChineseChessBoardPiece[][] = [
         { piece: '', pieceColor: '', row: 6, column: 1, isMoveValid: false },
         { piece: 'pawn', pieceColor: 'black', row: 6, column: 2, isMoveValid: false },
         { piece: '', pieceColor: '', row: 6, column: 3, isMoveValid: false },
-        { piece: 'pawn', pieceColor: 'black', row: 6, column: 4, isMoveValid: false },
+        { piece: 'rook', pieceColor: 'red', row: 6, column: 4, isMoveValid: false },
         { piece: '', pieceColor: '', row: 6, column: 5, isMoveValid: false },
         { piece: 'pawn', pieceColor: 'black', row: 6, column: 6, isMoveValid: false },
         { piece: '', pieceColor: '', row: 6, column: 7, isMoveValid: false },
@@ -111,11 +111,11 @@ export const initialState: ChineseChessBoardPiece[][] = [
     [
         { piece: 'rook', pieceColor: 'black', row: 9, column: 0, isMoveValid: false },
         { piece: 'knight', pieceColor: 'black', row: 9, column: 1, isMoveValid: false },
-        { piece: 'elephant', pieceColor: 'black', row: 9, column: 2, isMoveValid: false },
+        { piece: 'bishop', pieceColor: 'black', row: 9, column: 2, isMoveValid: false },
         { piece: 'advisor', pieceColor: 'black', row: 9, column: 3, isMoveValid: false },
         { piece: 'king', pieceColor: 'black', row: 9, column: 4, isMoveValid: false },
-        { piece: 'advisor', pieceColor: 'black', row: 0, column: 5, isMoveValid: false },
-        { piece: 'elephant', pieceColor: 'black', row: 9, column: 6, isMoveValid: false },
+        { piece: 'advisor', pieceColor: 'black', row: 9, column: 5, isMoveValid: false },
+        { piece: 'bishop', pieceColor: 'black', row: 9, column: 6, isMoveValid: false },
         { piece: 'knight', pieceColor: 'black', row: 9, column: 7, isMoveValid: false },
         { piece: 'rook', pieceColor: 'black', row: 9, column: 8, isMoveValid: false },
     ],//row9
@@ -136,22 +136,28 @@ const Board = () => {
     };
 
     useEffect(() => {
-        console.log("p1", game.turn());
+        // console.log("p1", game.turn());
 
-        handleSquarePress("e3", "e4");
-        console.log("p2", game.turn());
-        handleSquarePress("e6", "e5");
-        console.log("p3", game.turn());
-        handleSquarePress("e4", "e5");
-        console.log("p4", game.turn());
-        console.log(game.ascii());
+        // handleSquarePress("e3", "e4");
+        // console.log("p2", game.turn());
+        // handleSquarePress("e6", "e5");
+        // console.log("p3", game.turn());
+        // handleSquarePress("e4", "e5");
+        // console.log("p4", game.turn());
+        // console.log(game.ascii());
+
+        const handleF = async () => {
+            const check = await checkPotentialBlockMoves(gameState, 'black');
+            console.log("thu coi", check);
+
+        }
+        handleF();
 
     }, [])
 
     // Checks if the king is in check or not
     const checkKingState = async () => {
-        setIsCheck(await isInCheck(gameState, player === 'white' ? '#cacaca' : 'black'))
-        // console.log(isCheck)
+        setIsCheck(await isInCheck(gameState, player === 'white' ? 'red' : 'black'))
     }
 
     const onMove = (from: { row: number; col: number }, to: { x: number; y: number }) => {
@@ -189,7 +195,7 @@ const Board = () => {
             return
         }
 
-        checkKingState()
+        await checkKingState()
 
         newGameState.map((innerArray) => {
             innerArray.map((obj) => {
@@ -207,6 +213,15 @@ const Board = () => {
                 break;
             case 'knight':
                 newGameState = checkKnightMove(gameState, { piece, pieceColor, row, column, isMoveValid })
+                break;
+            case 'bishop':
+                newGameState = checkBishopMove(gameState, { piece, pieceColor, row, column, isMoveValid })
+                break;
+            case 'advisor':
+                newGameState = checkAdvisorMove(gameState, { piece, pieceColor, row, column, isMoveValid })
+                break;
+            case 'cannon':
+                newGameState = checkCannonMove(gameState, { piece, pieceColor, row, column, isMoveValid })
                 break;
             case 'king':
                 newGameState = checkKingMove(gameState, { piece, pieceColor, row, column, isMoveValid })

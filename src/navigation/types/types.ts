@@ -18,6 +18,7 @@ export type RootStackParamList = {
     };
     ChineseChessGame: undefined;
     CameraScreen: undefined;
+    LocalGame: undefined;
 };
 
 export type NavigationProps = StackNavigationProp<RootStackParamList>;

@@ -1,4 +1,4 @@
-export type ChineseChessPiece = "rook" | "knight" | "elephant" | "advisor" | "king" | "cannon" | "pawn" | ""
+export type ChineseChessPiece = "rook" | "knight" | "bishop" | "advisor" | "king" | "cannon" | "pawn" | ""
 
 export interface ChineseChessBoardPiece {
     piece: ChineseChessPiece,
