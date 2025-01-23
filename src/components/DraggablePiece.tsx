@@ -26,6 +26,7 @@ const DraggablePiece: React.FC<DraggablePieceProps> = ({ piece, pieceColor, posi
     }));
 
     const panGesture = Gesture.Pan()
+        .enabled(false)
         .onBegin((event) => {
             contextRow.value = position.row;
             contextCol.value = position.col;
