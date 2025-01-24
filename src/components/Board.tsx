@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Pressable, Text } from 'react-native';
 import DraggablePiece from './DraggablePiece';
-import { checkAdvisorMove, checkBishopMove, checkCannonMove, checkKingMove, checkKnightMove, checkPawnMove, checkPotentialBlockMoves, checkRookMove, isInCheck } from '../utils/checkChineseChessLogic';
+import { checkAdvisorMove, checkBishopMove, checkCannonMove, checkKingMove, checkKnightMove, checkPawnMove, checkPotentialBlockMoves, checkRookMove, isInCheck, updateNewGameState } from '../utils/checkChineseChessLogic';
 import { ScreenHeight } from '@rneui/base';
-import { ChineseChessBoardPiece } from '../screens/types/chineseChessTypes';
+import { ChineseChessBoardPiece, PotentialMovePiece } from '../screens/types/chineseChessTypes';
 import { Xiangqi } from 'xiangqi.js';
 
 
@@ -143,6 +143,7 @@ const Board = () => {
     const [lostWhitePiece, setLostWhitePiece] = useState<ChineseChessBoardPiece[]>([]);
     const [lostBlackPiece, setLostBlackPiece] = useState<ChineseChessBoardPiece[]>([]);
     const [selectedPiece, setSelectedPiece] = useState<ChineseChessBoardPiece>({ piece: '', pieceColor: '', row: 0, column: 0, isMoveValid: false });
+    const [availableForSelected, setAvailableForSelected] = useState<PotentialMovePiece[]>([]);
 
     // const [game, setGame] = useState(new Xiangqi());
     const game = new Xiangqi();
@@ -198,7 +199,7 @@ const Board = () => {
 
     // Gives suggetion of the valid moves for the selected piece
     const onPieceSelected = async ({ piece, pieceColor, row, column, isMoveValid }: ChineseChessBoardPiece) => {
-        let newGameState = [...gameState];
+        let newGameState: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(gameState));
         if (isWinner) {
             return
         }
@@ -211,28 +212,27 @@ const Board = () => {
             })
         })
 
-
         switch (piece) {
             case 'pawn':
-                newGameState = checkPawnMove(gameState, { piece, pieceColor, row, column, isMoveValid })
+                newGameState = checkPawnMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
                 break;
             case 'rook':
-                newGameState = checkRookMove(gameState, { piece, pieceColor, row, column, isMoveValid })
+                newGameState = checkRookMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
                 break;
             case 'knight':
-                newGameState = checkKnightMove(gameState, { piece, pieceColor, row, column, isMoveValid })
+                newGameState = checkKnightMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
                 break;
             case 'bishop':
-                newGameState = checkBishopMove(gameState, { piece, pieceColor, row, column, isMoveValid })
+                newGameState = checkBishopMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
                 break;
             case 'advisor':
-                newGameState = checkAdvisorMove(gameState, { piece, pieceColor, row, column, isMoveValid })
+                newGameState = checkAdvisorMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
                 break;
             case 'cannon':
-                newGameState = checkCannonMove(gameState, { piece, pieceColor, row, column, isMoveValid })
+                newGameState = checkCannonMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
                 break;
             case 'king':
-                newGameState = await checkKingMove(gameState, { piece, pieceColor, row, column, isMoveValid })
+                newGameState = await checkKingMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
                 break;
             default:
                 console.log('Please select valid piece')
@@ -240,45 +240,48 @@ const Board = () => {
         }
 
 
-        setGameState(newGameState)
-        // checkIsWinner(pieceColor,row,column)
-    }
+        let newGameState2: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(newGameState));
 
-    // Selects the destination or target square to make move
-    const selectMove = async (row: number, column: number) => {
-        let newGameState = [...gameState];
-        const currentSquareState = newGameState[row][column]
+        const availableMoves = await checkPotentialBlockMoves(newGameState2, player === "white" ? "red" : "black")
 
+        //Tìm nước đi phù hợp cho quân đã chọn
+        const filteredMoves = (
+            await Promise.all(
+                availableMoves.map(async (element, index) => {
+                    newGameState2[row][column] = {
+                        piece: "",
+                        pieceColor: "",
+                        row: row,
+                        column: column,
+                        isMoveValid: false
+                    };
 
-        if (redIsCheck) {
-            console.log("King Red Is In Check")
+                    newGameState2[element.potentialMove.row][element.potentialMove.column] = element.potentialMove;
 
-            const availableMoves = await checkPotentialBlockMoves(gameState, "red")
-            const res = availableMoves.find(moves => moves.row === currentSquareState.row && moves.column === currentSquareState.column)
-            if (availableMoves.length === 0) {
-                setIsWinner('Black won the Game')
-            }
+                    const isCheck = await isInCheck(newGameState2, player === "white" ? "red" : "black");
+                    // Trả về phần tử hợp lệ, nếu không hợp lệ thì trả về undefined
+                    if (!isCheck && element.potentialMove.piece === piece && element.potentialMove.pieceColor === pieceColor) {
+                        return element; // Phần tử hợp lệ
+                    }
+                    return undefined; // Loại bỏ phần tử không hợp lệ
+                })
+            )
+        ).filter((el) => el !== undefined); // Loại bỏ undefined ngay sau Promise.all
 
-            if (res != undefined) {
-                makeMove(currentSquareState)
-            }
+        setAvailableForSelected(filteredMoves);
 
-        } else if (blackIsCheck) {
-            console.log("King Black Is In Check")
+        if (filteredMoves.length != 0) {// Nếu có nước đi phù hợp thì cập nhật lại state
+            newGameState2 = await updateNewGameState(newGameState, filteredMoves, { piece, pieceColor, row, column, isMoveValid });
 
-            const availableMoves = await checkPotentialBlockMoves(gameState, "black")
-            const res = availableMoves.find(moves => moves.row === currentSquareState.row && moves.column === currentSquareState.column)
-            if (availableMoves.length === 0) {
-                setIsWinner('Red won the game')
-            }
-
-            if (res != undefined) {
-                makeMove(currentSquareState)
-            }
-        } else {
-            makeMove(currentSquareState);
+            setGameState(newGameState2);
+        } else {// Ngược lại thì set hết thành false tạo hiệu ứng không đi được
+            newGameState.map((innerArray) => {
+                innerArray.map((obj) => {
+                    obj.isMoveValid = false
+                })
+            })
+            setGameState(newGameState);
         }
-
     }
 
     // Updates the game state and piece position
@@ -306,7 +309,6 @@ const Board = () => {
                 setLostBlackPiece(temp)
             }
         }
-
 
         newGameState[row][column] = {
             row: row,
@@ -337,21 +339,58 @@ const Board = () => {
         )
 
         setGameState(newGameState)
-        checkIsWinner()
+        await checkIsWinner()
         setPlayer(selectedPiece.pieceColor === 'red' ? 'black' : 'white')
 
     }
 
     // Check if the game is over or not
-    const checkIsWinner = () => {
-        const blackKing = gameState.flatMap((innerArray) =>
-            innerArray.filter((obj) => obj.piece == 'king')
-        );
+    const checkIsWinner = async () => {
+        let newGameState: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(gameState));
 
-        if (blackKing.length == 1) {
-            setIsWinner(`Player ${blackKing[0].pieceColor === 'black' ? 'Red' : 'Black'} has won the game`)
+        const availableMoves = await checkPotentialBlockMoves(gameState, player === "white" ? "black" : "red")
+        const filteredMoves = (
+            await Promise.all(
+                availableMoves.map(async (element) => {
+                    newGameState[element.fromMove.row][element.fromMove.column] = {
+                        piece: "",
+                        pieceColor: "",
+                        row: element.fromMove.row,
+                        column: element.fromMove.column,
+                        isMoveValid: false
+                    };
+
+                    newGameState[element.potentialMove.row][element.potentialMove.column] = element.potentialMove;
+
+                    const isCheck = await isInCheck(newGameState, player === "white" ? "black" : "red");
+
+                    // Trả về phần tử hợp lệ, nếu không hợp lệ thì trả về undefined
+                    if (!isCheck) {
+                        return element; // Phần tử hợp lệ
+                    }
+                    return undefined; // Loại bỏ phần tử không hợp lệ
+                })
+            )
+        ).filter((el) => el !== undefined); // Loại bỏ undefined ngay sau Promise.all
+
+        if (filteredMoves.length == 0) {
+            setIsWinner(`Player ${player === 'white' ? 'Red' : 'Black'} has won the game`)
         }
-        // console.log(player)
+        // else {
+        //     filteredMoves.forEach((element, index) => {
+        //         if (index == 0) {
+        //             console.log("Start-------------------------------------------");
+
+        //         }
+        //         console.log(element);
+        //         if (filteredMoves.length - 1 == index) {
+        //             console.log("-------------------------------------------End");
+
+        //         }
+        //     });
+        // }
+
+        setAvailableForSelected(filteredMoves);
     }
 
     const renderBoard = () => {
@@ -359,8 +398,6 @@ const Board = () => {
             <View style={styles.row} key={`row-${rowIndex}`}>
                 {row.map((cell, colIndex) => (
                     <Pressable onPress={() => {
-                        console.log("click");
-
                         if (player == cell.pieceColor || (cell.pieceColor === "red" && player === 'white')) {
                             onPieceSelected({
                                 piece: cell.piece,
@@ -380,13 +417,13 @@ const Board = () => {
                         }
 
                         if (cell.isMoveValid) {
-                            selectMove(cell.row, cell.column)
+                            makeMove(gameState[cell.row][cell.column])
                         }
 
                     }}
 
                         key={`${cell.column}+${cell.row}+${colIndex}`}
-                    // disabled={isWinner !== ""}
+                        disabled={isWinner !== ""}
                     >
                         <DraggablePiece
                             key={`cell-${rowIndex}-${colIndex}`}
@@ -418,6 +455,10 @@ const Board = () => {
                 bottom: -130
             }}>Black bị chiếu</Text>
         }
+        <Text style={{
+            position: "absolute",
+            bottom: -150
+        }}>Moves {availableForSelected.length}</Text>
         {
             isWinner &&
             <Text style={{

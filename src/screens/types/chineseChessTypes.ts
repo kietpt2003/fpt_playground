@@ -5,6 +5,11 @@ export type Position = {
     column: number,
 }
 
+export type PotentialMovePiece = {
+    potentialMove: ChineseChessBoardPiece,
+    fromMove: ChineseChessBoardPiece,
+}
+
 export interface ChineseChessBoardPiece {
     piece: ChineseChessPiece,
     pieceColor: string,
