@@ -1,11 +1,13 @@
 import React from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, runOnJS } from 'react-native-reanimated';
-import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
+import ChineseChessPiece from './ChineseChessPiece';
+import { ChineseChessPiece as ChineseChessPieceType, chineseChessSize } from '../screens/types/chineseChessTypes';
 
 interface DraggablePieceProps {
-    piece: string;
+    piece: ChineseChessPieceType;
     pieceColor: string;
     position: { row: number; col: number };
     onMove: (from: { row: number; col: number }, to: { x: number; y: number }) => void;
@@ -20,8 +22,8 @@ const DraggablePiece: React.FC<DraggablePieceProps> = ({ piece, pieceColor, posi
 
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [
-            { translateX: translateX.value },
-            { translateY: translateY.value },
+            { translateX: translateX.value * 0 },
+            { translateY: translateY.value * 0 },
         ],
     }));
 
@@ -46,10 +48,17 @@ const DraggablePiece: React.FC<DraggablePieceProps> = ({ piece, pieceColor, posi
 
     return (
         <GestureDetector gesture={panGesture}>
-            <Animated.View style={[styles.piece, animatedStyle]}>
-                {isValid && (<FontAwesome name='circle' size={8} solid color={'#4dafff'} />)}
+            <Animated.View style={[
+                styles.piece,
+                animatedStyle,
+            ]}>
+                {isValid && (<FontAwesome name='circle' size={8} solid color={'#4dafff'} style={styles.suggest} />)}
                 {piece &&
-                    <Text style={{ color: pieceColor === 'red' ? 'red' : 'black' }}>{piece}</Text>
+                    <ChineseChessPiece
+                        piece={piece}
+                        pieceColor={pieceColor}
+                        size={chineseChessSize}
+                    />
                 }
             </Animated.View>
         </GestureDetector>
@@ -57,15 +66,15 @@ const DraggablePiece: React.FC<DraggablePieceProps> = ({ piece, pieceColor, posi
 };
 
 const styles = StyleSheet.create({
+    suggest: {
+        position: "absolute",
+        top: 16,
+        left: 16,
+        zIndex: 1
+    },
     piece: {
-        width: 40,
-        height: 40,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 20,
-        backgroundColor: 'white',
-        borderWidth: 1,
-        borderColor: 'black',
+        width: chineseChessSize,
+        height: chineseChessSize,
     },
 });
 

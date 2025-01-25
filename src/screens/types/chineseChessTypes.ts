@@ -1,4 +1,4 @@
-type ChineseChessPiece = "rook" | "knight" | "bishop" | "advisor" | "king" | "cannon" | "pawn" | ""
+export type ChineseChessPiece = "rook" | "knight" | "bishop" | "advisor" | "king" | "cannon" | "pawn" | ""
 
 export type Position = {
     row: number,
@@ -17,3 +17,7 @@ export interface ChineseChessBoardPiece {
     column: number,
     isMoveValid?: boolean
 }
+
+export const chineseChessRowSize = 40;
+
+export const chineseChessSize = chineseChessRowSize;

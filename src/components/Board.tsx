@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Pressable, Text } from 'react-native';
 import DraggablePiece from './DraggablePiece';
-import { checkAdvisorMove, checkBishopMove, checkCannonMove, checkKingMove, checkKnightMove, checkPawnMove, checkPotentialBlockMoves, checkRookMove, isInCheck, updateNewGameState } from '../utils/checkChineseChessLogic';
+import { checkAdvisorMove, checkBishopMove, checkCannonMove, checkKingMove, checkKnightMove, checkPawnMove, checkPotentialBlockMoves, checkRookMove, convertToChessCoordinate, isInCheck, updateNewGameState } from '../utils/checkChineseChessLogic';
 import { ScreenHeight } from '@rneui/base';
-import { ChineseChessBoardPiece, PotentialMovePiece } from '../screens/types/chineseChessTypes';
+import { ChineseChessBoardPiece, chineseChessRowSize, chineseChessSize, PotentialMovePiece } from '../screens/types/chineseChessTypes';
 import { Xiangqi } from 'xiangqi.js';
+import ChineseChessSquare from './ChineseChessSquare';
 
 
 export const initialState: ChineseChessBoardPiece[][] = [
@@ -161,7 +162,7 @@ const Board = () => {
         // console.log("p3", game.turn());
         // handleSquarePress("e4", "e5");
         // console.log("p4", game.turn());
-        // console.log(game.ascii());
+        console.log(game.ascii());
 
         // const handleF = async () => {
         //     const check = await isInCheck(gameState, 'red');
@@ -338,7 +339,9 @@ const Board = () => {
             { piece: '', pieceColor: '', row: 0, column: 0, isMoveValid: false }
         )
 
-        setGameState(newGameState)
+        setGameState(newGameState);
+        console.log(convertToChessCoordinate(row, column));
+
         await checkIsWinner()
         setPlayer(selectedPiece.pieceColor === 'red' ? 'black' : 'white')
 
@@ -397,42 +400,54 @@ const Board = () => {
         return gameState.map((row, rowIndex) => (
             <View style={styles.row} key={`row-${rowIndex}`}>
                 {row.map((cell, colIndex) => (
-                    <Pressable onPress={() => {
-                        if (player == cell.pieceColor || (cell.pieceColor === "red" && player === 'white')) {
-                            onPieceSelected({
-                                piece: cell.piece,
-                                pieceColor: cell.pieceColor,
-                                row: cell.row,
-                                column: cell.column,
-                                isMoveValid: cell.isMoveValid
-                            })
+                    <Pressable
+                        style={[
+                            styles.piece,
+                            // {
+                            //     borderTopWidth: 0 == rowIndex ? 2 : 1,
+                            //     borderLeftWidth: 0 == colIndex ? 2 : 1,
+                            //     borderBottomWidth: gameState.length - 1 == rowIndex ? 2 : 0,
+                            //     borderRightWidth: row.length - 1 == colIndex ? 2 : 0
+                            // }
+                        ]}
+                        onPress={() => {
+                            if (player == cell.pieceColor || (cell.pieceColor === "red" && player === 'white')) {
+                                onPieceSelected({
+                                    piece: cell.piece,
+                                    pieceColor: cell.pieceColor,
+                                    row: cell.row,
+                                    column: cell.column,
+                                    isMoveValid: cell.isMoveValid
+                                })
 
-                            setSelectedPiece({
-                                piece: cell.piece,
-                                pieceColor: cell.pieceColor,
-                                row: cell.row,
-                                column: cell.column,
-                                isMoveValid: false
-                            })
-                        }
+                                setSelectedPiece({
+                                    piece: cell.piece,
+                                    pieceColor: cell.pieceColor,
+                                    row: cell.row,
+                                    column: cell.column,
+                                    isMoveValid: false
+                                })
+                            }
 
-                        if (cell.isMoveValid) {
-                            makeMove(gameState[cell.row][cell.column])
-                        }
+                            if (cell.isMoveValid) {
+                                makeMove(gameState[cell.row][cell.column])
+                            }
 
-                    }}
+                        }}
 
                         key={`${cell.column}+${cell.row}+${colIndex}`}
                         disabled={isWinner !== ""}
                     >
-                        <DraggablePiece
-                            key={`cell-${rowIndex}-${colIndex}`}
-                            piece={cell.piece}
-                            pieceColor={cell.pieceColor}
-                            position={{ row: rowIndex, col: colIndex }}
-                            onMove={onMove}
-                            isValid={cell.isMoveValid}
-                        />
+                        <ChineseChessSquare>
+                            <DraggablePiece
+                                key={`cell-${rowIndex}-${colIndex}`}
+                                piece={cell.piece}
+                                pieceColor={cell.pieceColor}
+                                position={{ row: rowIndex, col: colIndex }}
+                                onMove={onMove}
+                                isValid={cell.isMoveValid}
+                            />
+                        </ChineseChessSquare>
                     </Pressable>
                 ))}
             </View>
@@ -471,17 +486,23 @@ const Board = () => {
 
 const styles = StyleSheet.create({
     board: {
-        width: 360,
-        height: 400,
-        borderWidth: 2,
-        borderColor: 'black',
+        width: chineseChessRowSize * 8,
+        height: chineseChessRowSize * 9,
         alignSelf: "center",
         justifyContent: "center",
         alignItems: "center",
-        marginTop: ScreenHeight / 5
+        marginTop: ScreenHeight / 5,
+        backgroundColor: "green"
     },
     row: {
         flexDirection: 'row',
+    },
+    piece: {
+        width: chineseChessSize,
+        height: chineseChessSize,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'white',
     },
 });
 

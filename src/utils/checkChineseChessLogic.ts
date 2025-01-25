@@ -965,3 +965,17 @@ export const updateNewGameState = async (gameState: ChineseChessBoardPiece[][], 
     )
     return newGameState
 }
+
+export function convertToChessCoordinate(row: number, column: number): string {
+    // Mảng ký tự cột tương ứng với chỉ số column
+    const columnMap = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
+
+    // Lấy ký tự của cột từ columnMap
+    const columnChar = columnMap[column];
+
+    // Cột row trong hệ tọa độ cần giảm 1 để phù hợp với chỉ số từ 0 đến 9
+    const convertedRow = 9 - row;
+
+    // Trả về chuỗi tọa độ
+    return `${columnChar}${convertedRow}`;
+}
