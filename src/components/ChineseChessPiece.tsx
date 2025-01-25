@@ -3,7 +3,7 @@ import Svg, { Circle, Text } from 'react-native-svg'
 import { ChineseChessPieceProps } from './types/chineseChessPieceTypes'
 import { ChineseChessPiece as ChineseChessPieceType } from '../screens/types/chineseChessTypes'
 
-export default function ChineseChessPiece({ piece, pieceColor, size }: ChineseChessPieceProps) {
+export default function ChineseChessPiece({ piece, pieceColor, size, borderColor, chessBg = "white" }: ChineseChessPieceProps) {
     function handlePieceString(piece: ChineseChessPieceType): string {
         switch (piece) {
             case "king":
@@ -55,15 +55,24 @@ export default function ChineseChessPiece({ piece, pieceColor, size }: ChineseCh
                 cx={10}
                 cy={10}
                 r={10 - 1}
+                stroke={borderColor}
+                strokeWidth={0.7}
+                fill={chessBg}
+            />
+
+            <Circle
+                cx={10}
+                cy={10}
+                r={10 - 2.5}
                 stroke={pieceColor}
-                strokeWidth={0.5}
+                strokeWidth={0.6}
                 fill={"none"}
             />
             <Text
                 x="10" // Vị trí ngang (tâm x)
                 y="11" // Vị trí dọc (tâm y)
                 fill={pieceColor} // Màu chữ
-                fontSize="12" // Kích thước chữ
+                fontSize="9.5" // Kích thước chữ
                 textAnchor="middle" // Căn giữa theo chiều ngang
                 alignmentBaseline="middle" // Căn giữa theo chiều dọc
                 fontFamily="RobotoBold"

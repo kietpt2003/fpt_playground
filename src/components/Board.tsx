@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Pressable, Text } from 'react-native';
-import DraggablePiece from './DraggablePiece';
 import { checkAdvisorMove, checkBishopMove, checkCannonMove, checkKingMove, checkKnightMove, checkPawnMove, checkPotentialBlockMoves, checkRookMove, convertToChessCoordinate, isInCheck, updateNewGameState } from '../utils/checkChineseChessLogic';
 import { ScreenHeight } from '@rneui/base';
 import { ChineseChessBoardPiece, chineseChessRowSize, chineseChessSize, PotentialMovePiece } from '../screens/types/chineseChessTypes';
 import { Xiangqi } from 'xiangqi.js';
 import ChineseChessSquare from './ChineseChessSquare';
+import ChineseChessPiece from './ChineseChessPiece';
+import { FontAwesome } from '@expo/vector-icons';
+import { colors } from '../constants/colors';
+import Svg, { Line } from 'react-native-svg';
 
 
 export const initialState: ChineseChessBoardPiece[][] = [
@@ -178,25 +181,6 @@ const Board = () => {
         setRedIsCheck(await isInCheck(gameState, "red"));
         setBlackIsCheck(await isInCheck(gameState, "black"));
     }
-
-    const onMove = (from: { row: number; col: number }, to: { x: number; y: number }) => {
-        console.log("x.", to.x / 40, "\ny.", to.y / 40);
-        // Tính toán vị trí đích dựa trên tọa độ `to`
-        const col = Math.round(to.x / 40); // Mỗi ô cờ có kích thước 40px
-        const row = Math.round(to.y / 40);
-
-        // Kiểm tra vị trí đích có hợp lệ không
-        if (row >= 0 && row < 10 && col >= 0 && col < 9) {
-            // console.log("fromCell", gameState[from.row][from.col], "\nfromRow", from.row, "\n fromCol", from.col);
-            console.log("toCell", gameState[row][col], "\n Col", col, "\nRow", row);
-
-            const fromCell = gameState[from.row][from.col];
-            const toCell = gameState[row][col];
-
-
-
-        }
-    };
 
     // Gives suggetion of the valid moves for the selected piece
     const onPieceSelected = async ({ piece, pieceColor, row, column, isMoveValid }: ChineseChessBoardPiece) => {
@@ -401,15 +385,7 @@ const Board = () => {
             <View style={styles.row} key={`row-${rowIndex}`}>
                 {row.map((cell, colIndex) => (
                     <Pressable
-                        style={[
-                            styles.piece,
-                            // {
-                            //     borderTopWidth: 0 == rowIndex ? 2 : 1,
-                            //     borderLeftWidth: 0 == colIndex ? 2 : 1,
-                            //     borderBottomWidth: gameState.length - 1 == rowIndex ? 2 : 0,
-                            //     borderRightWidth: row.length - 1 == colIndex ? 2 : 0
-                            // }
-                        ]}
+                        style={styles.piece}
                         onPress={() => {
                             if (player == cell.pieceColor || (cell.pieceColor === "red" && player === 'white')) {
                                 onPieceSelected({
@@ -438,15 +414,93 @@ const Board = () => {
                         key={`${cell.column}+${cell.row}+${colIndex}`}
                         disabled={isWinner !== ""}
                     >
-                        <ChineseChessSquare>
-                            <DraggablePiece
-                                key={`cell-${rowIndex}-${colIndex}`}
-                                piece={cell.piece}
-                                pieceColor={cell.pieceColor}
-                                position={{ row: rowIndex, col: colIndex }}
-                                onMove={onMove}
-                                isValid={cell.isMoveValid}
-                            />
+                        <ChineseChessSquare
+                            bgColor={colors.white}
+                            topRightBg={row.length - 1 != colIndex && 0 != rowIndex && !(colIndex >= 3 && colIndex <= 4 && ((rowIndex >= 0 && rowIndex <= 2) || (rowIndex >= 8 && rowIndex <= 9)))}
+                            topLeftBg={0 != colIndex && 0 != rowIndex && !(colIndex >= 4 && colIndex <= 5 && ((rowIndex >= 0 && rowIndex <= 2) || (rowIndex >= 8 && rowIndex <= 9)))}
+                            bottomRightBg={gameState.length - 1 != rowIndex && row.length - 1 != colIndex && !(colIndex >= 3 && colIndex <= 4 && ((rowIndex >= 0 && rowIndex <= 1) || (rowIndex >= 7 && rowIndex <= 8)))}
+                            bottomLeftBg={gameState.length - 1 != rowIndex && 0 != colIndex && !(colIndex >= 4 && colIndex <= 5 && ((rowIndex >= 0 && rowIndex <= 1) || (rowIndex >= 7 && rowIndex <= 8)))}
+                            topRightL={(rowIndex == 2 && colIndex == 1) ||
+                                (rowIndex == 2 && colIndex == 7) ||
+                                (rowIndex == 7 && colIndex == 1) ||
+                                (rowIndex == 7 && colIndex == 7) ||
+                                (rowIndex == 3 && colIndex == 0) ||
+                                (rowIndex == 3 && colIndex == 2) ||
+                                (rowIndex == 3 && colIndex == 4) ||
+                                (rowIndex == 3 && colIndex == 6) ||
+                                (rowIndex == 6 && colIndex == 0) ||
+                                (rowIndex == 6 && colIndex == 2) ||
+                                (rowIndex == 6 && colIndex == 4) ||
+                                (rowIndex == 6 && colIndex == 6)}
+                            topLeftL={(rowIndex == 2 && colIndex == 1) ||
+                                (rowIndex == 2 && colIndex == 7) ||
+                                (rowIndex == 7 && colIndex == 1) ||
+                                (rowIndex == 7 && colIndex == 7) ||
+                                (rowIndex == 3 && colIndex == 2) ||
+                                (rowIndex == 3 && colIndex == 4) ||
+                                (rowIndex == 3 && colIndex == 6) ||
+                                (rowIndex == 3 && colIndex == 8) ||
+                                (rowIndex == 6 && colIndex == 2) ||
+                                (rowIndex == 6 && colIndex == 4) ||
+                                (rowIndex == 6 && colIndex == 6) ||
+                                (rowIndex == 6 && colIndex == 8)}
+                            bottomRightL={(rowIndex == 2 && colIndex == 1) ||
+                                (rowIndex == 2 && colIndex == 7) ||
+                                (rowIndex == 7 && colIndex == 1) ||
+                                (rowIndex == 7 && colIndex == 7) ||
+                                (rowIndex == 3 && colIndex == 0) ||
+                                (rowIndex == 3 && colIndex == 2) ||
+                                (rowIndex == 3 && colIndex == 4) ||
+                                (rowIndex == 3 && colIndex == 6) ||
+                                (rowIndex == 6 && colIndex == 0) ||
+                                (rowIndex == 6 && colIndex == 2) ||
+                                (rowIndex == 6 && colIndex == 4) ||
+                                (rowIndex == 6 && colIndex == 6)}
+                            bottomLeftL={(rowIndex == 2 && colIndex == 1) ||
+                                (rowIndex == 2 && colIndex == 7) ||
+                                (rowIndex == 7 && colIndex == 1) ||
+                                (rowIndex == 7 && colIndex == 7) ||
+                                (rowIndex == 3 && colIndex == 2) ||
+                                (rowIndex == 3 && colIndex == 4) ||
+                                (rowIndex == 3 && colIndex == 6) ||
+                                (rowIndex == 3 && colIndex == 8) ||
+                                (rowIndex == 6 && colIndex == 2) ||
+                                (rowIndex == 6 && colIndex == 4) ||
+                                (rowIndex == 6 && colIndex == 6) ||
+                                (rowIndex == 6 && colIndex == 8)}
+                            diagonalLeftToRightHalfTop={(rowIndex == 1 && colIndex == 4) ||
+                                (rowIndex == 2 && colIndex == 5) ||
+                                (rowIndex == 8 && colIndex == 4) ||
+                                (rowIndex == 9 && colIndex == 5)}
+                            diagonalLeftToRightHalfBottom={(rowIndex == 0 && colIndex == 3) ||
+                                (rowIndex == 1 && colIndex == 4) ||
+                                (rowIndex == 7 && colIndex == 3) ||
+                                (rowIndex == 8 && colIndex == 4)}
+                            diagonalRightToLeftHalfTop={(rowIndex == 1 && colIndex == 4) ||
+                                (rowIndex == 2 && colIndex == 3) ||
+                                (rowIndex == 8 && colIndex == 4) ||
+                                (rowIndex == 9 && colIndex == 3)}
+                            diagonalRightToLeftHalfBottom={(rowIndex == 0 && colIndex == 5) ||
+                                (rowIndex == 1 && colIndex == 4) ||
+                                (rowIndex == 7 && colIndex == 5) ||
+                                (rowIndex == 8 && colIndex == 4)}
+                            horizontalLeft={0 != colIndex}
+                            horizontalRight={row.length - 1 != colIndex}
+                            verticalTop={0 != rowIndex && (colIndex == 0 || rowIndex != 5 || colIndex == row.length - 1)}
+                            verticalBottom={gameState.length - 1 != rowIndex && (colIndex == 0 || rowIndex != 4 || colIndex == row.length - 1)}
+                        >
+                            <View>
+                                {cell.isMoveValid && (<FontAwesome name='circle' size={8} solid color={'#4dafff'} style={styles.suggest} />)}
+                                {cell.piece &&
+                                    <ChineseChessPiece
+                                        piece={cell.piece}
+                                        pieceColor={cell.pieceColor}
+                                        size={chineseChessSize}
+                                        borderColor={colors.black}
+                                        chessBg={colors.milkyWhite}
+                                    />
+                                }
+                            </View>
                         </ChineseChessSquare>
                     </Pressable>
                 ))}
@@ -456,6 +510,58 @@ const Board = () => {
 
     return <View style={styles.board}>
         {renderBoard()}
+        <View style={styles.redPalaceContainer} >
+            <Svg
+                width={chineseChessRowSize * 2}
+                height={chineseChessRowSize * 2}
+            >
+                {/* Đường chéo từ trái sang phải */}
+                <Line
+                    x1={0}
+                    y1={0}
+                    x2={chineseChessRowSize * 2}
+                    y2={chineseChessRowSize * 2}
+                    stroke="black"
+                    strokeWidth={1.5}
+                />
+
+                {/* Đường chéo từ phải sang trái */}
+                <Line
+                    x1={chineseChessRowSize * 2}
+                    y1={0}
+                    x2={0}
+                    y2={chineseChessRowSize * 2}
+                    stroke="black"
+                    strokeWidth={1.5}
+                />
+            </Svg>
+        </View>
+        <View style={styles.blackPalaceContainer} >
+            <Svg
+                width={chineseChessRowSize * 2}
+                height={chineseChessRowSize * 2}
+            >
+                {/* Đường chéo từ trái sang phải */}
+                <Line
+                    x1={0}
+                    y1={0}
+                    x2={chineseChessRowSize * 2}
+                    y2={chineseChessRowSize * 2}
+                    stroke="black"
+                    strokeWidth={1.5}
+                />
+
+                {/* Đường chéo từ phải sang trái */}
+                <Line
+                    x1={chineseChessRowSize * 2}
+                    y1={0}
+                    x2={0}
+                    y2={chineseChessRowSize * 2}
+                    stroke="black"
+                    strokeWidth={1.5}
+                />
+            </Svg>
+        </View>
         {
             (redIsCheck && isWinner === "") &&
             <Text style={{
@@ -486,13 +592,31 @@ const Board = () => {
 
 const styles = StyleSheet.create({
     board: {
-        width: chineseChessRowSize * 8,
-        height: chineseChessRowSize * 9,
+        width: chineseChessRowSize * 8.5,
+        height: chineseChessRowSize * 9.5,
         alignSelf: "center",
         justifyContent: "center",
         alignItems: "center",
         marginTop: ScreenHeight / 5,
-        backgroundColor: "green"
+        backgroundColor: colors.white,
+        borderWidth: 4.5,
+        borderRadius: 10
+    },
+    redPalaceContainer: {
+        position: "absolute",
+        top: (chineseChessRowSize * 0.5 - 9) / 2,
+        left: (chineseChessRowSize * 0.5 - 9) / 2 + chineseChessRowSize * 3,
+        width: chineseChessRowSize * 2,
+        height: chineseChessRowSize * 2,
+        backgroundColor: colors.white,
+    },
+    blackPalaceContainer: {
+        position: "absolute",
+        bottom: (chineseChessRowSize * 0.5 - 9) / 2,
+        left: (chineseChessRowSize * 0.5 - 9) / 2 + chineseChessRowSize * 3,
+        width: chineseChessRowSize * 2,
+        height: chineseChessRowSize * 2,
+        backgroundColor: colors.white,
     },
     row: {
         flexDirection: 'row',
@@ -502,7 +626,13 @@ const styles = StyleSheet.create({
         height: chineseChessSize,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'white',
+        zIndex: 1
+    },
+    suggest: {
+        position: "absolute",
+        top: 16,
+        left: 16,
+        zIndex: 1
     },
 });
 

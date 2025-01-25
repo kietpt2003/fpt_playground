@@ -1,6 +1,6 @@
 import { View, StyleSheet } from 'react-native'
 import React, { ReactNode } from 'react'
-import Svg, { Line, Path, Rect } from 'react-native-svg';
+import Svg, { Line, Path } from 'react-native-svg';
 import { chineseChessSize } from '../screens/types/chineseChessTypes';
 
 interface SquareProps {
@@ -17,15 +17,20 @@ interface SquareProps {
     diagonalLeftToRightHalfBottom?: boolean; // Hiển thị đường chéo từ trái sang phải nửa dưới
     diagonalRightToLeftHalfTop?: boolean; // Hiển thị đường chéo từ phải sang trái nửa trên
     diagonalRightToLeftHalfBottom?: boolean; // Hiển thị đường chéo từ phải sang trái nửa dưới
+    bgColor?: string;
+    topRightBg?: boolean; //Bật/Tắt background topRight
+    topLeftBg?: boolean; //Bật/Tắt background topLeft
+    bottomRightBg?: boolean; //Bật/Tắt background bottomRight
+    bottomLeftBg?: boolean; //Bật/Tắt background bottomLeft
     children: ReactNode;
 }
 
 export default function ChineseChessSquare({
     size = 40,
-    horizontalLeft = true,
-    horizontalRight = true,
-    verticalTop = true,
-    verticalBottom = true,
+    horizontalLeft = false,
+    horizontalRight = false,
+    verticalTop = false,
+    verticalBottom = false,
     topRightL = false,
     topLeftL = false,
     bottomRightL = false,
@@ -34,22 +39,71 @@ export default function ChineseChessSquare({
     diagonalLeftToRightHalfBottom = false,
     diagonalRightToLeftHalfTop = false,
     diagonalRightToLeftHalfBottom = false,
+    bgColor = "white",
+    topRightBg = false,
+    topLeftBg = false,
+    bottomRightBg = false,
+    bottomLeftBg = false,
     children
 }: SquareProps) {
     return (
         <View style={[styles.container, { width: size, height: size }]}>
-            <Svg width={size} height={size}>
-                {/* Vẽ viền của ô vuông */}
-                <Rect
-                    x={0}
-                    y={0}
-                    width={size}
-                    height={size}
-                    stroke="black"
-                    strokeWidth={0}
-                    fill="none"
-                />
+            {/* background topRight */}
+            {
+                topRightBg &&
+                <View style={{
+                    width: size / 2,
+                    height: size / 2,
+                    position: "absolute",
+                    top: 0,
+                    right: 0,
+                    backgroundColor: bgColor
+                }} />
+            }
 
+            {/* background topLeft */}
+            {
+                topLeftBg &&
+                <View style={{
+                    width: size / 2,
+                    height: size / 2,
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    backgroundColor: bgColor
+                }} />
+            }
+
+            {/* background bottomRightBg */}
+            {
+                bottomRightBg &&
+                <View style={{
+                    width: size / 2,
+                    height: size / 2,
+                    position: "absolute",
+                    bottom: 0,
+                    right: 0,
+                    backgroundColor: bgColor
+                }} />
+            }
+
+            {/* background bottomLeftBg */}
+            {
+                bottomLeftBg &&
+                <View style={{
+                    width: size / 2,
+                    height: size / 2,
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    backgroundColor: bgColor
+                }} />
+            }
+
+            <Svg
+                width={size}
+                height={size}
+            >
                 {/* Đường kẻ ngang nửa trái */}
                 {horizontalLeft && (
                     <Line
@@ -58,7 +112,7 @@ export default function ChineseChessSquare({
                         x2={size / 2}
                         y2={size / 2}
                         stroke="black"
-                        strokeWidth={1}
+                        strokeWidth={1.5}
                     />
                 )}
 
@@ -70,7 +124,7 @@ export default function ChineseChessSquare({
                         x2={size}
                         y2={size / 2}
                         stroke="black"
-                        strokeWidth={1}
+                        strokeWidth={1.5}
                     />
                 )}
 
@@ -82,7 +136,7 @@ export default function ChineseChessSquare({
                         x2={size / 2}
                         y2={size / 2}
                         stroke="black"
-                        strokeWidth={1}
+                        strokeWidth={1.5}
                     />
                 )}
 
@@ -94,7 +148,7 @@ export default function ChineseChessSquare({
                         x2={size / 2}
                         y2={size}
                         stroke="black"
-                        strokeWidth={1}
+                        strokeWidth={1.5}
                     />
                 )}
 
@@ -102,13 +156,13 @@ export default function ChineseChessSquare({
                 {topRightL && (
                     <>
                         <Path
-                            d={`M${(size / 2) + 5} ${(size / 2) - 5} V${size - (size / 1.4)}`}
-                            strokeWidth={1}
+                            d={`M${(size / 2) + 4} ${(size / 2) - 4} V${size - (size / 1.3)}`}
+                            strokeWidth={1.5}
                             stroke={"black"}
                         />
                         <Path
-                            d={`M${(size / 2) + 5} ${(size / 2) - 5} H${size / 1.4}`}
-                            strokeWidth={1}
+                            d={`M${(size / 2) + 4} ${(size / 2) - 4} H${size / 1.3}`}
+                            strokeWidth={1.5}
                             stroke={"black"}
                         />
                     </>
@@ -118,13 +172,13 @@ export default function ChineseChessSquare({
                 {topLeftL && (
                     <>
                         <Path
-                            d={`M${(size / 2) - 5} ${(size / 2) - 5} V${size - (size / 1.4)}`}
-                            strokeWidth={1}
+                            d={`M${(size / 2) - 4} ${(size / 2) - 4} V${size - (size / 1.3)}`}
+                            strokeWidth={1.5}
                             stroke={"black"}
                         />
                         <Path
-                            d={`M${(size / 2) - 5} ${(size / 2) - 5} H${size - (size / 1.4)}`}
-                            strokeWidth={1}
+                            d={`M${(size / 2) - 4} ${(size / 2) - 4} H${size - (size / 1.3)}`}
+                            strokeWidth={1.5}
                             stroke={"black"}
                         />
                     </>
@@ -134,13 +188,13 @@ export default function ChineseChessSquare({
                 {bottomRightL && (
                     <>
                         <Path
-                            d={`M${(size / 2) + 5} ${(size / 2) + 5} V${size / 1.4}`}
-                            strokeWidth={1}
+                            d={`M${(size / 2) + 4} ${(size / 2) + 4} V${size / 1.3}`}
+                            strokeWidth={1.5}
                             stroke={"black"}
                         />
                         <Path
-                            d={`M${(size / 2) + 5} ${(size / 2) + 5} H${size / 1.4}`}
-                            strokeWidth={1}
+                            d={`M${(size / 2) + 4} ${(size / 2) + 4} H${size / 1.3}`}
+                            strokeWidth={1.5}
                             stroke={"black"}
                         />
                     </>
@@ -150,66 +204,21 @@ export default function ChineseChessSquare({
                 {bottomLeftL && (
                     <>
                         <Path
-                            d={`M${(size / 2) - 5} ${(size / 2) + 5} V${size / 1.4}`}
-                            strokeWidth={1}
+                            d={`M${(size / 2) - 4} ${(size / 2) + 4} V${size / 1.3}`}
+                            strokeWidth={1.5}
                             stroke={"black"}
                         />
                         <Path
-                            d={`M${(size / 2) - 5} ${(size / 2) + 5} H${size - (size / 1.4)}`}
-                            strokeWidth={1}
+                            d={`M${(size / 2) - 4} ${(size / 2) + 4} H${size - (size / 1.3)}`}
+                            strokeWidth={1.5}
                             stroke={"black"}
                         />
                     </>
                 )}
 
-                {/* Đường chéo từ trái sang phải nửa trên */}
-                {diagonalLeftToRightHalfTop && (
-                    <Line
-                        x1={0}
-                        y1={0}
-                        x2={size / 2}
-                        y2={size / 2}
-                        stroke="black"
-                        strokeWidth={1}
-                    />
-                )}
 
-                {/* Đường chéo từ trái sang phải nửa dưới */}
-                {diagonalLeftToRightHalfBottom && (
-                    <Line
-                        x1={size / 2}
-                        y1={size / 2}
-                        x2={size}
-                        y2={size}
-                        stroke="black"
-                        strokeWidth={1}
-                    />
-                )}
-
-                {/* Đường chéo từ phải sang trái nửa trên */}
-                {diagonalRightToLeftHalfTop && (
-                    <Line
-                        x1={size}
-                        y1={0}
-                        x2={size / 2}
-                        y2={size / 2}
-                        stroke="black"
-                        strokeWidth={1}
-                    />
-                )}
-
-                {/* Đường chéo từ phải sang trái nửa dưới */}
-                {diagonalRightToLeftHalfBottom && (
-                    <Line
-                        x1={size / 2}
-                        y1={size / 2}
-                        x2={0}
-                        y2={size}
-                        stroke="black"
-                        strokeWidth={1}
-                    />
-                )}
             </Svg>
+
             <View style={styles.childrenContainer}>
                 {children}
             </View>
@@ -219,13 +228,12 @@ export default function ChineseChessSquare({
 
 const styles = StyleSheet.create({
     container: {
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "white",
-    },
-    childrenContainer: {
         width: chineseChessSize,
         height: chineseChessSize,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    childrenContainer: {
         position: "absolute",
         top: 0,
         left: 0
