@@ -59,5 +59,7 @@ export const colors = {
     diamond: "#00BFFF",
     diamond1: "#94D4F5",
     diamond2: "#3868A4",
-    chatBox: "rgba(0,0,0,0.1)"
+    chatBox: "rgba(0,0,0,0.1)",
+    gameColorItem1: "#C38F65",
+    gameColorItem2: "#9E5E3F"
 };

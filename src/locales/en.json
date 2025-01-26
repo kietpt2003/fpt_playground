@@ -145,5 +145,6 @@
     "no-image": "No images found",
     "all-images": "All images",
     "capture-image-err": "An error occurred while taking the photo, please try again later.",
-    "save-image-err": "There was a problem extracting the image, please try again later."
+    "save-image-err": "There was a problem extracting the image, please try again later.",
+    "people-online-game": "Online"
 }

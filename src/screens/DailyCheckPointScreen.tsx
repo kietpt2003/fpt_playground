@@ -427,7 +427,7 @@ export default function DailyCheckPointScreen() {
             <TouchableOpacity
                 style={dailyCheckPointScreenStyleSheet.functionContainer}
                 onPress={() => {
-                    navigation.navigate("ChineseChessGame");
+                    navigation.navigate("GameList");
                 }}
             >
                 <LinearGradient
