@@ -12,4 +12,3 @@ export type GameDataItem = {
 }
 
 export type GameListNavigationProp = NativeStackNavigationProp<RootStackParamList>;
-

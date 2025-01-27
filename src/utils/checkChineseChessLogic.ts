@@ -902,13 +902,16 @@ export const checkValidMove = async (gameState: ChineseChessBoardPiece[][], ches
                             row.map(sq => ({ ...sq }))
                         );
 
+                        temp[chessPiece.row][chessPiece.column].piece = "";
+                        temp[chessPiece.row][chessPiece.column].pieceColor = "";
+                        temp[chessPiece.row][chessPiece.column].isMoveValid = false;
 
                         temp[row][column].piece = chessPiece.piece;
                         temp[row][column].pieceColor = chessPiece.pieceColor;
                         temp[row][column].isMoveValid = false;
 
                         const res: boolean = await isInCheck(temp, chessPiece.pieceColor);
-                        // console.log(res);
+
                         if (!res) {
                             const potentialMove: ChineseChessBoardPiece = {
                                 piece: chessPiece.piece,

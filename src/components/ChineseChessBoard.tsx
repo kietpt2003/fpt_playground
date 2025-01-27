@@ -1,15 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Pressable, Text } from 'react-native';
+import { View, StyleSheet, Pressable, Text, Image } from 'react-native';
 import { checkAdvisorMove, checkBishopMove, checkCannonMove, checkKingMove, checkKnightMove, checkPawnMove, checkPotentialBlockMoves, checkRookMove, convertToChessCoordinate, isInCheck, updateNewGameState } from '../utils/checkChineseChessLogic';
-import { ScreenHeight } from '@rneui/base';
-import { ChineseChessBoardPiece, chineseChessRowSize, chineseChessSize, PotentialMovePiece } from '../screens/types/chineseChessTypes';
+import { ScreenHeight, ScreenWidth } from '@rneui/base';
+import { ChineseChessBoardPiece, chineseChessRowSize, PotentialMovePiece } from '../screens/types/chineseChessTypes';
 import { Xiangqi } from 'xiangqi.js';
 import ChineseChessSquare from './ChineseChessSquare';
 import ChineseChessPiece from './ChineseChessPiece';
 import { FontAwesome } from '@expo/vector-icons';
 import { colors } from '../constants/colors';
 import Svg, { Line } from 'react-native-svg';
-
+import { FlatList } from 'react-native-gesture-handler';
+import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { statusBarHeight } from '../constants/statusBarHeight';
+import UserAvatar from './UserAvatar';
+import { User } from '../constants/entities/User';
+import { faker } from '@faker-js/faker/.';
+import { formatNumber } from '../utils/formatNumber';
+import { useTranslation } from 'react-i18next';
+import PTKCoinIcon from './PTKCoinIcon';
 
 export const initialState: ChineseChessBoardPiece[][] = [
     // Trạng thái bàn cờ với 10 hàng x 9 cột
@@ -125,7 +134,26 @@ export const initialState: ChineseChessBoardPiece[][] = [
     ],//row9
 ];
 
-const Board = () => {
+const chessBoardBackground = colors.chineseChessBoard1;
+const chessBoardOutline = colors.gameColorItem2;
+const chessPieceColor = colors.chessPiece;
+const chessPieceBorder = colors.black;
+
+const user1: User = {
+    id: "abc",
+    gender: "Male",
+    name: "Tuan Kiet",
+    imageUrl: faker.image.urlPicsumPhotos({ width: 200, height: 200 })
+}
+
+const user2: User = {
+    id: "def",
+    gender: "Male",
+    name: "Minh Thong",
+    imageUrl: faker.image.urlPicsumPhotos({ width: 200, height: 200 })
+}
+
+const ChineseChessBoard = () => {
     const convertKeysToObject = (board: any[][]) => {
         return board.map(row =>
             row.map(cell => ({
@@ -138,6 +166,8 @@ const Board = () => {
         );
     };
 
+    const [timeLeft, setTimeLeft] = useState<number>(3 * 60);
+
     const [player, setPlayer] = useState('black');
     const [isWinner, setIsWinner] = useState("")
     const [gameState, setGameState] = useState<ChineseChessBoardPiece[][]>(initialState);
@@ -148,6 +178,8 @@ const Board = () => {
     const [lostBlackPiece, setLostBlackPiece] = useState<ChineseChessBoardPiece[]>([]);
     const [selectedPiece, setSelectedPiece] = useState<ChineseChessBoardPiece>({ piece: '', pieceColor: '', row: 0, column: 0, isMoveValid: false });
     const [availableForSelected, setAvailableForSelected] = useState<PotentialMovePiece[]>([]);
+
+    const { t } = useTranslation();
 
     // const [game, setGame] = useState(new Xiangqi());
     const game = new Xiangqi();
@@ -233,6 +265,7 @@ const Board = () => {
         const filteredMoves = (
             await Promise.all(
                 availableMoves.map(async (element, index) => {
+                    let newGameState2: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(newGameState));
                     newGameState2[row][column] = {
                         piece: "",
                         pieceColor: "",
@@ -328,7 +361,7 @@ const Board = () => {
 
         await checkIsWinner()
         setPlayer(selectedPiece.pieceColor === 'red' ? 'black' : 'white')
-
+        resetTime();
     }
 
     // Check if the game is over or not
@@ -380,10 +413,37 @@ const Board = () => {
         setAvailableForSelected(filteredMoves);
     }
 
-    const renderBoard = () => {
-        return gameState.map((row, rowIndex) => (
-            <View style={styles.row} key={`row-${rowIndex}`}>
-                {row.map((cell, colIndex) => (
+    // Format thời gian thành MM:SS
+    const formatTime = (time: number): string => {
+        const minutes = Math.floor(time / 60); // Tính phút
+        const seconds = time % 60; // Tính giây
+        return `${minutes.toString().padStart(2, '0')}:${seconds
+            .toString()
+            .padStart(2, '0')}`; // Format MM:SS
+    };
+
+    // Reset thời gian
+    const resetTime = () => {
+        setTimeLeft(3 * 60);
+    };
+
+    useEffect(() => {
+        // Nếu thời gian còn lại > 0, thiết lập interva4
+        if (timeLeft > 0) {
+            const interval = setInterval(() => {
+                setTimeLeft((prev) => prev - 1);
+            }, 1000); // Cập nhật mỗi giây
+
+            return () => clearInterval(interval); // Xóa interval khi component bị unmount hoặc timeLeft thay đổi
+        }
+    }, [timeLeft]);
+
+    const renderRow = (data: ChineseChessBoardPiece[], rowIndex: number) => {
+        return (
+            <FlatList<ChineseChessBoardPiece>
+                data={data}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item: cell, index: colIndex }) => (
                     <Pressable
                         style={styles.piece}
                         onPress={() => {
@@ -410,16 +470,15 @@ const Board = () => {
                             }
 
                         }}
-
-                        key={`${cell.column}+${cell.row}+${colIndex}`}
                         disabled={isWinner !== ""}
                     >
                         <ChineseChessSquare
-                            bgColor={colors.white}
-                            topRightBg={row.length - 1 != colIndex && 0 != rowIndex && !(colIndex >= 3 && colIndex <= 4 && ((rowIndex >= 0 && rowIndex <= 2) || (rowIndex >= 8 && rowIndex <= 9)))}
-                            topLeftBg={0 != colIndex && 0 != rowIndex && !(colIndex >= 4 && colIndex <= 5 && ((rowIndex >= 0 && rowIndex <= 2) || (rowIndex >= 8 && rowIndex <= 9)))}
-                            bottomRightBg={gameState.length - 1 != rowIndex && row.length - 1 != colIndex && !(colIndex >= 3 && colIndex <= 4 && ((rowIndex >= 0 && rowIndex <= 1) || (rowIndex >= 7 && rowIndex <= 8)))}
-                            bottomLeftBg={gameState.length - 1 != rowIndex && 0 != colIndex && !(colIndex >= 4 && colIndex <= 5 && ((rowIndex >= 0 && rowIndex <= 1) || (rowIndex >= 7 && rowIndex <= 8)))}
+                            size={chineseChessRowSize}
+                            bgColor={chessBoardBackground}
+                            // topRightBg={data.length - 1 != colIndex && 0 != rowIndex && !(colIndex >= 3 && colIndex <= 4 && ((rowIndex >= 0 && rowIndex <= 2) || (rowIndex >= 8 && rowIndex <= 9)))}
+                            // topLeftBg={0 != colIndex && 0 != rowIndex && !(colIndex >= 4 && colIndex <= 5 && ((rowIndex >= 0 && rowIndex <= 2) || (rowIndex >= 8 && rowIndex <= 9)))}
+                            // bottomRightBg={gameState.length - 1 != rowIndex && data.length - 1 != colIndex && !(colIndex >= 3 && colIndex <= 4 && ((rowIndex >= 0 && rowIndex <= 1) || (rowIndex >= 7 && rowIndex <= 8)))}
+                            // bottomLeftBg={gameState.length - 1 != rowIndex && 0 != colIndex && !(colIndex >= 4 && colIndex <= 5 && ((rowIndex >= 0 && rowIndex <= 1) || (rowIndex >= 7 && rowIndex <= 8)))}
                             topRightL={(rowIndex == 2 && colIndex == 1) ||
                                 (rowIndex == 2 && colIndex == 7) ||
                                 (rowIndex == 7 && colIndex == 1) ||
@@ -468,26 +527,10 @@ const Board = () => {
                                 (rowIndex == 6 && colIndex == 4) ||
                                 (rowIndex == 6 && colIndex == 6) ||
                                 (rowIndex == 6 && colIndex == 8)}
-                            diagonalLeftToRightHalfTop={(rowIndex == 1 && colIndex == 4) ||
-                                (rowIndex == 2 && colIndex == 5) ||
-                                (rowIndex == 8 && colIndex == 4) ||
-                                (rowIndex == 9 && colIndex == 5)}
-                            diagonalLeftToRightHalfBottom={(rowIndex == 0 && colIndex == 3) ||
-                                (rowIndex == 1 && colIndex == 4) ||
-                                (rowIndex == 7 && colIndex == 3) ||
-                                (rowIndex == 8 && colIndex == 4)}
-                            diagonalRightToLeftHalfTop={(rowIndex == 1 && colIndex == 4) ||
-                                (rowIndex == 2 && colIndex == 3) ||
-                                (rowIndex == 8 && colIndex == 4) ||
-                                (rowIndex == 9 && colIndex == 3)}
-                            diagonalRightToLeftHalfBottom={(rowIndex == 0 && colIndex == 5) ||
-                                (rowIndex == 1 && colIndex == 4) ||
-                                (rowIndex == 7 && colIndex == 5) ||
-                                (rowIndex == 8 && colIndex == 4)}
                             horizontalLeft={0 != colIndex}
-                            horizontalRight={row.length - 1 != colIndex}
-                            verticalTop={0 != rowIndex && (colIndex == 0 || rowIndex != 5 || colIndex == row.length - 1)}
-                            verticalBottom={gameState.length - 1 != rowIndex && (colIndex == 0 || rowIndex != 4 || colIndex == row.length - 1)}
+                            horizontalRight={data.length - 1 != colIndex}
+                            verticalTop={0 != rowIndex && (colIndex == 0 || rowIndex != 5 || colIndex == data.length - 1)}
+                            verticalBottom={gameState.length - 1 != rowIndex && (colIndex == 0 || rowIndex != 4 || colIndex == data.length - 1)}
                         >
                             <View>
                                 {cell.isMoveValid && (<FontAwesome name='circle' size={8} solid color={'#4dafff'} style={styles.suggest} />)}
@@ -495,135 +538,318 @@ const Board = () => {
                                     <ChineseChessPiece
                                         piece={cell.piece}
                                         pieceColor={cell.pieceColor}
-                                        size={chineseChessSize}
-                                        borderColor={colors.black}
-                                        chessBg={colors.milkyWhite}
+                                        size={chineseChessRowSize}
+                                        borderColor={chessPieceBorder}
+                                        chessBg={chessPieceColor}
                                     />
                                 }
                             </View>
                         </ChineseChessSquare>
                     </Pressable>
-                ))}
-            </View>
-        ));
+                )}
+                scrollEnabled={false}
+                horizontal={true}
+            />
+        )
+    }
+
+    const renderBoard = () => {
+        return (
+            <FlatList<ChineseChessBoardPiece[]>
+                data={gameState}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item, index: rowIndex }) => (
+                    renderRow(item, rowIndex)
+                )}
+                style={{
+                    zIndex: 1
+                }}
+            />
+        );
     };
 
-    return <View style={styles.board}>
-        {renderBoard()}
-        <View style={styles.redPalaceContainer} >
-            <Svg
-                width={chineseChessRowSize * 2}
-                height={chineseChessRowSize * 2}
-            >
-                {/* Đường chéo từ trái sang phải */}
-                <Line
-                    x1={0}
-                    y1={0}
-                    x2={chineseChessRowSize * 2}
-                    y2={chineseChessRowSize * 2}
-                    stroke="black"
-                    strokeWidth={1.5}
+
+    return (
+        <SafeAreaView>
+            <View style={styles.container}>
+                <LinearGradient
+                    colors={[colors.chineseChessBg1, colors.chineseChessBg2, colors.chineseChessBg3]} // Hiệu ứng chuyển màu
+                    style={styles.containerLiner}
                 />
 
-                {/* Đường chéo từ phải sang trái */}
-                <Line
-                    x1={chineseChessRowSize * 2}
-                    y1={0}
-                    x2={0}
-                    y2={chineseChessRowSize * 2}
-                    stroke="black"
-                    strokeWidth={1.5}
-                />
-            </Svg>
-        </View>
-        <View style={styles.blackPalaceContainer} >
-            <Svg
-                width={chineseChessRowSize * 2}
-                height={chineseChessRowSize * 2}
-            >
-                {/* Đường chéo từ trái sang phải */}
-                <Line
-                    x1={0}
-                    y1={0}
-                    x2={chineseChessRowSize * 2}
-                    y2={chineseChessRowSize * 2}
-                    stroke="black"
-                    strokeWidth={1.5}
-                />
+                <View style={styles.headerContainer}>
+                    <LinearGradient
+                        colors={[colors.gameColorItem1, colors.gameColorItem2]} // Hiệu ứng chuyển màu
+                        style={styles.headerContainerLinear}
+                    />
 
-                {/* Đường chéo từ phải sang trái */}
-                <Line
-                    x1={chineseChessRowSize * 2}
-                    y1={0}
-                    x2={0}
-                    y2={chineseChessRowSize * 2}
-                    stroke="black"
-                    strokeWidth={1.5}
-                />
-            </Svg>
-        </View>
-        {
-            (redIsCheck && isWinner === "") &&
-            <Text style={{
-                position: "absolute",
-                bottom: -130
-            }}>Red bị chiếu</Text>
-        }
-        {
-            (blackIsCheck && isWinner === "") &&
-            <Text style={{
-                position: "absolute",
-                bottom: -130
-            }}>Black bị chiếu</Text>
-        }
-        <Text style={{
-            position: "absolute",
-            bottom: -150
-        }}>Moves {availableForSelected.length}</Text>
-        {
-            isWinner &&
-            <Text style={{
-                position: "absolute",
-                bottom: -160
-            }}>{isWinner}</Text>
-        }
-    </View>;
+                    {/* Player1*/}
+                    <View style={styles.playerContainer}>
+                        <UserAvatar
+                            imageWidth={chineseChessRowSize * 1.8}
+                            imageHeight={chineseChessRowSize * 1.8}
+                            avatarUrl={user1.imageUrl}
+                            imageBorderRadius={chineseChessRowSize}
+                            loadingIndicatorSize={chineseChessRowSize / 3}
+                            imageBorderColor={player !== "white" ? colors.approve : colors.black}
+                            imageBorderWidth={4.5}
+                        />
+                        <Text
+                            style={styles.playerName}
+                            numberOfLines={1}
+                        >
+                            {user1.name}
+                        </Text>
+                        <View style={styles.coinContainer}>
+                            <Image
+                                source={require("../../assets/images/ptk-coin.png")}
+                                style={styles.coinImage}
+                            />
+                            <Text style={styles.playerName}>{formatNumber(12450, t)}</Text>
+                        </View>
+                    </View>
+
+                    <View style={styles.timingContainer}>
+                        <Image
+                            source={require("../../assets/images/coinPackage.webp")}
+                            style={styles.coinPackage}
+                        />
+                        <View style={styles.petCoinContainer}>
+                            <Image
+                                source={require("../../assets/images/ptk-coin.png")}
+                                style={styles.coinImage}
+                            />
+                            <Text style={styles.playerName}>{formatNumber(450, t)}</Text>
+                        </View>
+                        <Text style={styles.countdownText}>{formatTime(timeLeft)}</Text>
+                    </View>
+
+                    {/* Player2 */}
+                    <View style={styles.playerContainer}>
+                        <UserAvatar
+                            imageWidth={chineseChessRowSize * 1.8}
+                            imageHeight={chineseChessRowSize * 1.8}
+                            avatarUrl={user2.imageUrl}
+                            imageBorderRadius={chineseChessRowSize}
+                            loadingIndicatorSize={chineseChessRowSize / 3}
+                            imageBorderColor={player === "white" ? colors.approve : colors.black}
+                            imageBorderWidth={4.5}
+                        />
+                        <Text
+                            style={styles.playerName}
+                            numberOfLines={1}
+                        >
+                            {user2.name}
+                        </Text>
+                        <View style={styles.coinContainer}>
+                            <Image
+                                source={require("../../assets/images/ptk-coin.png")}
+                                style={styles.coinImage}
+                            />
+                            <Text style={styles.playerName}>{formatNumber(13550, t)}</Text>
+                        </View>
+                    </View>
+                </View>
+
+                {/* Chinese Chess Board */}
+                <View style={styles.board}>
+                    <View style={{
+                        width: chineseChessRowSize * 9,
+                        height: chineseChessRowSize * 10,
+                        alignItems: "center",
+                        justifyContent: "center"
+                    }}>
+                        {renderBoard()}
+                        {/* Custom Background */}
+                        <LinearGradient
+                            colors={[colors.chineseChessBoard1, colors.chineseChessBoard2]} // Hiệu ứng chuyển màu
+                            style={{
+                                position: "absolute",
+                                width: chineseChessRowSize * 8,
+                                height: chineseChessRowSize * 9,
+                            }}
+                            start={{ x: 0, y: 1 }} // Bắt đầu từ dưới trái
+                            end={{ x: 1, y: 0 }} //Kết thúc ở trên phải
+                        />
+                    </View>
+                    <View style={styles.redPalaceContainer} >
+                        <Svg
+                            width={chineseChessRowSize * 2}
+                            height={chineseChessRowSize * 2}
+                        >
+                            {/* Đường chéo từ trái sang phải */}
+                            <Line
+                                x1={0}
+                                y1={0}
+                                x2={chineseChessRowSize * 2}
+                                y2={chineseChessRowSize * 2}
+                                stroke="black"
+                                strokeWidth={1.5}
+                            />
+
+                            {/* Đường chéo từ phải sang trái */}
+                            <Line
+                                x1={chineseChessRowSize * 2}
+                                y1={0}
+                                x2={0}
+                                y2={chineseChessRowSize * 2}
+                                stroke="black"
+                                strokeWidth={1.5}
+                            />
+                        </Svg>
+                    </View>
+                    <View style={styles.blackPalaceContainer} >
+                        <Svg
+                            width={chineseChessRowSize * 2}
+                            height={chineseChessRowSize * 2}
+                        >
+                            {/* Đường chéo từ trái sang phải */}
+                            <Line
+                                x1={0}
+                                y1={0}
+                                x2={chineseChessRowSize * 2}
+                                y2={chineseChessRowSize * 2}
+                                stroke="black"
+                                strokeWidth={1.5}
+                            />
+
+                            {/* Đường chéo từ phải sang trái */}
+                            <Line
+                                x1={chineseChessRowSize * 2}
+                                y1={0}
+                                x2={0}
+                                y2={chineseChessRowSize * 2}
+                                stroke="black"
+                                strokeWidth={1.5}
+                            />
+                        </Svg>
+                    </View>
+                    {
+                        (redIsCheck && isWinner === "") &&
+                        <Text style={{
+                            position: "absolute",
+                            bottom: -130
+                        }}>Red bị chiếu</Text>
+                    }
+                    {
+                        (blackIsCheck && isWinner === "") &&
+                        <Text style={{
+                            position: "absolute",
+                            bottom: -130
+                        }}>Black bị chiếu</Text>
+                    }
+                    <Text style={{
+                        position: "absolute",
+                        bottom: -150
+                    }}>Moves {availableForSelected.length}</Text>
+                    {
+                        isWinner &&
+                        <Text style={{
+                            position: "absolute",
+                            bottom: -160
+                        }}>{isWinner}</Text>
+                    }
+                </View>
+            </View>
+        </SafeAreaView>
+    );
 };
 
 const styles = StyleSheet.create({
+    container: {
+        width: ScreenWidth,
+        height: ScreenHeight - statusBarHeight,
+    },
+    containerLiner: {
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+    },
+    headerContainer: {
+        width: ScreenWidth,
+        height: ScreenHeight / 5.5,
+        flexDirection: "row",
+        justifyContent: "space-around",
+        alignItems: "center"
+    },
+    headerContainerLinear: {
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        left: 0
+    },
+    playerContainer: {
+        overflow: "hidden",
+        width: chineseChessRowSize * 1.8
+    },
+    playerName: {
+        fontFamily: "RobotoMedium",
+        fontSize: 18,
+        textAlign: "center",
+        color: colors.milkyWhite
+    },
+    coinContainer: {
+        flexDirection: "row"
+    },
+    coinImage: {
+        width: chineseChessRowSize / 1.5,
+        height: chineseChessRowSize / 1.5,
+    },
+    timingContainer: {
+        alignItems: "center"
+    },
+    coinPackage: {
+        width: chineseChessRowSize * 1.4,
+        height: chineseChessRowSize * 1.4,
+    },
+    petCoinContainer: {
+        flexDirection: "row",
+        width: chineseChessRowSize * 2,
+        height: chineseChessRowSize,
+        justifyContent: "center",
+        alignItems: "center",
+        borderWidth: 1,
+        borderRadius: 7,
+        backgroundColor: colors.darkBrown
+    },
+    countdownText: {
+        fontSize: 24,
+        fontFamily: "RobotoMedium",
+        color: colors.milkyWhite
+    },
     board: {
-        width: chineseChessRowSize * 8.5,
-        height: chineseChessRowSize * 9.5,
+        width: chineseChessRowSize * 10,
+        height: chineseChessRowSize * 11,
         alignSelf: "center",
         justifyContent: "center",
         alignItems: "center",
-        marginTop: ScreenHeight / 5,
-        backgroundColor: colors.white,
+        marginTop: 20,
+        backgroundColor: chessBoardOutline,
         borderWidth: 4.5,
-        borderRadius: 10
+        borderRadius: 10,
     },
     redPalaceContainer: {
         position: "absolute",
-        top: (chineseChessRowSize * 0.5 - 9) / 2,
-        left: (chineseChessRowSize * 0.5 - 9) / 2 + chineseChessRowSize * 3,
+        top: chineseChessRowSize - 4.5,
         width: chineseChessRowSize * 2,
         height: chineseChessRowSize * 2,
-        backgroundColor: colors.white,
+        // backgroundColor: chessBoardBackground,
+        zIndex: 0,
     },
     blackPalaceContainer: {
         position: "absolute",
-        bottom: (chineseChessRowSize * 0.5 - 9) / 2,
-        left: (chineseChessRowSize * 0.5 - 9) / 2 + chineseChessRowSize * 3,
+        bottom: chineseChessRowSize - 4.5,
         width: chineseChessRowSize * 2,
         height: chineseChessRowSize * 2,
-        backgroundColor: colors.white,
+        // backgroundColor: chessBoardBackground,
+        zIndex: 0,
     },
     row: {
         flexDirection: 'row',
     },
     piece: {
-        width: chineseChessSize,
-        height: chineseChessSize,
+        width: chineseChessRowSize,
+        height: chineseChessRowSize,
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 1
@@ -636,4 +862,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Board;
+export default ChineseChessBoard;

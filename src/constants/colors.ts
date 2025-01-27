@@ -61,5 +61,11 @@ export const colors = {
     diamond2: "#3868A4",
     chatBox: "rgba(0,0,0,0.1)",
     gameColorItem1: "#C38F65",
-    gameColorItem2: "#9E5E3F"
+    gameColorItem2: "#9E5E3F",
+    chessPiece: "#FFF1C4",
+    chineseChessBoard1: "#CA9A67",
+    chineseChessBoard2: "#AF7641",
+    chineseChessBg1: "#E7E0CF",
+    chineseChessBg2: "#F8F5E9",
+    chineseChessBg3: "#E6DBC8",
 };

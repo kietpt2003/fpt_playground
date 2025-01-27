@@ -1,3 +1,7 @@
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../navigation/types/types";
+import { ScreenWidth } from "@rneui/base";
+
 export type ChineseChessPiece = "rook" | "knight" | "bishop" | "advisor" | "king" | "cannon" | "pawn" | ""
 
 export type Position = {
@@ -18,6 +22,6 @@ export interface ChineseChessBoardPiece {
     isMoveValid?: boolean
 }
 
-export const chineseChessRowSize = 40;
+export const chineseChessRowSize = Math.floor(ScreenWidth / 10) - 1;
 
-export const chineseChessSize = chineseChessRowSize;
+export type ChineseChessNavigationProp = NativeStackNavigationProp<RootStackParamList>;

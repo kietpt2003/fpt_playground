@@ -7,7 +7,7 @@ import { ScreenHeight } from '@rneui/base'
 import { colors } from '../constants/colors'
 import { FontAwesome6, Foundation } from '@expo/vector-icons';
 import { convertNumberToString } from '../utils/convertNumberToString'
-import { formatLikesNumber } from '../utils/formatLikesNumber'
+import { formatLikesNumber } from '../utils/formatNumber'
 import { useTranslation } from 'react-i18next'
 
 export default function RankingUserItem({ user }: RankingUserProps) {

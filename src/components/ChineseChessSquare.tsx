@@ -1,7 +1,7 @@
 import { View, StyleSheet } from 'react-native'
 import React, { ReactNode } from 'react'
 import Svg, { Line, Path } from 'react-native-svg';
-import { chineseChessSize } from '../screens/types/chineseChessTypes';
+import { chineseChessRowSize } from '../screens/types/chineseChessTypes';
 
 interface SquareProps {
     size?: number; // Kích thước ô vuông (mặc định là 40)
@@ -13,10 +13,6 @@ interface SquareProps {
     topLeftL?: boolean;// Hiển thị chữ L trên bên trái
     bottomRightL?: boolean;// Hiển thị chữ L dưới bên phải
     bottomLeftL?: boolean;// Hiển thị chữ L dưới bên trái
-    diagonalLeftToRightHalfTop?: boolean; // Hiển thị đường chéo từ trái sang phải nửa trên
-    diagonalLeftToRightHalfBottom?: boolean; // Hiển thị đường chéo từ trái sang phải nửa dưới
-    diagonalRightToLeftHalfTop?: boolean; // Hiển thị đường chéo từ phải sang trái nửa trên
-    diagonalRightToLeftHalfBottom?: boolean; // Hiển thị đường chéo từ phải sang trái nửa dưới
     bgColor?: string;
     topRightBg?: boolean; //Bật/Tắt background topRight
     topLeftBg?: boolean; //Bật/Tắt background topLeft
@@ -35,10 +31,6 @@ export default function ChineseChessSquare({
     topLeftL = false,
     bottomRightL = false,
     bottomLeftL = false,
-    diagonalLeftToRightHalfTop = false,
-    diagonalLeftToRightHalfBottom = false,
-    diagonalRightToLeftHalfTop = false,
-    diagonalRightToLeftHalfBottom = false,
     bgColor = "white",
     topRightBg = false,
     topLeftBg = false,
@@ -228,8 +220,8 @@ export default function ChineseChessSquare({
 
 const styles = StyleSheet.create({
     container: {
-        width: chineseChessSize,
-        height: chineseChessSize,
+        width: chineseChessRowSize,
+        height: chineseChessRowSize,
         justifyContent: "center",
         alignItems: "center",
     },

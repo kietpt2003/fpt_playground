@@ -128,6 +128,17 @@ const chineseChessHomeStyleSheet = StyleSheet.create({
     },
     loadingBarProgress: {
         backgroundColor: colors.gameColorItem2
+    },
+    backButton: {
+        position: "absolute",
+        top: 30,
+        left: 30,
+        width: 45,
+        height: 35,
+        backgroundColor: colors.grey,
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: 5
     }
 });
 

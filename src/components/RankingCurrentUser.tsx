@@ -5,7 +5,7 @@ import { RankingUserProps } from '../screens/types/rankingTypes';
 import rankingCurrentUserStyleSheet from './styles/rankingCurrentUserStyleSheet';
 import { FontAwesome6, Foundation } from '@expo/vector-icons';
 import { convertNumberToString } from '../utils/convertNumberToString'
-import { formatLikesNumber } from '../utils/formatLikesNumber'
+import { formatLikesNumber } from '../utils/formatNumber'
 import { colors } from '../constants/colors';
 import { ScreenHeight } from '@rneui/base';
 import UserAvatar from './UserAvatar';

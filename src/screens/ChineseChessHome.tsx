@@ -1,4 +1,4 @@
-import { View, Text, ImageBackground, TouchableOpacity } from 'react-native'
+import { View, Text, ImageBackground, TouchableOpacity, Alert, BackHandler } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import chineseChessHomeStyleSheet from './styles/chineseChessHomeStyleSheet'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -12,6 +12,10 @@ import useClick from '../hooks/useClick';
 import useAudio from '../hooks/useAudio';
 import { ScreenHeight } from '@rneui/base';
 import LoadingBar from '../components/LoadingBar';
+import { useNavigation } from '@react-navigation/native';
+import { ChineseChessNavigationProp } from './types/chineseChessTypes';
+import ErrorModal from '../components/ErrorModal';
+import ConfirmModal from '../components/ConfirmModal';
 
 export default function ChineseChessHome() {
     const { t } = useTranslation();
@@ -19,6 +23,14 @@ export default function ChineseChessHome() {
 
     const [bso, setBso] = useState(false); // Tín hiệu true để tiếp tục loading
     const [percentage, setPercentage] = useState(0); // Hiển thị % đã load
+
+    const navigation = useNavigation<ChineseChessNavigationProp>();
+
+    const [stringErr, setStringErr] = useState<string>("");
+    const [isError, setIsError] = useState<boolean>(false);
+
+    const [stringConfirm, setStringConfirm] = useState<string>("");
+    const [isConfirm, setIsConfirm] = useState<boolean>(false);
 
     const [menuExpand, setMenuExpand] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -35,6 +47,16 @@ export default function ChineseChessHome() {
         setMenuExpand(false);
     };
 
+    const handleClickBack = () => {
+        setStringConfirm("Bạn có muốn thoát trò chơi không? Mọi dữ liệu có thể bị mất. Bạn chắc chắn chứ?");
+        setIsConfirm(true);
+        return true; // Chặn hành động mặc định của nút back
+    }
+
+    const handleBackPress = () => {
+        navigation.goBack();
+    };
+
     useEffect(() => {
         setTimeout(() => {
             setBso(true); // Load tiếp đến 100%
@@ -47,12 +69,32 @@ export default function ChineseChessHome() {
         }
     }, [percentage]);
 
+    //Back handler
+    useEffect(() => {
+        // Gắn sự kiện BackHandler
+        BackHandler.addEventListener('hardwareBackPress', handleClickBack);
+
+        // Gỡ sự kiện khi component unmount
+        return () => BackHandler.removeEventListener('hardwareBackPress', handleClickBack);
+    }, []);
+
     return (
         <SafeAreaView>
             <ImageBackground
                 source={require('../../assets/images/chineseChessHomeBg.webp')}
                 style={chineseChessHomeStyleSheet.backgroundImage}
             >
+                {/* Back button */}
+                <TouchableOpacity
+                    onPress={() => {
+                        handleClickBack();
+                    }}
+                    touchSoundDisabled={true}
+                    style={chineseChessHomeStyleSheet.backButton}
+                >
+                    <Ionicons name={"return-up-back"} size={35} color={colors.white} />
+                </TouchableOpacity>
+
                 {/* Menu */}
                 <View style={[
                     chineseChessHomeStyleSheet.menuOptionContainer,
@@ -139,7 +181,7 @@ export default function ChineseChessHome() {
                     <TouchableOpacity
                         style={chineseChessHomeStyleSheet.menuItemContainer}
                         onPress={() => {
-
+                            navigation.navigate("ChineseChessBoard");
                         }}
                         touchSoundDisabled={true}
                     >
@@ -183,6 +225,17 @@ export default function ChineseChessHome() {
                     source={require('../../assets/images/chineseChessLoadingBg.webp')}
                     style={chineseChessHomeStyleSheet.loadingBackgroundImage}
                 >
+                    {/* Back button */}
+                    <TouchableOpacity
+                        onPress={() => {
+                            handleClickBack();
+                        }}
+                        touchSoundDisabled={true}
+                        style={chineseChessHomeStyleSheet.backButton}
+                    >
+                        <Ionicons name={"return-up-back"} size={35} color={colors.white} />
+                    </TouchableOpacity>
+
                     <View style={chineseChessHomeStyleSheet.loadingContainer}>
                         <Text style={chineseChessHomeStyleSheet.loadingBarTxt}>{t("loading")} {percentage}%</Text>
                         <LoadingBar
@@ -194,6 +247,19 @@ export default function ChineseChessHome() {
                     </View>
                 </ImageBackground>
             }
+
+            <ConfirmModal
+                stringConfirm={stringConfirm}
+                isConfirm={isConfirm}
+                setIsConfirm={setIsConfirm}
+                handleConfirmFunction={handleBackPress}
+            />
+
+            <ErrorModal
+                stringErr={stringErr}
+                isError={isError}
+                setIsError={setIsError}
+            />
         </SafeAreaView>
     )
 }
