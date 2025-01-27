@@ -146,5 +146,13 @@
     "all-images": "All images",
     "capture-image-err": "An error occurred while taking the photo, please try again later.",
     "save-image-err": "There was a problem extracting the image, please try again later.",
-    "people-online-game": "Online"
+    "people-online-game": "Online",
+    "play-with-bot": "Bot Playing",
+    "play-button": "One Player",
+    "find-room": "Find Room",
+    "chinese-chess-guideline": "Guideline",
+    "sound": "Sound",
+    "expand": "Expand",
+    "shrink": "Shrink",
+    "loading": "Loading..."
 }

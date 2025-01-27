@@ -146,5 +146,13 @@
     "all-images": "Tất cả ảnh",
     "capture-image-err": "Có lỗi trong quá trình chụp ảnh, vui lòng thử lại sau.",
     "save-image-err": "Có vấn đề trong quá trình trích xuất hình ảnh, vui lòng thử lại sau.",
-    "people-online-game": "Đang chơi"
+    "people-online-game": "Đang chơi",
+    "play-with-bot": "Chơi với máy",
+    "play-button": "Chơi đơn",
+    "find-room": "Tìm phòng",
+    "chinese-chess-guideline": "Hướng dẫn",
+    "sound": "Âm thanh",
+    "expand": "Xem thêm",
+    "shrink": "Thu nhỏ",
+    "loading": "Đang tải..."
 }
