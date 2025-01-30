@@ -1,23 +1,23 @@
-import { ChineseChessBoardPiece, Position, PotentialMovePiece } from "../screens/types/chineseChessTypes";
+import { ChineseChessBoardPiece, PotentialMovePiece } from "../screens/types/chineseChessTypes";
 
 // Vua/Sĩ chỉ được di chuyển trong cung
 const withinKingPalace = (row: number, column: number, pieceColor: string): boolean => {
-    if (pieceColor === "black") return row >= 7 && column >= 3 && column <= 5;
-    if (pieceColor === "red") return row <= 2 && column >= 3 && column <= 5;
+    if (pieceColor === "red") return row >= 7 && column >= 3 && column <= 5;
+    if (pieceColor === "black") return row <= 2 && column >= 3 && column <= 5;
     return false;
 };
 
-export const checkPawnMove = (gameState: ChineseChessBoardPiece[][], { pieceColor, row, column }: ChineseChessBoardPiece) => {
+export const checkPawnMove = async (gameState: ChineseChessBoardPiece[][], { pieceColor, row, column }: ChineseChessBoardPiece) => {
     let newGameState = [...gameState]
 
-    if (pieceColor === 'red') { //TH quân đỏ (nẳm trên)
+    if (pieceColor === 'black') { //TH quân đen (nẳm trên)
         if (row >= 3 && row < 9) {
             newGameState[row + 1][column].isMoveValid =
                 (newGameState[row + 1][column].piece === "" ||
                     newGameState[row + 1][column].pieceColor !== pieceColor)
         }
 
-    } else { //TH quân đen nằm dưới
+    } else { //TH quân đỏ nằm dưới
         if (row <= 6 && row > 0) {
             newGameState[row - 1][column].isMoveValid =
                 (newGameState[row - 1][column].piece === "" ||
@@ -25,7 +25,7 @@ export const checkPawnMove = (gameState: ChineseChessBoardPiece[][], { pieceColo
         }
     }
 
-    if ((row <= 4 && pieceColor === "black") || (row >= 5 && pieceColor === "red")) { //TH tốt qua sông
+    if ((row <= 4 && pieceColor === "red") || (row >= 5 && pieceColor === "black")) { //TH tốt qua sông
         if (column == 0) { //TH tốt qua sông mà sát mép trái thì không đi bên trái được
             newGameState[row][column + 1].isMoveValid =
                 (newGameState[row][column + 1].piece === "" ||
@@ -47,7 +47,7 @@ export const checkPawnMove = (gameState: ChineseChessBoardPiece[][], { pieceColo
     return newGameState
 }
 
-export const checkRookMove = (gameState: ChineseChessBoardPiece[][], { pieceColor, row, column }: ChineseChessBoardPiece) => {
+export const checkRookMove = async (gameState: ChineseChessBoardPiece[][], { pieceColor, row, column }: ChineseChessBoardPiece) => {
     let newGameState = [...gameState]
 
     // Upward
@@ -105,7 +105,7 @@ export const checkRookMove = (gameState: ChineseChessBoardPiece[][], { pieceColo
     return newGameState
 }
 
-export const checkKnightMove = (gameState: ChineseChessBoardPiece[][], { pieceColor, row, column }: ChineseChessBoardPiece) => {
+export const checkKnightMove = async (gameState: ChineseChessBoardPiece[][], { pieceColor, row, column }: ChineseChessBoardPiece) => {
 
 
     let newGameState = [...gameState]
@@ -286,7 +286,7 @@ export const checkKnightMove = (gameState: ChineseChessBoardPiece[][], { pieceCo
     return newGameState
 }
 
-export const checkBishopMove = (gameState: ChineseChessBoardPiece[][], { pieceColor, row, column }: ChineseChessBoardPiece) => {
+export const checkBishopMove = async (gameState: ChineseChessBoardPiece[][], { pieceColor, row, column }: ChineseChessBoardPiece) => {
     let newGameState = [...gameState]
 
     const checkValidMove = (i: number, j: number) => {
@@ -296,10 +296,10 @@ export const checkBishopMove = (gameState: ChineseChessBoardPiece[][], { pieceCo
             if (loopIndex == 1 && targetSquare.piece !== '') { //Check có vật cản phải từ đầu không
                 return false;
             }
-            if (targetSquare.piece === '' && ((pieceColor === "red" && i <= 4 && i % 2 == 0) || (pieceColor === "black" && i >= 5 && i % 2 == 1))) {
+            if (targetSquare.piece === '' && ((pieceColor === "black" && i <= 4 && i % 2 == 0) || (pieceColor === "red" && i >= 5 && i % 2 == 1))) {
                 newGameState[i][j].isMoveValid = true;
                 return false;
-            } else if (targetSquare.pieceColor !== pieceColor && ((pieceColor === "red" && i <= 4 && i % 2 == 0) || (pieceColor === "black" && i >= 5 && i % 2 == 1))) {
+            } else if (targetSquare.pieceColor !== pieceColor && ((pieceColor === "black" && i <= 4 && i % 2 == 0) || (pieceColor === "red" && i >= 5 && i % 2 == 1))) {
                 newGameState[i][j].isMoveValid = true;
                 return false;
             }
@@ -338,7 +338,7 @@ export const checkBishopMove = (gameState: ChineseChessBoardPiece[][], { pieceCo
     return newGameState
 }
 
-export const checkAdvisorMove = (gameState: ChineseChessBoardPiece[][], { pieceColor, row, column }: ChineseChessBoardPiece) => {
+export const checkAdvisorMove = async (gameState: ChineseChessBoardPiece[][], { pieceColor, row, column }: ChineseChessBoardPiece) => {
     let newGameState = [...gameState]
 
     const checkValidMove = (i: number, j: number) => {
@@ -347,9 +347,9 @@ export const checkAdvisorMove = (gameState: ChineseChessBoardPiece[][], { pieceC
                 const targetSquare = gameState[i][j];
 
                 if (withinKingPalace(i, j, pieceColor)) { //Check sĩ có trong cung không
-                    if (targetSquare.piece === '' && ((pieceColor === "red" && i <= 2) || (pieceColor === "black" && i >= 7))) {
+                    if (targetSquare.piece === '' && ((pieceColor === "black" && i <= 2) || (pieceColor === "red" && i >= 7))) {
                         newGameState[i][j].isMoveValid = true;
-                    } else if (targetSquare.pieceColor !== pieceColor && ((pieceColor === "red" && i <= 2) || (pieceColor === "black" && i >= 7))) {
+                    } else if (targetSquare.pieceColor !== pieceColor && ((pieceColor === "black" && i <= 2) || (pieceColor === "red" && i >= 7))) {
                         newGameState[i][j].isMoveValid = true;
                     } else {
                         return false;
@@ -361,7 +361,7 @@ export const checkAdvisorMove = (gameState: ChineseChessBoardPiece[][], { pieceC
             return true;
 
         } catch (error) {
-            console.log("er", error);
+            console.log("AdvisorMove error", error);
 
             return false;
         }
@@ -378,7 +378,7 @@ export const checkAdvisorMove = (gameState: ChineseChessBoardPiece[][], { pieceC
     return newGameState
 }
 
-export const checkCannonMove = (gameState: ChineseChessBoardPiece[][], { pieceColor, row, column }: ChineseChessBoardPiece) => {
+export const checkCannonMove = async (gameState: ChineseChessBoardPiece[][], { pieceColor, row, column }: ChineseChessBoardPiece) => {
     let newGameState = [...gameState]
     let blockIndex = -1;
 
@@ -447,7 +447,7 @@ export const checkCannonMove = (gameState: ChineseChessBoardPiece[][], { pieceCo
 export const checkKingMove = async (gameState: ChineseChessBoardPiece[][], { piece, pieceColor, row, column }: ChineseChessBoardPiece) => {
     let newGameState = [...gameState];
 
-    if (pieceColor === 'red') { //TH quân đỏ (nẳm trên)
+    if (pieceColor === 'black') { //TH quân đen (nẳm trên)
         if (row >= 0 && row <= 2) {
             if (row == 0) {//TH row = 0 thì chỉ có xuống
                 const isCheck = await checkMoveToNewPos(newGameState, {
@@ -505,7 +505,7 @@ export const checkKingMove = async (gameState: ChineseChessBoardPiece[][], { pie
         }
     }
 
-    if ((row == 1 && pieceColor === "red") || (row == 8 && pieceColor === "black")) {//TH row = 1 hoặc row = 8 thì lên hoặc xuống đều được
+    if ((row == 1 && pieceColor === "black") || (row == 8 && pieceColor === "red")) {//TH row = 1 hoặc row = 8 thì lên hoặc xuống đều được
         let isCheck = await checkMoveToNewPos(newGameState, {
             piece,
             pieceColor,
@@ -584,7 +584,7 @@ export const checkKingMove = async (gameState: ChineseChessBoardPiece[][], { pie
     const kingValidMoves: ChineseChessBoardPiece[] = newGameState.flatMap((row) =>
         row.filter(
             (item) => {
-                if (pieceColor === "red") {
+                if (pieceColor === "black") {
                     return item.row >= 0 &&
                         item.row <= 2 &&
                         item.column >= 3 &&
@@ -711,7 +711,7 @@ export const checkInCannonRange = (gameState: ChineseChessBoardPiece[][], target
 //Check TH 2 king đối mặt nhau (Ko check các TH bị quân khác chiếu, chỉ check TH có bị quân khác chặn)
 const checkKingFaceToFace = (gameState: ChineseChessBoardPiece[][], curKingRow: number, curKingCol: number, pieceColor: string) => {
     let isFaceToFace = false;
-    if (pieceColor === "red") { //Nếu là red thì quét từ dưới lên để tối ưu hiệu suất (ít vòng lặp)
+    if (pieceColor === "black") { //Nếu là black thì quét từ dưới lên để tối ưu hiệu suất (ít vòng lặp)
         for (let i = curKingRow + 1; i <= 9; i++) {
             const blockSquare = gameState[i][curKingCol];
             if (blockSquare.pieceColor !== pieceColor && blockSquare.piece === "king") {
@@ -722,7 +722,7 @@ const checkKingFaceToFace = (gameState: ChineseChessBoardPiece[][], curKingRow: 
                 break;
             }
         }
-    } else { //Nếu là black thì quét từ trên xuống để tối ưu hiệu suất (ít vòng lặp)
+    } else { //Nếu là red thì quét từ trên xuống để tối ưu hiệu suất (ít vòng lặp)
         for (let i = 9; i >= curKingRow; i--) {
             const blockSquare = gameState[i][curKingCol];
             if (blockSquare.pieceColor !== pieceColor && blockSquare.piece === "king") {
@@ -776,22 +776,22 @@ export const isInCheck = async (gameState: ChineseChessBoardPiece[][], pieceColo
                 // console.log(obj.piece,obj.pieceColor)
                 switch (obj.piece) {
                     case 'pawn':
-                        newGameState = checkPawnMove(newGameState, obj)
+                        newGameState = await checkPawnMove(newGameState, obj)
                         break;
                     case 'rook':
-                        newGameState = checkRookMove(newGameState, obj)
+                        newGameState = await checkRookMove(newGameState, obj)
                         break;
                     case 'knight':
-                        newGameState = checkKnightMove(newGameState, obj)
+                        newGameState = await checkKnightMove(newGameState, obj)
                         break;
                     case 'bishop':
-                        newGameState = checkBishopMove(newGameState, obj)
+                        newGameState = await checkBishopMove(newGameState, obj)
                         break;
                     case 'advisor':
-                        newGameState = checkAdvisorMove(newGameState, obj)
+                        newGameState = await checkAdvisorMove(newGameState, obj)
                         break;
                     case 'cannon':
-                        newGameState = checkCannonMove(newGameState, obj)
+                        newGameState = await checkCannonMove(newGameState, obj)
                         break;
                     // case 'king':
                     //     newGameState = await checkKingMove(newGameState, obj)
@@ -802,7 +802,7 @@ export const isInCheck = async (gameState: ChineseChessBoardPiece[][], pieceColo
             }
 
             if (obj.isMoveValid === true && obj.pieceColor !== pieceColor && obj.piece === 'king') {
-                console.log("Opponent King in check")
+                console.log("Opponent King in check");
             }
         })
     })
@@ -847,22 +847,22 @@ export const checkPotentialBlockMoves = async (gameState: ChineseChessBoardPiece
                         })
                         switch (obj.piece) {
                             case 'pawn':
-                                tempState = checkPawnMove(tempState, obj)
+                                tempState = await checkPawnMove(tempState, obj)
                                 break;
                             case 'rook':
-                                tempState = checkRookMove(tempState, obj)
+                                tempState = await checkRookMove(tempState, obj)
                                 break;
                             case 'knight':
-                                tempState = checkKnightMove(tempState, obj)
+                                tempState = await checkKnightMove(tempState, obj)
                                 break;
                             case 'bishop':
-                                tempState = checkBishopMove(tempState, obj)
+                                tempState = await checkBishopMove(tempState, obj)
                                 break;
                             case 'advisor':
-                                tempState = checkAdvisorMove(tempState, obj)
+                                tempState = await checkAdvisorMove(tempState, obj)
                                 break;
                             case 'cannon':
-                                tempState = checkCannonMove(tempState, obj)
+                                tempState = await checkCannonMove(tempState, obj)
                                 break;
                             case 'king':
                                 tempState = await checkKingMove(tempState, obj)
@@ -969,6 +969,7 @@ export const updateNewGameState = async (gameState: ChineseChessBoardPiece[][], 
     return newGameState
 }
 
+//TODO: For Minimax algorithm
 export function convertToChessCoordinate(row: number, column: number): string {
     // Mảng ký tự cột tương ứng với chỉ số column
     const columnMap = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
@@ -982,3 +983,136 @@ export function convertToChessCoordinate(row: number, column: number): string {
     // Trả về chuỗi tọa độ
     return `${columnChar}${convertedRow}`;
 }
+
+const chinesePieceValues: Record<string, number> = {
+    'king': 900, 'advisor': 40, 'bishop': 50, 'knight': 90, 'rook': 500, 'cannon': 100, 'pawn': 10
+};
+
+const evaluateChineseBoard = (board: ChineseChessBoardPiece[][]): number => {
+    let score = 0;
+    for (let y = 0; y < board.length; y++) {
+        for (let x = 0; x < board[y].length; x++) {
+            const piece = board[y][x];
+            if (piece) {
+                const value = chinesePieceValues[piece.piece] || 0;
+                score += piece.pieceColor === "black" ? value : -value; //AI (quân đen) cố gắng làm tăng điểm, Người chơi (quân đỏ) cố gắng làm giảm điểm
+            }
+        }
+    }
+    return score;
+};
+
+const minimax = async (
+    board: ChineseChessBoardPiece[][],
+    depth: number,
+    isMaximizing: boolean, //truyền true nếu muốn nước đi đạt điểm cao nhất và ngược lại
+    alpha: number,
+    beta: number
+): Promise<number> => {
+    if (depth === 0) return evaluateChineseBoard(board);
+
+    const availableMoves = await checkPotentialBlockMoves(board, isMaximizing ? "black" : "red")
+
+    //Tìm nước đi phù hợp cho quân đã chọn
+    const filteredMoves = (
+        await Promise.all(
+            availableMoves.map(async (element, index) => {
+                let newGameState2: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(board));
+                newGameState2[element.fromMove.row][element.fromMove.column] = {
+                    piece: "",
+                    pieceColor: "",
+                    row: element.fromMove.row,
+                    column: element.fromMove.column,
+                    isMoveValid: false
+                };
+
+                newGameState2[element.potentialMove.row][element.potentialMove.column] = element.potentialMove;
+
+                const isCheck = await isInCheck(newGameState2, isMaximizing ? "black" : "red");
+                // Trả về nước không bị chiếu
+                if (!isCheck) {
+                    return element; // Phần tử hợp lệ
+                }
+                return undefined; // Loại bỏ phần tử không hợp lệ
+            })
+        )
+    ).filter((el) => el !== undefined); // Loại bỏ undefined ngay sau Promise.all
+
+    if (isMaximizing) {
+        let maxEval = -Infinity;
+        for (const move of filteredMoves) {
+            const newBoard = simulateMove(board, move);
+            const evalScore = await minimax(newBoard, depth - 1, false, alpha, beta);
+            maxEval = Math.max(maxEval, evalScore);
+            alpha = Math.max(alpha, evalScore);
+            if (beta <= alpha) break;
+        }
+        return maxEval;
+    } else {
+        let minEval = Infinity;
+        for (const move of filteredMoves) {
+            const newBoard = simulateMove(board, move);
+            const evalScore = await minimax(newBoard, depth - 1, true, alpha, beta);
+            minEval = Math.min(minEval, evalScore);
+            beta = Math.min(beta, evalScore);
+            if (beta <= alpha) break;
+        }
+        return minEval;
+    }
+};
+
+const simulateMove = (board: ChineseChessBoardPiece[][], move: PotentialMovePiece) => {
+    const newBoard = board.map(row => [...row]);
+
+    newBoard[move.fromMove.row][move.fromMove.column].piece = "";
+    newBoard[move.fromMove.row][move.fromMove.column].pieceColor = "";
+    newBoard[move.fromMove.row][move.fromMove.column].isMoveValid = false;
+
+    newBoard[move.potentialMove.row][move.potentialMove.column].piece = move.potentialMove.piece;
+    newBoard[move.potentialMove.row][move.potentialMove.column].pieceColor = move.potentialMove.pieceColor;
+    newBoard[move.potentialMove.row][move.potentialMove.column].isMoveValid = false;
+    return newBoard;
+};
+
+export const getBestChineseChessMove = async (board: ChineseChessBoardPiece[][], depth: number) => {
+    let bestMove: PotentialMovePiece | null = null;
+    let bestScore = -Infinity;
+
+    const availableMoves = await checkPotentialBlockMoves(board, "black")
+
+    //Tìm nước đi phù hợp cho quân đã chọn
+    const filteredMoves = (
+        await Promise.all(
+            availableMoves.map(async (element, index) => {
+                let newGameState2: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(board));
+                newGameState2[element.fromMove.row][element.fromMove.column] = {
+                    piece: "",
+                    pieceColor: "",
+                    row: element.fromMove.row,
+                    column: element.fromMove.column,
+                    isMoveValid: false
+                };
+
+                newGameState2[element.potentialMove.row][element.potentialMove.column] = element.potentialMove;
+
+                const isCheck = await isInCheck(newGameState2, "black");
+                // Trả về nước không bị chiếu
+                if (!isCheck) {
+                    return element; // Phần tử hợp lệ
+                }
+                return undefined; // Loại bỏ phần tử không hợp lệ
+            })
+        )
+    ).filter((el) => el !== undefined); // Loại bỏ undefined ngay sau Promise.all
+
+    for (const move of filteredMoves) {
+        const newBoard = simulateMove(board, move);
+        const moveScore = await minimax(newBoard, depth - 1, false, -Infinity, Infinity);
+
+        if (moveScore > bestScore) {
+            bestScore = moveScore;
+            bestMove = move;
+        }
+    }
+    return bestMove;
+};

@@ -4,11 +4,6 @@ import { ScreenWidth } from "@rneui/base";
 
 export type ChineseChessPiece = "rook" | "knight" | "bishop" | "advisor" | "king" | "cannon" | "pawn" | ""
 
-export type Position = {
-    row: number,
-    column: number,
-}
-
 export type PotentialMovePiece = {
     potentialMove: ChineseChessBoardPiece,
     fromMove: ChineseChessBoardPiece,

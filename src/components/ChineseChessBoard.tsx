@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Pressable, Text, Image } from 'react-native';
-import { checkAdvisorMove, checkBishopMove, checkCannonMove, checkKingMove, checkKnightMove, checkPawnMove, checkPotentialBlockMoves, checkRookMove, convertToChessCoordinate, isInCheck, updateNewGameState } from '../utils/checkChineseChessLogic';
+import { View, StyleSheet, Pressable, Text, Image, NativeModules } from 'react-native';
+import { checkAdvisorMove, checkBishopMove, checkCannonMove, checkKingMove, checkKnightMove, checkPawnMove, checkPotentialBlockMoves, checkRookMove, convertToChessCoordinate, getBestChineseChessMove, isInCheck, updateNewGameState } from '../utils/checkChineseChessLogic';
 import { ScreenHeight, ScreenWidth } from '@rneui/base';
 import { ChineseChessBoardPiece, chineseChessRowSize, PotentialMovePiece } from '../screens/types/chineseChessTypes';
 import { Xiangqi } from 'xiangqi.js';
@@ -18,20 +18,21 @@ import { User } from '../constants/entities/User';
 import { faker } from '@faker-js/faker/.';
 import { formatNumber } from '../utils/formatNumber';
 import { useTranslation } from 'react-i18next';
-import PTKCoinIcon from './PTKCoinIcon';
+
+const { ChessAI } = NativeModules;
 
 export const initialState: ChineseChessBoardPiece[][] = [
     // Trạng thái bàn cờ với 10 hàng x 9 cột
     [
-        { piece: 'rook', pieceColor: 'red', row: 0, column: 0, isMoveValid: false },
-        { piece: 'knight', pieceColor: 'red', row: 0, column: 1, isMoveValid: false },
-        { piece: 'bishop', pieceColor: 'red', row: 0, column: 2, isMoveValid: false },
-        { piece: 'advisor', pieceColor: 'red', row: 0, column: 3, isMoveValid: false },
-        { piece: 'king', pieceColor: 'red', row: 0, column: 4, isMoveValid: false },
-        { piece: 'advisor', pieceColor: 'red', row: 0, column: 5, isMoveValid: false },
-        { piece: 'bishop', pieceColor: 'red', row: 0, column: 6, isMoveValid: false },
-        { piece: 'knight', pieceColor: 'red', row: 0, column: 7, isMoveValid: false },
-        { piece: 'rook', pieceColor: 'red', row: 0, column: 8, isMoveValid: false },
+        { piece: 'rook', pieceColor: 'black', row: 0, column: 0, isMoveValid: false },
+        { piece: 'knight', pieceColor: 'black', row: 0, column: 1, isMoveValid: false },
+        { piece: 'bishop', pieceColor: 'black', row: 0, column: 2, isMoveValid: false },
+        { piece: 'advisor', pieceColor: 'black', row: 0, column: 3, isMoveValid: false },
+        { piece: 'king', pieceColor: 'black', row: 0, column: 4, isMoveValid: false },
+        { piece: 'advisor', pieceColor: 'black', row: 0, column: 5, isMoveValid: false },
+        { piece: 'bishop', pieceColor: 'black', row: 0, column: 6, isMoveValid: false },
+        { piece: 'knight', pieceColor: 'black', row: 0, column: 7, isMoveValid: false },
+        { piece: 'rook', pieceColor: 'black', row: 0, column: 8, isMoveValid: false },
     ],//row0
     [
         { piece: '', pieceColor: '', row: 1, column: 0, isMoveValid: false },
@@ -46,25 +47,25 @@ export const initialState: ChineseChessBoardPiece[][] = [
     ],//row1
     [
         { piece: '', pieceColor: '', row: 2, column: 0, isMoveValid: false },
-        { piece: 'cannon', pieceColor: 'red', row: 2, column: 1, isMoveValid: false },
+        { piece: 'cannon', pieceColor: 'black', row: 2, column: 1, isMoveValid: false },
         { piece: '', pieceColor: '', row: 2, column: 2, isMoveValid: false },
         { piece: '', pieceColor: '', row: 2, column: 3, isMoveValid: false },
         { piece: '', pieceColor: '', row: 2, column: 4, isMoveValid: false },
         { piece: '', pieceColor: '', row: 2, column: 5, isMoveValid: false },
         { piece: '', pieceColor: '', row: 2, column: 6, isMoveValid: false },
-        { piece: 'cannon', pieceColor: 'red', row: 2, column: 7, isMoveValid: false },
+        { piece: 'cannon', pieceColor: 'black', row: 2, column: 7, isMoveValid: false },
         { piece: '', pieceColor: '', row: 2, column: 8, isMoveValid: false },
     ],//row2
     [
-        { piece: 'pawn', pieceColor: 'red', row: 3, column: 0, isMoveValid: false },
+        { piece: 'pawn', pieceColor: 'black', row: 3, column: 0, isMoveValid: false },
         { piece: '', pieceColor: '', row: 3, column: 1, isMoveValid: false },
-        { piece: 'pawn', pieceColor: 'red', row: 3, column: 2, isMoveValid: false },
+        { piece: 'pawn', pieceColor: 'black', row: 3, column: 2, isMoveValid: false },
         { piece: '', pieceColor: '', row: 3, column: 3, isMoveValid: false },
-        { piece: 'pawn', pieceColor: 'red', row: 3, column: 4, isMoveValid: false },
+        { piece: 'pawn', pieceColor: 'black', row: 3, column: 4, isMoveValid: false },
         { piece: '', pieceColor: '', row: 3, column: 5, isMoveValid: false },
-        { piece: 'pawn', pieceColor: 'red', row: 3, column: 6, isMoveValid: false },
+        { piece: 'pawn', pieceColor: 'black', row: 3, column: 6, isMoveValid: false },
         { piece: '', pieceColor: '', row: 3, column: 7, isMoveValid: false },
-        { piece: 'pawn', pieceColor: 'red', row: 3, column: 8, isMoveValid: false },
+        { piece: 'pawn', pieceColor: 'black', row: 3, column: 8, isMoveValid: false },
     ],//row3
     [
         { piece: '', pieceColor: '', row: 4, column: 0, isMoveValid: false },
@@ -89,25 +90,25 @@ export const initialState: ChineseChessBoardPiece[][] = [
         { piece: '', pieceColor: '', row: 5, column: 8, isMoveValid: false },
     ],//row5
     [
-        { piece: 'pawn', pieceColor: 'black', row: 6, column: 0, isMoveValid: false },
+        { piece: 'pawn', pieceColor: 'red', row: 6, column: 0, isMoveValid: false },
         { piece: '', pieceColor: '', row: 6, column: 1, isMoveValid: false },
-        { piece: 'pawn', pieceColor: 'black', row: 6, column: 2, isMoveValid: false },
+        { piece: 'pawn', pieceColor: 'red', row: 6, column: 2, isMoveValid: false },
         { piece: '', pieceColor: '', row: 6, column: 3, isMoveValid: false },
-        { piece: 'pawn', pieceColor: 'black', row: 6, column: 4, isMoveValid: false },
+        { piece: 'pawn', pieceColor: 'red', row: 6, column: 4, isMoveValid: false },
         { piece: '', pieceColor: '', row: 6, column: 5, isMoveValid: false },
-        { piece: 'pawn', pieceColor: 'black', row: 6, column: 6, isMoveValid: false },
+        { piece: 'pawn', pieceColor: 'red', row: 6, column: 6, isMoveValid: false },
         { piece: '', pieceColor: '', row: 6, column: 7, isMoveValid: false },
-        { piece: 'pawn', pieceColor: 'black', row: 6, column: 8, isMoveValid: false },
+        { piece: 'pawn', pieceColor: 'red', row: 6, column: 8, isMoveValid: false },
     ],//row6
     [
         { piece: '', pieceColor: '', row: 7, column: 0, isMoveValid: false },
-        { piece: 'cannon', pieceColor: 'black', row: 7, column: 1, isMoveValid: false },
+        { piece: 'cannon', pieceColor: 'red', row: 7, column: 1, isMoveValid: false },
         { piece: '', pieceColor: '', row: 7, column: 2, isMoveValid: false },
         { piece: '', pieceColor: '', row: 7, column: 3, isMoveValid: false },
         { piece: '', pieceColor: '', row: 7, column: 4, isMoveValid: false },
         { piece: '', pieceColor: '', row: 7, column: 5, isMoveValid: false },
         { piece: '', pieceColor: '', row: 7, column: 6, isMoveValid: false },
-        { piece: 'cannon', pieceColor: 'black', row: 7, column: 7, isMoveValid: false },
+        { piece: 'cannon', pieceColor: 'red', row: 7, column: 7, isMoveValid: false },
         { piece: '', pieceColor: '', row: 7, column: 8, isMoveValid: false },
     ],//row7
     [
@@ -122,15 +123,15 @@ export const initialState: ChineseChessBoardPiece[][] = [
         { piece: '', pieceColor: '', row: 8, column: 8, isMoveValid: false },
     ],//row8
     [
-        { piece: 'rook', pieceColor: 'black', row: 9, column: 0, isMoveValid: false },
-        { piece: 'knight', pieceColor: 'black', row: 9, column: 1, isMoveValid: false },
-        { piece: 'bishop', pieceColor: 'black', row: 9, column: 2, isMoveValid: false },
-        { piece: 'advisor', pieceColor: 'black', row: 9, column: 3, isMoveValid: false },
-        { piece: 'king', pieceColor: 'black', row: 9, column: 4, isMoveValid: false },
-        { piece: 'advisor', pieceColor: 'black', row: 9, column: 5, isMoveValid: false },
-        { piece: 'bishop', pieceColor: 'black', row: 9, column: 6, isMoveValid: false },
-        { piece: 'knight', pieceColor: 'black', row: 9, column: 7, isMoveValid: false },
-        { piece: 'rook', pieceColor: 'black', row: 9, column: 8, isMoveValid: false },
+        { piece: 'rook', pieceColor: 'red', row: 9, column: 0, isMoveValid: false },
+        { piece: 'knight', pieceColor: 'red', row: 9, column: 1, isMoveValid: false },
+        { piece: 'bishop', pieceColor: 'red', row: 9, column: 2, isMoveValid: false },
+        { piece: 'advisor', pieceColor: 'red', row: 9, column: 3, isMoveValid: false },
+        { piece: 'king', pieceColor: 'red', row: 9, column: 4, isMoveValid: false },
+        { piece: 'advisor', pieceColor: 'red', row: 9, column: 5, isMoveValid: false },
+        { piece: 'bishop', pieceColor: 'red', row: 9, column: 6, isMoveValid: false },
+        { piece: 'knight', pieceColor: 'red', row: 9, column: 7, isMoveValid: false },
+        { piece: 'rook', pieceColor: 'red', row: 9, column: 8, isMoveValid: false },
     ],//row9
 ];
 
@@ -168,7 +169,7 @@ const ChineseChessBoard = () => {
 
     const [timeLeft, setTimeLeft] = useState<number>(3 * 60);
 
-    const [player, setPlayer] = useState('black');
+    const [player, setPlayer] = useState('red');
     const [isWinner, setIsWinner] = useState("")
     const [gameState, setGameState] = useState<ChineseChessBoardPiece[][]>(initialState);
     const [redIsCheck, setRedIsCheck] = useState(false);
@@ -181,32 +182,14 @@ const ChineseChessBoard = () => {
 
     const { t } = useTranslation();
 
-    // const [game, setGame] = useState(new Xiangqi());
-    const game = new Xiangqi();
+    const [game, setGame] = useState(new Xiangqi());
 
-    const handleSquarePress = (from: string, to: string) => {
-        game.move({ from: from, to: to }); // Kiểm tra nước đi
+    const handleChessMove = (from: string, to: string) => {
+        const move = game.move({ from: from, to: to }); // Kiểm tra nước đi
+        if (move) {
+            setGame(new Xiangqi(game.fen()));
+        }
     };
-
-    useEffect(() => {
-        // console.log("p1", game.turn());
-
-        // handleSquarePress("e3", "e4");
-        // console.log("p2", game.turn());
-        // handleSquarePress("e6", "e5");
-        // console.log("p3", game.turn());
-        // handleSquarePress("e4", "e5");
-        // console.log("p4", game.turn());
-        console.log(game.ascii());
-
-        // const handleF = async () => {
-        //     const check = await isInCheck(gameState, 'red');
-        //     console.log("thu coi", check);
-
-        // }
-        // handleF();
-
-    }, [])
 
     // Checks if the king is in check or not
     const checkKingState = async () => {
@@ -221,45 +204,48 @@ const ChineseChessBoard = () => {
             return
         }
 
-        // await checkKingState()
-
         newGameState.map((innerArray) => {
             innerArray.map((obj) => {
                 obj.isMoveValid = false
             })
         })
+        try {
 
-        switch (piece) {
-            case 'pawn':
-                newGameState = checkPawnMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
-                break;
-            case 'rook':
-                newGameState = checkRookMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
-                break;
-            case 'knight':
-                newGameState = checkKnightMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
-                break;
-            case 'bishop':
-                newGameState = checkBishopMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
-                break;
-            case 'advisor':
-                newGameState = checkAdvisorMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
-                break;
-            case 'cannon':
-                newGameState = checkCannonMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
-                break;
-            case 'king':
-                newGameState = await checkKingMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
-                break;
-            default:
-                console.log('Please select valid piece')
-                break;
+            switch (piece) {
+                case 'pawn':
+                    newGameState = await checkPawnMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
+                    break;
+                case 'rook':
+                    newGameState = await checkRookMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
+                    break;
+                case 'knight':
+                    newGameState = await checkKnightMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
+                    break;
+                case 'bishop':
+                    newGameState = await checkBishopMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
+                    break;
+                case 'advisor':
+                    newGameState = await checkAdvisorMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
+                    break;
+                case 'cannon':
+                    newGameState = await checkCannonMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
+                    break;
+                case 'king':
+                    newGameState = await checkKingMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
+                    break;
+                default:
+                    console.log('Please select valid piece')
+                    break;
+            }
+        } catch (error) {
+            console.log(error);
+
         }
 
 
         let newGameState2: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(newGameState));
 
-        const availableMoves = await checkPotentialBlockMoves(newGameState2, player === "white" ? "red" : "black")
+        const availableMoves = await checkPotentialBlockMoves(newGameState2, player === "red" ? "red" : "black")
 
         //Tìm nước đi phù hợp cho quân đã chọn
         const filteredMoves = (
@@ -276,7 +262,7 @@ const ChineseChessBoard = () => {
 
                     newGameState2[element.potentialMove.row][element.potentialMove.column] = element.potentialMove;
 
-                    const isCheck = await isInCheck(newGameState2, player === "white" ? "red" : "black");
+                    const isCheck = await isInCheck(newGameState2, player === "red" ? "red" : "black");
                     // Trả về phần tử hợp lệ, nếu không hợp lệ thì trả về undefined
                     if (!isCheck && element.potentialMove.piece === piece && element.potentialMove.pieceColor === pieceColor) {
                         return element; // Phần tử hợp lệ
@@ -357,10 +343,15 @@ const ChineseChessBoard = () => {
         )
 
         setGameState(newGameState);
-        console.log(convertToChessCoordinate(row, column));
+
+        const chessCurrentPosition: string = convertToChessCoordinate(selectedPiece.row, selectedPiece.column);
+        const chessNewPosition: string = convertToChessCoordinate(row, column);
+        handleChessMove(chessCurrentPosition, chessNewPosition);
+        // console.log("turn", game.turn());
+        // console.log("check board", game.ascii());
 
         await checkIsWinner()
-        setPlayer(selectedPiece.pieceColor === 'red' ? 'black' : 'white')
+        setPlayer(selectedPiece.pieceColor === 'red' ? 'black' : 'red')
         resetTime();
     }
 
@@ -368,7 +359,7 @@ const ChineseChessBoard = () => {
     const checkIsWinner = async () => {
         let newGameState: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(gameState));
 
-        const availableMoves = await checkPotentialBlockMoves(gameState, player === "white" ? "black" : "red")
+        const availableMoves = await checkPotentialBlockMoves(gameState, player === "red" ? "black" : "red")
         const filteredMoves = (
             await Promise.all(
                 availableMoves.map(async (element) => {
@@ -382,7 +373,7 @@ const ChineseChessBoard = () => {
 
                     newGameState[element.potentialMove.row][element.potentialMove.column] = element.potentialMove;
 
-                    const isCheck = await isInCheck(newGameState, player === "white" ? "black" : "red");
+                    const isCheck = await isInCheck(newGameState, player === "red" ? "black" : "red");
 
                     // Trả về phần tử hợp lệ, nếu không hợp lệ thì trả về undefined
                     if (!isCheck) {
@@ -394,7 +385,7 @@ const ChineseChessBoard = () => {
         ).filter((el) => el !== undefined); // Loại bỏ undefined ngay sau Promise.all
 
         if (filteredMoves.length == 0) {
-            setIsWinner(`Player ${player === 'white' ? 'Red' : 'Black'} has won the game`)
+            setIsWinner(`Player ${player === 'red' ? 'Red' : 'Black'} has won the game`)
         }
         // else {
         //     filteredMoves.forEach((element, index) => {
@@ -438,6 +429,48 @@ const ChineseChessBoard = () => {
         }
     }, [timeLeft]);
 
+    //Handle AI move
+    useEffect(() => {
+        const handleAIMove = async () => {
+            // Chuyển đổi WritableArray thành mảng đơn giản
+            // Tạo đối tượng quân cờ
+
+            // runOnJS(async () => {
+            //     let newGameState: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(gameState));
+            //     if (player === "black") { //Nếu là lượt của đen (AI) thì mới được đi
+            //         const aiMove = await getBestChineseChessMove(newGameState, 3);
+
+            //         console.log("ai", aiMove);
+
+
+            //         if (aiMove) {
+            //             let newGameState2: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(gameState));
+            //             newGameState2[aiMove.fromMove.row][aiMove.fromMove.column] = {
+            //                 row: aiMove.fromMove.row,
+            //                 column: aiMove.fromMove.column,
+            //                 piece: "",
+            //                 pieceColor: "",
+            //                 isMoveValid: false,
+            //             };
+
+            //             newGameState2[aiMove.potentialMove.row][aiMove.potentialMove.column] = {
+            //                 piece: aiMove.potentialMove.piece,
+            //                 pieceColor: aiMove.potentialMove.pieceColor,
+            //                 isMoveValid: false,
+            //                 row: aiMove.potentialMove.row,
+            //                 column: aiMove.potentialMove.column
+            //             };
+            //             setGameState(newGameState2);
+            //             setPlayer("red");
+            //         }
+            //     }
+            // })
+        }
+
+        handleAIMove();
+
+    }, [player])
+
     const renderRow = (data: ChineseChessBoardPiece[], rowIndex: number) => {
         return (
             <FlatList<ChineseChessBoardPiece>
@@ -447,7 +480,7 @@ const ChineseChessBoard = () => {
                     <Pressable
                         style={styles.piece}
                         onPress={() => {
-                            if (player == cell.pieceColor || (cell.pieceColor === "red" && player === 'white')) {
+                            if (player == cell.pieceColor || (cell.pieceColor === "red" && player === 'red')) {
                                 onPieceSelected({
                                     piece: cell.piece,
                                     pieceColor: cell.pieceColor,
@@ -470,7 +503,7 @@ const ChineseChessBoard = () => {
                             }
 
                         }}
-                        disabled={isWinner !== ""}
+                        disabled={isWinner !== "" || player === "black"}
                     >
                         <ChineseChessSquare
                             size={chineseChessRowSize}
@@ -591,7 +624,7 @@ const ChineseChessBoard = () => {
                             avatarUrl={user1.imageUrl}
                             imageBorderRadius={chineseChessRowSize}
                             loadingIndicatorSize={chineseChessRowSize / 3}
-                            imageBorderColor={player !== "white" ? colors.approve : colors.black}
+                            imageBorderColor={player == "red" ? colors.approve : colors.black}
                             imageBorderWidth={4.5}
                         />
                         <Text
@@ -632,7 +665,7 @@ const ChineseChessBoard = () => {
                             avatarUrl={user2.imageUrl}
                             imageBorderRadius={chineseChessRowSize}
                             loadingIndicatorSize={chineseChessRowSize / 3}
-                            imageBorderColor={player === "white" ? colors.approve : colors.black}
+                            imageBorderColor={player !== "red" ? colors.approve : colors.black}
                             imageBorderWidth={4.5}
                         />
                         <Text
