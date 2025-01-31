@@ -19,7 +19,7 @@ import { faker } from '@faker-js/faker/.';
 import { formatNumber } from '../utils/formatNumber';
 import { useTranslation } from 'react-i18next';
 
-const { ChessAI } = NativeModules;
+const { ChineseChessLogical } = NativeModules;
 
 export const initialState: ChineseChessBoardPiece[][] = [
     // Trạng thái bàn cờ với 10 hàng x 9 cột
@@ -193,8 +193,16 @@ const ChineseChessBoard = () => {
 
     // Checks if the king is in check or not
     const checkKingState = async () => {
-        setRedIsCheck(await isInCheck(gameState, "red"));
-        setBlackIsCheck(await isInCheck(gameState, "black"));
+        try {
+            console.log("vo day");
+
+            setRedIsCheck(await ChineseChessLogical.isInCheck(gameState, "red"));
+            setBlackIsCheck(await ChineseChessLogical.isInCheck(gameState, "black"));
+
+        } catch (error) {
+            console.log("heeheheh");
+
+        }
     }
 
     // Gives suggetion of the valid moves for the selected piece
@@ -213,25 +221,25 @@ const ChineseChessBoard = () => {
 
             switch (piece) {
                 case 'pawn':
-                    newGameState = await checkPawnMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
+                    newGameState = await ChineseChessLogical.checkPawnMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
                     break;
                 case 'rook':
-                    newGameState = await checkRookMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
+                    newGameState = await ChineseChessLogical.checkRookMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
                     break;
                 case 'knight':
-                    newGameState = await checkKnightMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
+                    newGameState = await ChineseChessLogical.checkKnightMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
                     break;
                 case 'bishop':
-                    newGameState = await checkBishopMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
+                    newGameState = await ChineseChessLogical.checkBishopMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
                     break;
                 case 'advisor':
-                    newGameState = await checkAdvisorMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
+                    newGameState = await ChineseChessLogical.checkAdvisorMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
                     break;
                 case 'cannon':
-                    newGameState = await checkCannonMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
+                    newGameState = await ChineseChessLogical.checkCannonMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
                     break;
                 case 'king':
-                    newGameState = await checkKingMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
+                    newGameState = await ChineseChessLogical.checkKingMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
                     break;
                 default:
                     console.log('Please select valid piece')
@@ -262,7 +270,7 @@ const ChineseChessBoard = () => {
 
                     newGameState2[element.potentialMove.row][element.potentialMove.column] = element.potentialMove;
 
-                    const isCheck = await isInCheck(newGameState2, player === "red" ? "red" : "black");
+                    const isCheck = await ChineseChessLogical.isInCheck(newGameState2, player === "red" ? "red" : "black");
                     // Trả về phần tử hợp lệ, nếu không hợp lệ thì trả về undefined
                     if (!isCheck && element.potentialMove.piece === piece && element.potentialMove.pieceColor === pieceColor) {
                         return element; // Phần tử hợp lệ
@@ -373,7 +381,7 @@ const ChineseChessBoard = () => {
 
                     newGameState[element.potentialMove.row][element.potentialMove.column] = element.potentialMove;
 
-                    const isCheck = await isInCheck(newGameState, player === "red" ? "black" : "red");
+                    const isCheck = await ChineseChessLogical.isInCheck(newGameState, player === "red" ? "black" : "red");
 
                     // Trả về phần tử hợp lệ, nếu không hợp lệ thì trả về undefined
                     if (!isCheck) {

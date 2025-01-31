@@ -2,6 +2,7 @@ package com.kietpt2003.fpt_playground
 
 import android.app.Application
 import android.content.res.Configuration
+import chinese_chess.ChineseChessPackage
 
 import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication
@@ -25,7 +26,7 @@ class MainApplication : Application(), ReactApplication {
             val packages = PackageList(this).packages
             // Packages that cannot be autolinked yet can be added manually here, for example:
             // packages.add(new MyReactNativePackage());
-            packages.add(ChessAIPackage());
+            packages.add(ChineseChessPackage());
             return packages
           }
 

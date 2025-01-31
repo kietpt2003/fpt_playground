@@ -758,7 +758,7 @@ const checkMoveToNewPos = async (gameState: ChineseChessBoardPiece[][], currentP
         tempGameState[newRow][newCol].row = newRow;
         tempGameState[newRow][newCol].column = newCol;
 
-        return await isInCheck(tempGameState, currentPiece.pieceColor);;
+        return await isInCheck(tempGameState, currentPiece.pieceColor);
     } else {
         return false
     }
