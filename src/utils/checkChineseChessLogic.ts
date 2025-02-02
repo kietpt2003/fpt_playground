@@ -895,7 +895,7 @@ export const checkValidMove = async (gameState: ChineseChessBoardPiece[][], ches
     await Promise.all(
         newGameState.map(async (rowArray) => {
             await Promise.all(
-                rowArray.map(async (square) => {
+                rowArray.map(async (square, index) => {
                     if (square.isMoveValid === true && square.pieceColor !== chessPiece.pieceColor) {
                         const { row, column } = square;
                         let temp: ChineseChessBoardPiece[][] = newGameState.map(row =>
@@ -912,7 +912,9 @@ export const checkValidMove = async (gameState: ChineseChessBoardPiece[][], ches
 
                         const res: boolean = await isInCheck(temp, chessPiece.pieceColor);
 
+
                         if (!res) {
+                            console.log(index, temp[row][column], "res:", res);
                             const potentialMove: ChineseChessBoardPiece = {
                                 piece: chessPiece.piece,
                                 pieceColor: chessPiece.pieceColor,

@@ -193,16 +193,8 @@ const ChineseChessBoard = () => {
 
     // Checks if the king is in check or not
     const checkKingState = async () => {
-        try {
-            console.log("vo day");
-
-            setRedIsCheck(await ChineseChessLogical.isInCheck(gameState, "red"));
-            setBlackIsCheck(await ChineseChessLogical.isInCheck(gameState, "black"));
-
-        } catch (error) {
-            console.log("heeheheh");
-
-        }
+        setRedIsCheck(await ChineseChessLogical.isInCheck(gameState, "red"));
+        setBlackIsCheck(await ChineseChessLogical.isInCheck(gameState, "black"));
     }
 
     // Gives suggetion of the valid moves for the selected piece
@@ -247,18 +239,17 @@ const ChineseChessBoard = () => {
             }
         } catch (error) {
             console.log(error);
-
         }
 
 
         let newGameState2: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(newGameState));
 
-        const availableMoves = await checkPotentialBlockMoves(newGameState2, player === "red" ? "red" : "black")
+        const availableMoves = await ChineseChessLogical.checkPotentialBlockMoves(newGameState2, player === "red" ? "red" : "black")
 
         //Tìm nước đi phù hợp cho quân đã chọn
         const filteredMoves = (
             await Promise.all(
-                availableMoves.map(async (element, index) => {
+                availableMoves.map(async (element: PotentialMovePiece) => {
                     let newGameState2: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(newGameState));
                     newGameState2[row][column] = {
                         piece: "",
@@ -352,9 +343,9 @@ const ChineseChessBoard = () => {
 
         setGameState(newGameState);
 
-        const chessCurrentPosition: string = convertToChessCoordinate(selectedPiece.row, selectedPiece.column);
-        const chessNewPosition: string = convertToChessCoordinate(row, column);
-        handleChessMove(chessCurrentPosition, chessNewPosition);
+        // const chessCurrentPosition: string = convertToChessCoordinate(selectedPiece.row, selectedPiece.column);
+        // const chessNewPosition: string = convertToChessCoordinate(row, column);
+        // handleChessMove(chessCurrentPosition, chessNewPosition);
         // console.log("turn", game.turn());
         // console.log("check board", game.ascii());
 
@@ -367,10 +358,10 @@ const ChineseChessBoard = () => {
     const checkIsWinner = async () => {
         let newGameState: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(gameState));
 
-        const availableMoves = await checkPotentialBlockMoves(gameState, player === "red" ? "black" : "red")
+        const availableMoves = await ChineseChessLogical.checkPotentialBlockMoves(gameState, player === "red" ? "black" : "red")
         const filteredMoves = (
             await Promise.all(
-                availableMoves.map(async (element) => {
+                availableMoves.map(async (element: PotentialMovePiece) => {
                     newGameState[element.fromMove.row][element.fromMove.column] = {
                         piece: "",
                         pieceColor: "",
@@ -511,7 +502,7 @@ const ChineseChessBoard = () => {
                             }
 
                         }}
-                        disabled={isWinner !== "" || player === "black"}
+                        disabled={isWinner !== ""}
                     >
                         <ChineseChessSquare
                             size={chineseChessRowSize}

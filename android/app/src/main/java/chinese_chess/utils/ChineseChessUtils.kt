@@ -2,13 +2,15 @@ package chinese_chess.utils
 
 import chinese_chess.entities.ChineseChessBoardPiece
 import chinese_chess.entities.ChineseChessPiece
+import chinese_chess.entities.PotentialMovePiece
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.WritableArray
+import com.facebook.react.bridge.WritableMap
 
 object ChineseChessUtils {
-    fun stringToChineseChessPiece(piece: String): ChineseChessPiece {
+    private fun stringToChineseChessPiece(piece: String): ChineseChessPiece {
         return when (piece.lowercase()) {
             "rook" -> ChineseChessPiece.ROOK
             "knight" -> ChineseChessPiece.KNIGHT
@@ -65,8 +67,8 @@ object ChineseChessUtils {
             for (piece in row) {
                 val pieceMap = Arguments.createMap()
                 when (piece.piece) {
-                    ChineseChessPiece.EMPTY -> pieceMap.putString("piece","");
-                    else -> pieceMap.putString("piece",piece.piece.name.lowercase());
+                    ChineseChessPiece.EMPTY -> pieceMap.putString("piece", "");
+                    else -> pieceMap.putString("piece", piece.piece.name.lowercase());
                 }
                 pieceMap.putString("pieceColor", piece.pieceColor)
                 pieceMap.putInt("row", piece.row)
@@ -87,5 +89,36 @@ object ChineseChessUtils {
         map.putInt("column", piece.column)
         map.putBoolean("isMoveValid", piece.isMoveValid)
         return map
+    }
+
+    fun convertPotentialMovesToReadableArray(gameState: ArrayList<PotentialMovePiece>): WritableArray {
+        val writableArray = Arguments.createArray()
+
+        gameState.forEach { potentialMovePiece ->
+            val potentialMoveMap: WritableMap = Arguments.createMap()
+            potentialMoveMap.putString(
+                "piece",
+                potentialMovePiece.potentialMove.piece.toString().lowercase()
+            )
+            potentialMoveMap.putString("pieceColor", potentialMovePiece.potentialMove.pieceColor)
+            potentialMoveMap.putInt("row", potentialMovePiece.potentialMove.row)
+            potentialMoveMap.putInt("column", potentialMovePiece.potentialMove.column)
+            potentialMoveMap.putBoolean("isMoveValid", potentialMovePiece.potentialMove.isMoveValid)
+
+            val fromMoveMap: WritableMap = Arguments.createMap()
+            fromMoveMap.putString("piece", potentialMovePiece.fromMove.piece.toString().lowercase())
+            fromMoveMap.putString("pieceColor", potentialMovePiece.fromMove.pieceColor)
+            fromMoveMap.putInt("row", potentialMovePiece.fromMove.row)
+            fromMoveMap.putInt("column", potentialMovePiece.fromMove.column)
+            fromMoveMap.putBoolean("isMoveValid", potentialMovePiece.fromMove.isMoveValid)
+
+            val moveMap: WritableMap = Arguments.createMap()
+            moveMap.putMap("potentialMove", potentialMoveMap)
+            moveMap.putMap("fromMove", fromMoveMap)
+
+            writableArray.pushMap(moveMap)
+        }
+
+        return writableArray
     }
 }
