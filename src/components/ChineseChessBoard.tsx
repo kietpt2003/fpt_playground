@@ -193,8 +193,11 @@ const ChineseChessBoard = () => {
 
     // Checks if the king is in check or not
     const checkKingState = async () => {
-        setRedIsCheck(await ChineseChessLogical.isInCheck(gameState, "red"));
-        setBlackIsCheck(await ChineseChessLogical.isInCheck(gameState, "black"));
+        if (player === "red") {
+            setBlackIsCheck(await ChineseChessLogical.isInCheck(gameState, "black"));
+        } else {
+            setRedIsCheck(await ChineseChessLogical.isInCheck(gameState, "red"));
+        }
     }
 
     // Gives suggetion of the valid moves for the selected piece
@@ -204,77 +207,17 @@ const ChineseChessBoard = () => {
             return
         }
 
-        newGameState.map((innerArray) => {
-            innerArray.map((obj) => {
-                obj.isMoveValid = false
-            })
-        })
-        try {
-
-            switch (piece) {
-                case 'pawn':
-                    newGameState = await ChineseChessLogical.checkPawnMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
-                    break;
-                case 'rook':
-                    newGameState = await ChineseChessLogical.checkRookMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
-                    break;
-                case 'knight':
-                    newGameState = await ChineseChessLogical.checkKnightMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
-                    break;
-                case 'bishop':
-                    newGameState = await ChineseChessLogical.checkBishopMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
-                    break;
-                case 'advisor':
-                    newGameState = await ChineseChessLogical.checkAdvisorMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
-                    break;
-                case 'cannon':
-                    newGameState = await ChineseChessLogical.checkCannonMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
-                    break;
-                case 'king':
-                    newGameState = await ChineseChessLogical.checkKingMove(newGameState, { piece, pieceColor, row, column, isMoveValid })
-                    break;
-                default:
-                    console.log('Please select valid piece')
-                    break;
-            }
-        } catch (error) {
-            console.log(error);
-        }
-
 
         let newGameState2: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(newGameState));
+        console.log("Start check potential");
 
-        const availableMoves = await ChineseChessLogical.checkPotentialBlockMoves(newGameState2, player === "red" ? "red" : "black")
+        const availableMoves = await ChineseChessLogical.checkPotentialMovesForCurrPiece(newGameState2, { piece, pieceColor, row, column, isMoveValid })
+        console.log("End check potential");
 
-        //Tìm nước đi phù hợp cho quân đã chọn
-        const filteredMoves = (
-            await Promise.all(
-                availableMoves.map(async (element: PotentialMovePiece) => {
-                    let newGameState2: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(newGameState));
-                    newGameState2[row][column] = {
-                        piece: "",
-                        pieceColor: "",
-                        row: row,
-                        column: column,
-                        isMoveValid: false
-                    };
+        setAvailableForSelected(availableMoves);
 
-                    newGameState2[element.potentialMove.row][element.potentialMove.column] = element.potentialMove;
-
-                    const isCheck = await ChineseChessLogical.isInCheck(newGameState2, player === "red" ? "red" : "black");
-                    // Trả về phần tử hợp lệ, nếu không hợp lệ thì trả về undefined
-                    if (!isCheck && element.potentialMove.piece === piece && element.potentialMove.pieceColor === pieceColor) {
-                        return element; // Phần tử hợp lệ
-                    }
-                    return undefined; // Loại bỏ phần tử không hợp lệ
-                })
-            )
-        ).filter((el) => el !== undefined); // Loại bỏ undefined ngay sau Promise.all
-
-        setAvailableForSelected(filteredMoves);
-
-        if (filteredMoves.length != 0) {// Nếu có nước đi phù hợp thì cập nhật lại state
-            newGameState2 = await updateNewGameState(newGameState, filteredMoves, { piece, pieceColor, row, column, isMoveValid });
+        if (availableMoves.length != 0) {// Nếu có nước đi phù hợp thì cập nhật lại state
+            newGameState2 = await updateNewGameState(newGameState, availableMoves, { piece, pieceColor, row, column, isMoveValid });
 
             setGameState(newGameState2);
         } else {// Ngược lại thì set hết thành false tạo hiệu ứng không đi được
@@ -329,7 +272,9 @@ const ChineseChessBoard = () => {
             column: selectedPiece.column
         };
 
+        console.log("Start check king state");
         await checkKingState();
+        console.log("End check king state");
 
         newGameState.map((innerArray) => {
             innerArray.map((obj) => {
@@ -349,58 +294,20 @@ const ChineseChessBoard = () => {
         // console.log("turn", game.turn());
         // console.log("check board", game.ascii());
 
+        console.log("Start check winner");
         await checkIsWinner()
+        console.log("End check winner");
         setPlayer(selectedPiece.pieceColor === 'red' ? 'black' : 'red')
         resetTime();
     }
 
     // Check if the game is over or not
     const checkIsWinner = async () => {
-        let newGameState: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(gameState));
+        const isWinner = await ChineseChessLogical.checkPlayerWinner(gameState, player === "red" ? "black" : "red")
 
-        const availableMoves = await ChineseChessLogical.checkPotentialBlockMoves(gameState, player === "red" ? "black" : "red")
-        const filteredMoves = (
-            await Promise.all(
-                availableMoves.map(async (element: PotentialMovePiece) => {
-                    newGameState[element.fromMove.row][element.fromMove.column] = {
-                        piece: "",
-                        pieceColor: "",
-                        row: element.fromMove.row,
-                        column: element.fromMove.column,
-                        isMoveValid: false
-                    };
-
-                    newGameState[element.potentialMove.row][element.potentialMove.column] = element.potentialMove;
-
-                    const isCheck = await ChineseChessLogical.isInCheck(newGameState, player === "red" ? "black" : "red");
-
-                    // Trả về phần tử hợp lệ, nếu không hợp lệ thì trả về undefined
-                    if (!isCheck) {
-                        return element; // Phần tử hợp lệ
-                    }
-                    return undefined; // Loại bỏ phần tử không hợp lệ
-                })
-            )
-        ).filter((el) => el !== undefined); // Loại bỏ undefined ngay sau Promise.all
-
-        if (filteredMoves.length == 0) {
+        if (isWinner) {
             setIsWinner(`Player ${player === 'red' ? 'Red' : 'Black'} has won the game`)
         }
-        // else {
-        //     filteredMoves.forEach((element, index) => {
-        //         if (index == 0) {
-        //             console.log("Start-------------------------------------------");
-
-        //         }
-        //         console.log(element);
-        //         if (filteredMoves.length - 1 == index) {
-        //             console.log("-------------------------------------------End");
-
-        //         }
-        //     });
-        // }
-
-        setAvailableForSelected(filteredMoves);
     }
 
     // Format thời gian thành MM:SS

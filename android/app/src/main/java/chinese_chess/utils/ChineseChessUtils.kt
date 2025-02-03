@@ -91,7 +91,7 @@ object ChineseChessUtils {
         return map
     }
 
-    fun convertPotentialMovesToReadableArray(gameState: ArrayList<PotentialMovePiece>): WritableArray {
+    fun convertPotentialMovesToReadableArray(gameState: MutableList<PotentialMovePiece>): WritableArray {
         val writableArray = Arguments.createArray()
 
         gameState.forEach { potentialMovePiece ->

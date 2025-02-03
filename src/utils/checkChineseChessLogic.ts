@@ -106,8 +106,6 @@ export const checkRookMove = async (gameState: ChineseChessBoardPiece[][], { pie
 }
 
 export const checkKnightMove = async (gameState: ChineseChessBoardPiece[][], { pieceColor, row, column }: ChineseChessBoardPiece) => {
-
-
     let newGameState = [...gameState]
 
     if (row >= 0 && row <= 1) { //TH ở row 0 và 1 thì chỉ có thể đi xuống thôi
@@ -389,8 +387,10 @@ export const checkCannonMove = async (gameState: ChineseChessBoardPiece[][], { p
             newGameState[i][column].isMoveValid = true;
         } else if (targetSquare.pieceColor !== "" && blockIndex == -1) { //Chặn rồi thì lưu index lại để quét các bước sau đó
             blockIndex = i;
-        } else if (targetSquare.pieceColor !== pieceColor && blockIndex != -1 && blockIndex > i && targetSquare.piece.length != 0) { //TH bay sang ăn quân địch
-            newGameState[i][column].isMoveValid = true;
+        } else if (targetSquare.pieceColor !== "" && blockIndex > i && targetSquare.piece.length != 0) { //TH bay sang ăn quân địch
+            if (targetSquare.pieceColor !== pieceColor) { //Nếu quân bị chặn đầu tiên là địch thì ăn không thì ngưng lại luôn
+                newGameState[i][column].isMoveValid = true;
+            }
             blockIndex = -1;
             break;
         }
@@ -404,8 +404,10 @@ export const checkCannonMove = async (gameState: ChineseChessBoardPiece[][], { p
             newGameState[i][column].isMoveValid = true;
         } else if (targetSquare.pieceColor !== "" && blockIndex == -1) {//Chặn rồi thì lưu index lại để quét các bước sau đó
             blockIndex = i;
-        } else if (targetSquare.pieceColor !== pieceColor && blockIndex != -1 && blockIndex < i && targetSquare.piece.length != 0) { //TH bay sang ăn quân địch
-            newGameState[i][column].isMoveValid = true;
+        } else if (targetSquare.pieceColor !== "" && blockIndex < i && targetSquare.piece.length != 0) { //TH bay sang ăn quân địch
+            if (targetSquare.pieceColor !== pieceColor) { //Nếu quân bị chặn đầu tiên là địch thì ăn không thì ngưng lại luôn
+                newGameState[i][column].isMoveValid = true;
+            }
             blockIndex = -1;
             break;
         }
@@ -419,8 +421,10 @@ export const checkCannonMove = async (gameState: ChineseChessBoardPiece[][], { p
             newGameState[row][i].isMoveValid = true;
         } else if (targetSquare.pieceColor !== "" && blockIndex == -1) {//Chặn rồi thì lưu index lại để quét các bước sau đó
             blockIndex = i;
-        } else if (targetSquare.pieceColor !== pieceColor && blockIndex != -1 && blockIndex < i && targetSquare.piece.length != 0) {//TH bay sang ăn quân địch
-            newGameState[row][i].isMoveValid = true;
+        } else if (targetSquare.pieceColor !== "" && blockIndex < i && targetSquare.piece.length != 0) {//TH bay sang ăn quân địch
+            if (targetSquare.pieceColor !== pieceColor) { //Nếu quân bị chặn đầu tiên là địch thì ăn không thì ngưng lại luôn
+                newGameState[row][i].isMoveValid = true;
+            }
             blockIndex = -1;
             break;
         }
@@ -434,8 +438,10 @@ export const checkCannonMove = async (gameState: ChineseChessBoardPiece[][], { p
             newGameState[row][i].isMoveValid = true;
         } else if (targetSquare.pieceColor !== "" && blockIndex == -1) {//Chặn rồi thì lưu index lại để quét các bước sau đó
             blockIndex = i;
-        } else if (targetSquare.pieceColor !== pieceColor && blockIndex != -1 && blockIndex > i && targetSquare.piece.length != 0) {//TH bay sang ăn quân địch
-            newGameState[row][i].isMoveValid = true;
+        } else if (targetSquare.pieceColor !== "" && blockIndex > i && targetSquare.piece.length != 0) {//TH bay sang ăn quân địch
+            if (targetSquare.pieceColor !== pieceColor) { //Nếu quân bị chặn đầu tiên là địch thì ăn không thì ngưng lại luôn
+                newGameState[row][i].isMoveValid = true;
+            }
             blockIndex = -1;
             break;
         }
@@ -800,10 +806,6 @@ export const isInCheck = async (gameState: ChineseChessBoardPiece[][], pieceColo
                         break;
                 }
             }
-
-            if (obj.isMoveValid === true && obj.pieceColor !== pieceColor && obj.piece === 'king') {
-                console.log("Opponent King in check");
-            }
         })
     })
 
@@ -811,7 +813,6 @@ export const isInCheck = async (gameState: ChineseChessBoardPiece[][], pieceColo
     let king: ChineseChessBoardPiece[] | undefined;
     king = newGameState.find(innerArray => {
         const potentialKing = innerArray.find(obj => obj.piece === 'king' && obj.pieceColor === pieceColor);
-        // console.log(potentialKing)
         return potentialKing?.pieceColor === pieceColor && potentialKing.piece === 'king' && potentialKing?.isMoveValid === true;
     });
 
@@ -914,7 +915,7 @@ export const checkValidMove = async (gameState: ChineseChessBoardPiece[][], ches
 
 
                         if (!res) {
-                            console.log(index, temp[row][column], "res:", res);
+                            // console.log(index, temp[row][column], "res:", res);
                             const potentialMove: ChineseChessBoardPiece = {
                                 piece: chessPiece.piece,
                                 pieceColor: chessPiece.pieceColor,

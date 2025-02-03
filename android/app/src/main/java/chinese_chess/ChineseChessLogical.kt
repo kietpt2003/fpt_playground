@@ -1,6 +1,5 @@
 package chinese_chess
 
-import android.util.Log
 import chinese_chess.entities.ChineseChessBoardPiece
 import chinese_chess.entities.ChineseChessPiece
 import chinese_chess.entities.PotentialMovePiece
@@ -22,9 +21,7 @@ import kotlin.coroutines.suspendCoroutine
 
 class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactApplicationContext) {
-    override fun getName(): String {
-        return "ChineseChessLogical";
-    }
+    override fun getName(): String = "ChineseChessLogical"
 
     @ReactMethod
     fun checkPawnMove(gameStateArray: ReadableArray, pieceMap: ReadableMap, promise: Promise) {
@@ -34,43 +31,42 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
             // Chuyển đổi ReadableMap thành ChineseChessBoardPiece
             val piece = ChineseChessUtils.parseBoardPieceMap(pieceMap)
             val (_, pieceColor, row, column) = piece
-            val newGameState = gameState.map { it.copyOf() }.toTypedArray()
 
             if (pieceColor == "black") {//TH quân đen (nẳm trên)
                 if (row in 3 until 9) {
-                    newGameState[row + 1][column].isMoveValid =
-                        newGameState[row + 1][column].piece == ChineseChessPiece.EMPTY ||
-                                newGameState[row + 1][column].pieceColor != pieceColor
+                    gameState[row + 1][column].isMoveValid =
+                        gameState[row + 1][column].piece == ChineseChessPiece.EMPTY ||
+                                gameState[row + 1][column].pieceColor != pieceColor
                 }
             } else {//TH quân đỏ nằm dưới
                 if (row in 1..6) {
-                    newGameState[row - 1][column].isMoveValid =
-                        newGameState[row - 1][column].piece == ChineseChessPiece.EMPTY ||
-                                newGameState[row - 1][column].pieceColor != pieceColor
+                    gameState[row - 1][column].isMoveValid =
+                        gameState[row - 1][column].piece == ChineseChessPiece.EMPTY ||
+                                gameState[row - 1][column].pieceColor != pieceColor
                 }
             }
 
             if ((row <= 4 && pieceColor == "red") || (row >= 5 && pieceColor == "black")) { //TH tốt qua sông
                 when (column) {
-                    0 -> newGameState[row][0].isMoveValid =
-                        newGameState[row][0].piece == ChineseChessPiece.EMPTY ||
-                                newGameState[row][0].pieceColor != pieceColor //TH tốt qua sông mà sát mép trái thì không đi bên trái được
-                    8 -> newGameState[row][column - 1].isMoveValid =
-                        newGameState[row][column - 1].piece == ChineseChessPiece.EMPTY ||
-                                newGameState[row][column - 1].pieceColor != pieceColor //TH tốt qua sông mà sát mép phải thì không đi bên phải được
+                    0 -> gameState[row][0].isMoveValid =
+                        gameState[row][0].piece == ChineseChessPiece.EMPTY ||
+                                gameState[row][0].pieceColor != pieceColor //TH tốt qua sông mà sát mép trái thì không đi bên trái được
+                    8 -> gameState[row][column - 1].isMoveValid =
+                        gameState[row][column - 1].piece == ChineseChessPiece.EMPTY ||
+                                gameState[row][column - 1].pieceColor != pieceColor //TH tốt qua sông mà sát mép phải thì không đi bên phải được
                     else -> { //TH tốt qua sông mà không sát mép thì đi trái phải được
-                        newGameState[row][column + 1].isMoveValid =
-                            newGameState[row][column + 1].piece == ChineseChessPiece.EMPTY ||
-                                    newGameState[row][column + 1].pieceColor != pieceColor
-                        newGameState[row][column - 1].isMoveValid =
-                            newGameState[row][column - 1].piece == ChineseChessPiece.EMPTY ||
-                                    newGameState[row][column - 1].pieceColor != pieceColor
+                        gameState[row][column + 1].isMoveValid =
+                            gameState[row][column + 1].piece == ChineseChessPiece.EMPTY ||
+                                    gameState[row][column + 1].pieceColor != pieceColor
+                        gameState[row][column - 1].isMoveValid =
+                            gameState[row][column - 1].piece == ChineseChessPiece.EMPTY ||
+                                    gameState[row][column - 1].pieceColor != pieceColor
                     }
                 }
             }
 
             // Chuyển đổi kết quả thành ReadableArray và trả về
-            promise.resolve(ChineseChessUtils.convertGameStateToReadableArray(newGameState))
+            promise.resolve(ChineseChessUtils.convertGameStateToReadableArray(gameState))
         } catch (e: Exception) {
             promise.reject("Error", e)
         }
@@ -79,66 +75,44 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
     @ReactMethod
     fun checkRookMove(gameStateArray: ReadableArray, pieceMap: ReadableMap, promise: Promise) {
         try {
-            // Chuyển đổi ReadableArray thành mảng hai chiều của ChineseChessBoardPiece
             val gameState = ChineseChessUtils.parseGameStateArray(gameStateArray)
-            // Chuyển đổi ReadableMap thành ChineseChessBoardPiece
             val piece = ChineseChessUtils.parseBoardPieceMap(pieceMap)
             val (_, pieceColor, row, column) = piece
-            val newGameState = gameState.map { it.copyOf() }.toTypedArray()
 
-            // Upward
-            for (i in row - 1 downTo 0) {
-                val targetSquare = gameState[i][column]
-                if (targetSquare.piece == ChineseChessPiece.EMPTY) {
-                    newGameState[i][column].isMoveValid = true
-                } else if (targetSquare.pieceColor != pieceColor) {
-                    newGameState[i][column].isMoveValid = true
-                    break
-                } else {
-                    break
+            // Danh sách 4 hướng di chuyển của xe: (deltaRow, deltaCol)
+            val directions = listOf(
+                -1 to 0,  // Up
+                1 to 0,   // Down
+                0 to 1,   // Right
+                0 to -1   // Left
+            )
+
+            // Hàm xử lý di chuyển theo một hướng
+            fun markValidMovesInDirection(deltaRow: Int, deltaCol: Int) {
+                var r = row + deltaRow
+                var c = column + deltaCol
+
+                while (r in 0..9 && c in 0..8) {
+                    val targetSquare = gameState[r][c]
+                    if (targetSquare.piece == ChineseChessPiece.EMPTY) {
+                        targetSquare.isMoveValid = true
+                    } else {
+                        if (targetSquare.pieceColor != pieceColor) {
+                            targetSquare.isMoveValid = true
+                        }
+                        break // Nếu gặp vật cản thì dừng lại
+                    }
+                    r += deltaRow
+                    c += deltaCol
                 }
             }
 
-            // Downward
-            for (i in row + 1..9) {
-                val targetSquare = gameState[i][column]
-                if (targetSquare.piece == ChineseChessPiece.EMPTY) {
-                    newGameState[i][column].isMoveValid = true
-                } else if (targetSquare.pieceColor != pieceColor) {
-                    newGameState[i][column].isMoveValid = true
-                    break
-                } else {
-                    break
-                }
+            // Chạy đồng thời các hướng di chuyển của xe (không cần chờ đợi từng cái)
+            directions.parallelStream().forEach { (deltaRow, deltaCol) ->
+                markValidMovesInDirection(deltaRow, deltaCol)
             }
 
-            // Right
-            for (i in column + 1..8) {
-                val targetSquare = gameState[row][i]
-                if (targetSquare.piece == ChineseChessPiece.EMPTY) {
-                    newGameState[row][i].isMoveValid = true
-                } else if (targetSquare.pieceColor != pieceColor) {
-                    newGameState[row][i].isMoveValid = true
-                    break
-                } else {
-                    break
-                }
-            }
-
-            // Left
-            for (i in column - 1 downTo 0) {
-                val targetSquare = gameState[row][i]
-                if (targetSquare.piece == ChineseChessPiece.EMPTY) {
-                    newGameState[row][i].isMoveValid = true
-                } else if (targetSquare.pieceColor != pieceColor) {
-                    newGameState[row][i].isMoveValid = true
-                    break
-                } else {
-                    break
-                }
-            }
-
-            promise.resolve(ChineseChessUtils.convertGameStateToReadableArray(newGameState))
+            promise.resolve(ChineseChessUtils.convertGameStateToReadableArray(gameState))
         } catch (e: Exception) {
             promise.reject("Error", e)
         }
@@ -150,175 +124,200 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
             val gameState = ChineseChessUtils.parseGameStateArray(gameStateArray)
             val piece = ChineseChessUtils.parseBoardPieceMap(pieceMap)
             val (_, pieceColor, row, column) = piece
-            val newGameState = gameState.map { it.copyOf() }.toTypedArray()
 
             if (row in 0..1) { //TH ở row 0 và 1 thì chỉ có thể đi xuống thôi
                 if (column in 0..6) { //TH từ col 0 -> 6 thì có thể qua 2 xuống 1 (Trong TH này sẽ không xét qua bên trái)
-                    val blockRightSquare = gameState[row][column + 1];
+                    val blockRightSquare = gameState[row][column + 1]
                     if (blockRightSquare.pieceColor == "") { //TH không bị chặn bên phải
-                        newGameState[row + 1][column + 2].isMoveValid =
-                            (newGameState[row + 1][column + 2].piece == ChineseChessPiece.EMPTY ||
-                                    newGameState[row + 1][column + 2].pieceColor != pieceColor)
+                        gameState[row + 1][column + 2].isMoveValid =
+                            (gameState[row + 1][column + 2].piece == ChineseChessPiece.EMPTY ||
+                                    gameState[row + 1][column + 2].pieceColor != pieceColor)
 
                         if (row == 1) { //TH row = 1 thì có thể đi lên với điều kiện là qua phải 2 lên 1
-                            newGameState[0][column + 2].isMoveValid =
-                                (newGameState[0][column + 2].piece == ChineseChessPiece.EMPTY ||
-                                        newGameState[0][column + 2].pieceColor != pieceColor)
+                            gameState[0][column + 2].isMoveValid =
+                                (gameState[0][column + 2].piece == ChineseChessPiece.EMPTY ||
+                                        gameState[0][column + 2].pieceColor != pieceColor)
                         }
                     }
 
-                    val blockBottomSquare = gameState[row + 1][column];
+                    val blockBottomSquare = gameState[row + 1][column]
                     if (blockBottomSquare.pieceColor == "") { //TH xuống 2 qua 1
-                        newGameState[row + 2][column + 1].isMoveValid =
-                            (newGameState[row + 2][column + 1].piece == ChineseChessPiece.EMPTY ||
-                                    newGameState[row + 2][column + 1].pieceColor != pieceColor)
+                        gameState[row + 2][column + 1].isMoveValid =
+                            (gameState[row + 2][column + 1].piece == ChineseChessPiece.EMPTY ||
+                                    gameState[row + 2][column + 1].pieceColor != pieceColor)
 
                         if (column != 0) { //TH nếu khác col = 0 thì đều có thể qua trái
-                            newGameState[row + 2][column - 1].isMoveValid =
-                                (newGameState[row + 2][column - 1].piece == ChineseChessPiece.EMPTY ||
-                                        newGameState[row + 2][column - 1].pieceColor != pieceColor)
+                            gameState[row + 2][column - 1].isMoveValid =
+                                (gameState[row + 2][column - 1].piece == ChineseChessPiece.EMPTY ||
+                                        gameState[row + 2][column - 1].pieceColor != pieceColor)
+                        }
+                    }
+                }
+
+                if (column in 2..8) { //TH từ col 2 -> 8 thì có thể qua 2 xuống 1 (Trong TH này sẽ không xét qua bên phải)
+                    val blockLeftSquare = gameState[row][column - 1]
+                    if (blockLeftSquare.pieceColor == "") { //TH không bị chặn bên trái
+                        gameState[row + 1][column - 2].isMoveValid =
+                            (gameState[row + 1][column - 2].piece == ChineseChessPiece.EMPTY ||
+                                    gameState[row + 1][column - 2].pieceColor !== pieceColor)
+                        if (row == 1) { //TH row = 1 thì có thể đi lên với điều kiện là qua trái 2 lên 1
+                            gameState[0][column - 2].isMoveValid =
+                                (gameState[0][column - 2].piece == ChineseChessPiece.EMPTY ||
+                                        gameState[0][column - 2].pieceColor !== pieceColor)
+                        }
+                    }
+
+                    val blockBottomSquare = gameState[row + 1][column]
+                    if (blockBottomSquare.pieceColor == "") { //TH xuống 2 qua 1
+                        gameState[row + 2][column - 1].isMoveValid =
+                            (gameState[row + 2][column - 1].piece == ChineseChessPiece.EMPTY ||
+                                    gameState[row + 2][column - 1].pieceColor !== pieceColor)
+                        if (column != 8) {//TH nếu khác col = 8 thì đều có thể qua phải
+                            gameState[row + 2][column + 1].isMoveValid =
+                                (gameState[row + 2][column + 1].piece == ChineseChessPiece.EMPTY ||
+                                        gameState[row + 2][column + 1].pieceColor !== pieceColor)
                         }
                     }
                 }
             } else if (row in 2..7) { //TH cách đỉnh >= 2 ô và cách đáy <= 7 ô
-                val blockTopSquare = gameState[row - 1][column];
+                val blockTopSquare = gameState[row - 1][column]
                 if (blockTopSquare.pieceColor == "") { //Top ko có người chặn
                     when (column) {
                         0 -> { // Đi được bên phải
-                            newGameState[row - 2][0].isMoveValid =
-                                (newGameState[row - 2][0].piece == ChineseChessPiece.EMPTY ||
-                                        newGameState[row - 2][0].pieceColor != pieceColor)
+                            gameState[row - 2][0].isMoveValid =
+                                (gameState[row - 2][0].piece == ChineseChessPiece.EMPTY ||
+                                        gameState[row - 2][0].pieceColor != pieceColor)
                         }
 
                         8 -> { // Đi được bên trái
-                            newGameState[row - 2][column - 1].isMoveValid =
-                                (newGameState[row - 2][column - 1].piece == ChineseChessPiece.EMPTY ||
-                                        newGameState[row - 2][column - 1].pieceColor != pieceColor);
+                            gameState[row - 2][column - 1].isMoveValid =
+                                (gameState[row - 2][column - 1].piece == ChineseChessPiece.EMPTY ||
+                                        gameState[row - 2][column - 1].pieceColor != pieceColor)
                         }
 
                         else -> {// Đi được cả hai bên
-                            newGameState[row - 2][column + 1].isMoveValid =
-                                (newGameState[row - 2][column + 1].piece == ChineseChessPiece.EMPTY ||
-                                        newGameState[row - 2][column + 1].pieceColor != pieceColor)
+                            gameState[row - 2][column + 1].isMoveValid =
+                                (gameState[row - 2][column + 1].piece == ChineseChessPiece.EMPTY ||
+                                        gameState[row - 2][column + 1].pieceColor != pieceColor)
 
-                            newGameState[row - 2][column - 1].isMoveValid =
-                                (newGameState[row - 2][column - 1].piece == ChineseChessPiece.EMPTY ||
-                                        newGameState[row - 2][column - 1].pieceColor != pieceColor)
+                            gameState[row - 2][column - 1].isMoveValid =
+                                (gameState[row - 2][column - 1].piece == ChineseChessPiece.EMPTY ||
+                                        gameState[row - 2][column - 1].pieceColor != pieceColor)
                         }
                     }
                 }
 
-                val blockBottomSquare = gameState[row + 1][column];
+                val blockBottomSquare = gameState[row + 1][column]
                 if (blockBottomSquare.pieceColor == "") { //Bottom ko có người chặn
                     when (column) {
                         0 -> { // Đi được bên phải
-                            newGameState[row + 2][0].isMoveValid =
-                                (newGameState[row + 2][0].piece == ChineseChessPiece.EMPTY ||
-                                        newGameState[row + 2][0].pieceColor != pieceColor)
+                            gameState[row + 2][0].isMoveValid =
+                                (gameState[row + 2][0].piece == ChineseChessPiece.EMPTY ||
+                                        gameState[row + 2][0].pieceColor != pieceColor)
                         }
 
                         8 -> { // Đi được bên trái
-                            newGameState[row + 2][column - 1].isMoveValid =
-                                (newGameState[row + 2][column - 1].piece == ChineseChessPiece.EMPTY ||
-                                        newGameState[row + 2][column - 1].pieceColor != pieceColor)
+                            gameState[row + 2][column - 1].isMoveValid =
+                                (gameState[row + 2][column - 1].piece == ChineseChessPiece.EMPTY ||
+                                        gameState[row + 2][column - 1].pieceColor != pieceColor)
                         }
 
                         else -> { // Đi được cả hai bên (lên/xuống 2 qua trái/phải 1)
-                            newGameState[row + 2][column + 1].isMoveValid =
-                                (newGameState[row + 2][column + 1].piece == ChineseChessPiece.EMPTY ||
-                                        newGameState[row + 2][column + 1].pieceColor != pieceColor)
+                            gameState[row + 2][column + 1].isMoveValid =
+                                (gameState[row + 2][column + 1].piece == ChineseChessPiece.EMPTY ||
+                                        gameState[row + 2][column + 1].pieceColor != pieceColor)
 
-                            newGameState[row + 2][column - 1].isMoveValid =
-                                (newGameState[row + 2][column - 1].piece == ChineseChessPiece.EMPTY ||
-                                        newGameState[row + 2][column - 1].pieceColor != pieceColor)
+                            gameState[row + 2][column - 1].isMoveValid =
+                                (gameState[row + 2][column - 1].piece == ChineseChessPiece.EMPTY ||
+                                        gameState[row + 2][column - 1].pieceColor != pieceColor)
                         }
                     }
                 }
 
                 if (column in 0..6) {
-                    val blockRightSquare = gameState[row][column + 1];
+                    val blockRightSquare = gameState[row][column + 1]
                     if (blockRightSquare.pieceColor == "") { //TH không bị chặn bên phải (qua phải 2 lên/xuống 1)
-                        newGameState[row - 1][column + 2].isMoveValid =
-                            (newGameState[row - 1][column + 2].piece == ChineseChessPiece.EMPTY ||
-                                    newGameState[row - 1][column + 2].pieceColor != pieceColor)
+                        gameState[row - 1][column + 2].isMoveValid =
+                            (gameState[row - 1][column + 2].piece == ChineseChessPiece.EMPTY ||
+                                    gameState[row - 1][column + 2].pieceColor != pieceColor)
 
-                        newGameState[row + 1][column + 2].isMoveValid =
-                            (newGameState[row + 1][column + 2].piece == ChineseChessPiece.EMPTY ||
-                                    newGameState[row + 1][column + 2].pieceColor != pieceColor)
+                        gameState[row + 1][column + 2].isMoveValid =
+                            (gameState[row + 1][column + 2].piece == ChineseChessPiece.EMPTY ||
+                                    gameState[row + 1][column + 2].pieceColor != pieceColor)
                     }
                 }
 
                 if (column in 2..8) {
-                    val blockLeftSquare = gameState[row][column - 1];
+                    val blockLeftSquare = gameState[row][column - 1]
                     if (blockLeftSquare.pieceColor == "") { //TH không bị chặn bên trái (qua trái 2 lên/xuống 1)
-                        newGameState[row - 1][column - 2].isMoveValid =
-                            (newGameState[row - 1][column - 2].piece == ChineseChessPiece.EMPTY ||
-                                    newGameState[row - 1][column - 2].pieceColor != pieceColor)
+                        gameState[row - 1][column - 2].isMoveValid =
+                            (gameState[row - 1][column - 2].piece == ChineseChessPiece.EMPTY ||
+                                    gameState[row - 1][column - 2].pieceColor != pieceColor)
 
-                        newGameState[row + 1][column - 2].isMoveValid =
-                            (newGameState[row + 1][column - 2].piece == ChineseChessPiece.EMPTY ||
-                                    newGameState[row + 1][column - 2].pieceColor != pieceColor)
+                        gameState[row + 1][column - 2].isMoveValid =
+                            (gameState[row + 1][column - 2].piece == ChineseChessPiece.EMPTY ||
+                                    gameState[row + 1][column - 2].pieceColor != pieceColor)
                     }
                 }
             } else if (row in 8..9) {
                 if (column in 0..6) { //TH từ col 0 -> 6 thì có thể qua 2 lên 1 (Trong TH này sẽ không xét qua bên trái)
-                    val blockRightSquare = gameState[row][column + 1];
+                    val blockRightSquare = gameState[row][column + 1]
                     if (blockRightSquare.pieceColor == "") { //TH không bị chặn bên phải
-                        newGameState[row - 1][column + 2].isMoveValid =
-                            (newGameState[row - 1][column + 2].piece == ChineseChessPiece.EMPTY ||
-                                    newGameState[row - 1][column + 2].pieceColor != pieceColor)
+                        gameState[row - 1][column + 2].isMoveValid =
+                            (gameState[row - 1][column + 2].piece == ChineseChessPiece.EMPTY ||
+                                    gameState[row - 1][column + 2].pieceColor != pieceColor)
 
                         if (row == 8) { //TH row = 8 thì có thể đi xuống với điều kiện là qua phải 2 xuống 1
-                            newGameState[row + 1][column + 2].isMoveValid =
-                                (newGameState[row + 1][column + 2].piece == ChineseChessPiece.EMPTY ||
-                                        newGameState[row + 1][column + 2].pieceColor != pieceColor)
+                            gameState[row + 1][column + 2].isMoveValid =
+                                (gameState[row + 1][column + 2].piece == ChineseChessPiece.EMPTY ||
+                                        gameState[row + 1][column + 2].pieceColor != pieceColor)
                         }
                     }
 
-                    val blockTopSquare = gameState[row - 1][column];
+                    val blockTopSquare = gameState[row - 1][column]
                     if (blockTopSquare.pieceColor == "") { //TH lên 2 qua 1
-                        newGameState[row - 2][column + 1].isMoveValid =
-                            (newGameState[row - 2][column + 1].piece == ChineseChessPiece.EMPTY ||
-                                    newGameState[row - 2][column + 1].pieceColor != pieceColor)
+                        gameState[row - 2][column + 1].isMoveValid =
+                            (gameState[row - 2][column + 1].piece == ChineseChessPiece.EMPTY ||
+                                    gameState[row - 2][column + 1].pieceColor != pieceColor)
 
                         if (column != 0) { //TH nếu khác col = 0 thì đều có thể qua trái
-                            newGameState[row - 2][column - 1].isMoveValid =
-                                (newGameState[row - 2][column - 1].piece == ChineseChessPiece.EMPTY ||
-                                        newGameState[row - 2][column - 1].pieceColor != pieceColor)
+                            gameState[row - 2][column - 1].isMoveValid =
+                                (gameState[row - 2][column - 1].piece == ChineseChessPiece.EMPTY ||
+                                        gameState[row - 2][column - 1].pieceColor != pieceColor)
                         }
                     }
 
                 }
                 if (column in 2..8) { //TH từ col 2 -> 8 thì có thể qua 2 lên 1 (Trong TH này sẽ không xét qua bên phải)
-                    val blockLeftSquare = gameState[row][column - 1];
+                    val blockLeftSquare = gameState[row][column - 1]
                     if (blockLeftSquare.pieceColor == "") { //TH không bị chặn bên trái
-                        newGameState[row - 1][column - 2].isMoveValid =
-                            (newGameState[row - 1][column - 2].piece == ChineseChessPiece.EMPTY ||
-                                    newGameState[row - 1][column - 2].pieceColor != pieceColor)
+                        gameState[row - 1][column - 2].isMoveValid =
+                            (gameState[row - 1][column - 2].piece == ChineseChessPiece.EMPTY ||
+                                    gameState[row - 1][column - 2].pieceColor != pieceColor)
 
                         if (row == 8) { //TH row = 8 thì có thể đi xuống với điều kiện là qua trái 2 xuống 1
-                            newGameState[row + 1][column - 2].isMoveValid =
-                                (newGameState[row + 1][column - 2].piece == ChineseChessPiece.EMPTY ||
-                                        newGameState[row + 1][column - 2].pieceColor != pieceColor)
+                            gameState[row + 1][column - 2].isMoveValid =
+                                (gameState[row + 1][column - 2].piece == ChineseChessPiece.EMPTY ||
+                                        gameState[row + 1][column - 2].pieceColor != pieceColor)
                         }
                     }
 
-                    val blockTopSquare = gameState[row - 1][column];
+                    val blockTopSquare = gameState[row - 1][column]
                     if (blockTopSquare.pieceColor == "") { //TH lên 2 qua 1
-                        newGameState[row - 2][column - 1].isMoveValid =
-                            (newGameState[row - 2][column - 1].piece == ChineseChessPiece.EMPTY ||
-                                    newGameState[row - 2][column - 1].pieceColor != pieceColor)
+                        gameState[row - 2][column - 1].isMoveValid =
+                            (gameState[row - 2][column - 1].piece == ChineseChessPiece.EMPTY ||
+                                    gameState[row - 2][column - 1].pieceColor != pieceColor)
 
                         if (column != 8) { //TH nếu khác col = 8 thì đều có thể qua phải
-                            newGameState[row - 2][column + 1].isMoveValid =
-                                (newGameState[row - 2][column + 1].piece == ChineseChessPiece.EMPTY ||
-                                        newGameState[row - 2][column + 1].pieceColor != pieceColor)
+                            gameState[row - 2][column + 1].isMoveValid =
+                                (gameState[row - 2][column + 1].piece == ChineseChessPiece.EMPTY ||
+                                        gameState[row - 2][column + 1].pieceColor != pieceColor)
                         }
                     }
                 }
             }
 
-            promise.resolve(ChineseChessUtils.convertGameStateToReadableArray(newGameState))
+            promise.resolve(ChineseChessUtils.convertGameStateToReadableArray(gameState))
         } catch (e: Exception) {
             promise.reject("Error", e)
         }
@@ -332,7 +331,6 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
             // Chuyển đổi ReadableMap thành ChineseChessBoardPiece
             val piece = ChineseChessUtils.parseBoardPieceMap(pieceMap)
             val (_, pieceColor, row, column) = piece
-            val newGameState = gameState.map { it.copyOf() }.toTypedArray()
 
             val checkValidMove = { i: Int, j: Int ->
                 if (i in 0..9 && j in 0..8) {
@@ -344,13 +342,13 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
                         ((pieceColor == "black" && i <= 4 && i % 2 == 0) ||
                                 (pieceColor == "red" && i >= 5 && i % 2 == 1))
                     ) {
-                        newGameState[i][j].isMoveValid = true
+                        gameState[i][j].isMoveValid = true
                         false
                     } else if (targetSquare.pieceColor != pieceColor &&
                         ((pieceColor == "black" && i <= 4 && i % 2 == 0) ||
                                 (pieceColor == "red" && i >= 5 && i % 2 == 1))
                     ) {
-                        newGameState[i][j].isMoveValid = true
+                        gameState[i][j].isMoveValid = true
                         false
                     } else {
                         true
@@ -380,7 +378,7 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
                 if (!res) break
             }
 
-            promise.resolve(ChineseChessUtils.convertGameStateToReadableArray(newGameState))
+            promise.resolve(ChineseChessUtils.convertGameStateToReadableArray(gameState))
         } catch (e: Exception) {
             promise.reject("Error", e)
         }
@@ -394,36 +392,35 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
             // Chuyển đổi ReadableMap thành ChineseChessBoardPiece
             val piece = ChineseChessUtils.parseBoardPieceMap(pieceMap)
             val (_, pieceColor, row, column) = piece
-            val newGameState = gameState.map { it.copyOf() }.toTypedArray()
 
             val checkValidMove = { i: Int, j: Int ->
                 if (i in 0..9 && j in 0..8) {
                     val targetSquare = gameState[i][j]
                     if (withinKingPalace(i, j, pieceColor)) { //Check sĩ có trong cung không
                         if (targetSquare.piece == ChineseChessPiece.EMPTY && ((pieceColor == "black" && i <= 2) || (pieceColor == "red" && i >= 7))) {
-                            newGameState[i][j].isMoveValid = true;
+                            gameState[i][j].isMoveValid = true
                         } else if (targetSquare.pieceColor != pieceColor && ((pieceColor == "black" && i <= 2) || (pieceColor == "red" && i >= 7))) {
-                            newGameState[i][j].isMoveValid = true;
+                            gameState[i][j].isMoveValid = true
                         } else {
-                            false;
+                            false
                         }
                     } else {
-                        false;
+                        false
                     }
                 } else {
                     true
                 }
             }
 
-            checkValidMove(row - 1, column + 1); //đen chéo lên sang phải
+            checkValidMove(row - 1, column + 1) //đen chéo lên sang phải
 
-            checkValidMove(row - 1, column - 1); //đen chéo lên sang trái
+            checkValidMove(row - 1, column - 1) //đen chéo lên sang trái
 
-            checkValidMove(row + 1, column + 1); //đỏ chéo xuống sang phải
+            checkValidMove(row + 1, column + 1) //đỏ chéo xuống sang phải
 
-            checkValidMove(row + 1, column - 1); //đỏ chéo xuống sang trái
+            checkValidMove(row + 1, column - 1) //đỏ chéo xuống sang trái
 
-            promise.resolve(ChineseChessUtils.convertGameStateToReadableArray(newGameState))
+            promise.resolve(ChineseChessUtils.convertGameStateToReadableArray(gameState))
         } catch (e: Exception) {
             promise.reject("Error", e)
         }
@@ -437,65 +434,72 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
             // Chuyển đổi ReadableMap thành ChineseChessBoardPiece
             val piece = ChineseChessUtils.parseBoardPieceMap(pieceMap)
             val (_, pieceColor, row, column) = piece
-            val newGameState = gameState.map { it.copyOf() }.toTypedArray()
-            var blockIndex = -1;
+            var blockIndex = -1
 
             //Upward
             for (i in row - 1 downTo 0) {
-                val targetSquare = gameState[i][column];
+                val targetSquare = gameState[i][column]
                 if (targetSquare.piece == ChineseChessPiece.EMPTY && blockIndex == -1) { //Xử lí các nước đi lên trước khi bị chặn
-                    newGameState[i][column].isMoveValid = true;
+                    gameState[i][column].isMoveValid = true
                 } else if (targetSquare.pieceColor != "" && blockIndex == -1) { //Chặn rồi thì lưu index lại để quét các bước sau đó
-                    blockIndex = i;
-                } else if (targetSquare.pieceColor != pieceColor && blockIndex != -1 && blockIndex > i && targetSquare.piece != ChineseChessPiece.EMPTY) { //TH bay sang ăn quân địch
-                    newGameState[i][column].isMoveValid = true;
-                    break;
+                    blockIndex = i
+                } else if (targetSquare.pieceColor != "" && blockIndex > i && targetSquare.piece != ChineseChessPiece.EMPTY) { //TH bay sang ăn quân địch
+                    if (targetSquare.pieceColor !== pieceColor) { //Nếu quân bị chặn đầu tiên là địch thì ăn không thì ngưng lại luôn
+                        gameState[i][column].isMoveValid = true
+                    }
+                    break
                 }
             }
 
             // Downward
-            blockIndex = -1;
+            blockIndex = -1
             for (i in row + 1..9) {
-                val targetSquare = gameState[i][column];
+                val targetSquare = gameState[i][column]
                 if (targetSquare.piece == ChineseChessPiece.EMPTY && blockIndex == -1) { //Xử lí các nước đi xuống trước khi bị chặn
-                    newGameState[i][column].isMoveValid = true;
+                    gameState[i][column].isMoveValid = true
                 } else if (targetSquare.pieceColor != "" && blockIndex == -1) { //Chặn rồi thì lưu index lại để quét các bước sau đó
-                    blockIndex = i;
-                } else if (targetSquare.pieceColor != pieceColor && blockIndex != -1 && blockIndex < i && targetSquare.piece != ChineseChessPiece.EMPTY) { //TH bay sang ăn quân địch
-                    newGameState[i][column].isMoveValid = true;
-                    break;
+                    blockIndex = i
+                } else if (targetSquare.pieceColor != "" && blockIndex < i && targetSquare.piece != ChineseChessPiece.EMPTY) { //TH bay sang ăn quân địch
+                    if (targetSquare.pieceColor !== pieceColor) { //Nếu quân bị chặn đầu tiên là địch thì ăn không thì ngưng lại luôn
+                        gameState[i][column].isMoveValid = true
+                    }
+                    break
                 }
             }
 
             // Right
-            blockIndex = -1;
+            blockIndex = -1
             for (i in column + 1..8) { //Xử lí các nước đi được bên phải trước khi bị chặn
-                val targetSquare = gameState[row][i];
+                val targetSquare = gameState[row][i]
                 if (targetSquare.piece == ChineseChessPiece.EMPTY && blockIndex == -1) {
-                    newGameState[row][i].isMoveValid = true;
+                    gameState[row][i].isMoveValid = true
                 } else if (targetSquare.pieceColor != "" && blockIndex == -1) { //Chặn rồi thì lưu index lại để quét các bước sau đó
-                    blockIndex = i;
-                } else if (targetSquare.pieceColor != pieceColor && blockIndex != -1 && blockIndex < i && targetSquare.piece != ChineseChessPiece.EMPTY) { //TH bay sang ăn quân địch
-                    newGameState[row][i].isMoveValid = true;
-                    break;
+                    blockIndex = i
+                } else if (targetSquare.pieceColor != "" && blockIndex < i && targetSquare.piece != ChineseChessPiece.EMPTY) { //TH bay sang ăn quân địch
+                    if (targetSquare.pieceColor !== pieceColor) { //Nếu quân bị chặn đầu tiên là địch thì ăn không thì ngưng lại luôn
+                        gameState[row][i].isMoveValid = true
+                    }
+                    break
                 }
             }
 
             // Left
-            blockIndex = -1;
+            blockIndex = -1
             for (i in column - 1 downTo 0) { // Xử lí các nước đi được bên trái trước khi bị chặn
-                val targetSquare = gameState[row][i];
+                val targetSquare = gameState[row][i]
                 if (targetSquare.piece == ChineseChessPiece.EMPTY && blockIndex == -1) {
-                    newGameState[row][i].isMoveValid = true;
+                    gameState[row][i].isMoveValid = true
                 } else if (targetSquare.pieceColor != "" && blockIndex == -1) {//Chặn rồi thì lưu index lại để quét các bước sau đó
-                    blockIndex = i;
-                } else if (targetSquare.pieceColor != pieceColor && blockIndex != -1 && blockIndex > i && targetSquare.piece != ChineseChessPiece.EMPTY) {//TH bay sang ăn quân địch
-                    newGameState[row][i].isMoveValid = true;
-                    break;
+                    blockIndex = i
+                } else if (targetSquare.pieceColor != "" && blockIndex > i && targetSquare.piece != ChineseChessPiece.EMPTY) {//TH bay sang ăn quân địch
+                    if (targetSquare.pieceColor !== pieceColor) { //Nếu quân bị chặn đầu tiên là địch thì ăn không thì ngưng lại luôn
+                        gameState[row][i].isMoveValid = true
+                    }
+                    break
                 }
             }
 
-            promise.resolve(ChineseChessUtils.convertGameStateToReadableArray(newGameState))
+            promise.resolve(ChineseChessUtils.convertGameStateToReadableArray(gameState))
         } catch (e: Exception) {
             promise.reject("Error", e)
         }
@@ -503,7 +507,7 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
 
     @ReactMethod
     fun checkKingMove(gameStateArray: ReadableArray, pieceMap: ReadableMap, promise: Promise) {
-        CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.Default).launch {
             try {
                 // Chuyển đổi ReadableArray thành mảng hai chiều của ChineseChessBoardPiece
                 val gameState = ChineseChessUtils.parseGameStateArray(gameStateArray)
@@ -518,13 +522,13 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
                             val isCheck = checkMoveToNewPos(
                                 ChineseChessUtils.convertGameStateToReadableArray(newGameState),
                                 piece,
-                                row + 1,
+                                1,
                                 column
                             ) //Nếu nước đi mới mà bị chiếu thì không gợi ý nó
                             if (!isCheck) {
-                                newGameState[row + 1][column].isMoveValid =
-                                    (newGameState[row + 1][column].piece == ChineseChessPiece.EMPTY ||
-                                            newGameState[row + 1][column].pieceColor != pieceColor)
+                                newGameState[1][column].isMoveValid =
+                                    (newGameState[1][column].piece == ChineseChessPiece.EMPTY ||
+                                            newGameState[1][column].pieceColor != pieceColor)
                             }
                         } else if (row == 2) {//TH row = 1 thì chỉ có lên
                             val isCheck = checkMoveToNewPos(
@@ -681,88 +685,28 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
     // Checks if the king is in check or not
     @ReactMethod
     fun isInCheck(gameStateArray: ReadableArray, pieceColor: String, promise: Promise) {
-        CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.Default).launch {
             try {
-                val gameState = ChineseChessUtils.parseGameStateArray(gameStateArray);
+                val gameState = ChineseChessUtils.parseGameStateArray(gameStateArray)
                 var newGameState = gameState.map { it.copyOf() }.toTypedArray()
                 var isCheck = false
 
-                newGameState.forEach { innerArray ->
-                    innerArray.forEach { obj ->
-                        if (obj.piece != ChineseChessPiece.EMPTY && obj.pieceColor != pieceColor) {
-                            newGameState = when(obj.piece) {
-                                ChineseChessPiece.PAWN -> ChineseChessUtils.parseGameStateArray(
-                                    callBackCheckMove(
-                                        ChineseChessUtils.convertGameStateToReadableArray(
-                                            newGameState
-                                        ),
-                                        ChineseChessUtils.convertChineseChessBoardPieceToReadableMap(
-                                            obj
-                                        ),
-                                        ChineseChessPiece.PAWN
-                                    )
+                // Xử lý tất cả quân cờ đối phương
+                newGameState.forEach { row ->
+                    row.forEach { obj ->
+                        if (obj.piece != ChineseChessPiece.EMPTY && obj.pieceColor != pieceColor && obj.piece != ChineseChessPiece.KING) {
+                            newGameState = ChineseChessUtils.parseGameStateArray(
+                                callBackCheckMove(
+                                    ChineseChessUtils.convertGameStateToReadableArray(newGameState),
+                                    ChineseChessUtils.convertChineseChessBoardPieceToReadableMap(obj),
+                                    obj.piece
                                 )
-                                ChineseChessPiece.ROOK -> ChineseChessUtils.parseGameStateArray(
-                                    callBackCheckMove(
-                                        ChineseChessUtils.convertGameStateToReadableArray(
-                                            newGameState
-                                        ),
-                                        ChineseChessUtils.convertChineseChessBoardPieceToReadableMap(
-                                            obj
-                                        ),
-                                        ChineseChessPiece.ROOK
-                                    )
-                                )
-                                ChineseChessPiece.KNIGHT -> ChineseChessUtils.parseGameStateArray(
-                                    callBackCheckMove(
-                                        ChineseChessUtils.convertGameStateToReadableArray(
-                                            newGameState
-                                        ),
-                                        ChineseChessUtils.convertChineseChessBoardPieceToReadableMap(
-                                            obj
-                                        ),
-                                        ChineseChessPiece.KNIGHT
-                                    )
-                                )
-                                ChineseChessPiece.BISHOP -> ChineseChessUtils.parseGameStateArray(
-                                    callBackCheckMove(
-                                        ChineseChessUtils.convertGameStateToReadableArray(
-                                            newGameState
-                                        ),
-                                        ChineseChessUtils.convertChineseChessBoardPieceToReadableMap(
-                                            obj
-                                        ),
-                                        ChineseChessPiece.BISHOP
-                                    )
-                                )
-                                ChineseChessPiece.ADVISOR -> ChineseChessUtils.parseGameStateArray(
-                                    callBackCheckMove(
-                                        ChineseChessUtils.convertGameStateToReadableArray(
-                                            newGameState
-                                        ),
-                                        ChineseChessUtils.convertChineseChessBoardPieceToReadableMap(
-                                            obj
-                                        ),
-                                        ChineseChessPiece.ADVISOR
-                                    )
-                                )
-                                ChineseChessPiece.CANNON -> ChineseChessUtils.parseGameStateArray(
-                                    callBackCheckMove(
-                                        ChineseChessUtils.convertGameStateToReadableArray(
-                                            newGameState
-                                        ),
-                                        ChineseChessUtils.convertChineseChessBoardPieceToReadableMap(
-                                            obj
-                                        ),
-                                        ChineseChessPiece.CANNON
-                                    )
-                                )
-                                else -> newGameState
-                            }
+                            )
                         }
                     }
                 }
 
+                // Kiểm tra xem vua có bị chiếu không
                 val king = newGameState.find { innerArray ->
                     innerArray.find { obj ->
                         obj.piece == ChineseChessPiece.KING && obj.pieceColor == pieceColor && obj.isMoveValid
@@ -773,9 +717,63 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
                     isCheck = true
                 }
 
-                promise.resolve(isCheck);
+                promise.resolve(isCheck)
             } catch (e: Exception) {
-                promise.resolve(false);
+                promise.resolve(false)
+            }
+        }
+    }
+
+    //Check if current player win by provide opponent pieceColor. Ý tưởng là nếu chỉ cần đối phương còn đi đuược ÍT NHẤT 1 NƯỚC thì chúng ta chưa Win
+    @ReactMethod
+    fun checkPlayerWinner(
+        gameStateArray: ReadableArray,
+        pieceColor: String,
+        promise: Promise
+    ) {
+        CoroutineScope(Dispatchers.Default).launch {
+            try {
+                val gameState = ChineseChessUtils.parseGameStateArray(gameStateArray)
+
+                // Chuyển đổi trạng thái game state một lần để tái sử dụng
+                val readableGameState = ChineseChessUtils.convertGameStateToReadableArray(gameState)
+
+                for (row in gameState) {
+                    for (piece in row) {
+                        if (piece.piece != ChineseChessPiece.EMPTY && piece.pieceColor == pieceColor) {
+                            val pieceMap =
+                                ChineseChessUtils.convertChineseChessBoardPieceToReadableMap(piece)
+
+                            // Dùng map để gọi callBackCheckMove tránh lặp code
+                            val newState = when (val pieceType = piece.piece) {
+                                in setOf(
+                                    ChineseChessPiece.PAWN,
+                                    ChineseChessPiece.ROOK,
+                                    ChineseChessPiece.KNIGHT,
+                                    ChineseChessPiece.BISHOP,
+                                    ChineseChessPiece.ADVISOR,
+                                    ChineseChessPiece.CANNON,
+                                    ChineseChessPiece.KING
+                                ) -> ChineseChessUtils.parseGameStateArray(
+                                    callBackCheckMove(readableGameState, pieceMap, pieceType)
+                                )
+
+                                else -> gameState
+                            }
+
+                            // Kiểm tra nước đi hợp lệ và thêm vào danh sách
+                            val potentialMoves = checkValidMove(newState, piece)
+                            if (potentialMoves.isNotEmpty()) {
+                                promise.resolve(false)  // Đối thủ có nước đi => chưa thắng
+                                return@launch  // Thoát khỏi coroutine luôn
+                            }
+                        }
+                    }
+                }
+
+                promise.resolve(true)
+            } catch (e: Exception) {
+                promise.resolve(false)
             }
         }
     }
@@ -787,115 +785,44 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
         pieceColor: String,
         promise: Promise
     ) {
-        CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.Default).launch {
             try {
-                val gameState = ChineseChessUtils.parseGameStateArray(gameStateArray);
-                val newGameState = gameState.map { it.copyOf() }.toTypedArray()
-                val potentialMoves: ArrayList<PotentialMovePiece> = ArrayList()
+                val gameState = ChineseChessUtils.parseGameStateArray(gameStateArray)
 
-                newGameState.forEach { innerArray ->
-                    innerArray.forEach { obj ->
-                        obj.isMoveValid = false
-                    }
-                }
+                // Sử dụng một danh sách để chứa các nước đi hợp lệ
+                val potentialMoves = mutableListOf<PotentialMovePiece>()
 
-                newGameState.forEachIndexed { _, innerArray ->
-                    innerArray.forEachIndexed { _, obj ->
-                        if (obj.piece != ChineseChessPiece.EMPTY && obj.pieceColor == pieceColor) {
-                            var tempState = newGameState.map { it.copyOf() }.toTypedArray()
-                            tempState.forEach { innerArray1 ->
-                                innerArray1.forEach { obj1 ->
-                                    obj1.isMoveValid = false
-                                }
+                // Duyệt tất cả các quân cờ của người chơi
+                gameState.forEach { row -> row.forEach { it.isMoveValid = false } }
+
+                // Chuyển đổi trạng thái game state một lần để tái sử dụng
+                val readableGameState = ChineseChessUtils.convertGameStateToReadableArray(gameState)
+
+                gameState.forEach { row ->
+                    row.forEach { piece ->
+                        if (piece.piece != ChineseChessPiece.EMPTY && piece.pieceColor == pieceColor) {
+                            val pieceMap =
+                                ChineseChessUtils.convertChineseChessBoardPieceToReadableMap(piece)
+
+                            // Dùng map để gọi callBackCheckMove tránh lặp code
+                            val newState = when (val pieceType = piece.piece) {
+                                in setOf(
+                                    ChineseChessPiece.PAWN,
+                                    ChineseChessPiece.ROOK,
+                                    ChineseChessPiece.KNIGHT,
+                                    ChineseChessPiece.BISHOP,
+                                    ChineseChessPiece.ADVISOR,
+                                    ChineseChessPiece.CANNON,
+                                    ChineseChessPiece.KING
+                                ) -> ChineseChessUtils.parseGameStateArray(
+                                    callBackCheckMove(readableGameState, pieceMap, pieceType)
+                                )
+
+                                else -> gameState
                             }
 
-                            tempState = when(obj.piece) {
-                                ChineseChessPiece.PAWN -> ChineseChessUtils.parseGameStateArray(
-                                    callBackCheckMove(
-                                        ChineseChessUtils.convertGameStateToReadableArray(
-                                            newGameState
-                                        ),
-                                        ChineseChessUtils.convertChineseChessBoardPieceToReadableMap(
-                                            obj
-                                        ),
-                                        ChineseChessPiece.PAWN
-                                    )
-                                )
-                                ChineseChessPiece.ROOK -> ChineseChessUtils.parseGameStateArray(
-                                    callBackCheckMove(
-                                        ChineseChessUtils.convertGameStateToReadableArray(
-                                            newGameState
-                                        ),
-                                        ChineseChessUtils.convertChineseChessBoardPieceToReadableMap(
-                                            obj
-                                        ),
-                                        ChineseChessPiece.ROOK
-                                    )
-                                )
-                                ChineseChessPiece.KNIGHT -> ChineseChessUtils.parseGameStateArray(
-                                    callBackCheckMove(
-                                        ChineseChessUtils.convertGameStateToReadableArray(
-                                            newGameState
-                                        ),
-                                        ChineseChessUtils.convertChineseChessBoardPieceToReadableMap(
-                                            obj
-                                        ),
-                                        ChineseChessPiece.KNIGHT
-                                    )
-                                )
-                                ChineseChessPiece.BISHOP -> ChineseChessUtils.parseGameStateArray(
-                                    callBackCheckMove(
-                                        ChineseChessUtils.convertGameStateToReadableArray(
-                                            newGameState
-                                        ),
-                                        ChineseChessUtils.convertChineseChessBoardPieceToReadableMap(
-                                            obj
-                                        ),
-                                        ChineseChessPiece.BISHOP
-                                    )
-                                )
-                                ChineseChessPiece.ADVISOR -> ChineseChessUtils.parseGameStateArray(
-                                    callBackCheckMove(
-                                        ChineseChessUtils.convertGameStateToReadableArray(
-                                            newGameState
-                                        ),
-                                        ChineseChessUtils.convertChineseChessBoardPieceToReadableMap(
-                                            obj
-                                        ),
-                                        ChineseChessPiece.ADVISOR
-                                    )
-                                )
-                                ChineseChessPiece.CANNON -> ChineseChessUtils.parseGameStateArray(
-                                    callBackCheckMove(
-                                        ChineseChessUtils.convertGameStateToReadableArray(
-                                            newGameState
-                                        ),
-                                        ChineseChessUtils.convertChineseChessBoardPieceToReadableMap(
-                                            obj
-                                        ),
-                                        ChineseChessPiece.CANNON
-                                    )
-                                )
-                                ChineseChessPiece.KING -> ChineseChessUtils.parseGameStateArray(
-                                    callBackCheckMove(
-                                        ChineseChessUtils.convertGameStateToReadableArray(
-                                            newGameState
-                                        ),
-                                        ChineseChessUtils.convertChineseChessBoardPieceToReadableMap(
-                                            obj
-                                        ),
-                                        ChineseChessPiece.KING
-                                    )
-                                )
-                                else -> tempState
-                            }
-
-                            val res = checkValidMove(tempState, obj)
-                            if (res.isNotEmpty()) {
-                                res.forEach { move ->
-                                    potentialMoves.add(move)
-                                }
-                            }
+                            // Kiểm tra nước đi hợp lệ và thêm vào danh sách
+                            potentialMoves += checkValidMove(newState, piece)
                         }
                     }
                 }
@@ -904,9 +831,61 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
                     ChineseChessUtils.convertPotentialMovesToReadableArray(
                         potentialMoves
                     )
-                );
+                )
             } catch (e: Exception) {
-                promise.resolve(arrayListOf<WritableArray>());
+                promise.resolve(arrayListOf<WritableArray>())
+            }
+        }
+    }
+
+    // Find and return potential moves for current piece
+    @ReactMethod
+    fun checkPotentialMovesForCurrPiece(
+        gameStateArray: ReadableArray,
+        pieceMap: ReadableMap,
+        promise: Promise
+    ) {
+        CoroutineScope(Dispatchers.Default).launch {
+            try {
+                val gameState = ChineseChessUtils.parseGameStateArray(gameStateArray)
+                val piece = ChineseChessUtils.parseBoardPieceMap(pieceMap)
+
+                // Sử dụng một danh sách để chứa các nước đi hợp lệ
+                val potentialMoves = mutableListOf<PotentialMovePiece>()
+
+                // Duyệt tất cả các quân cờ của người chơi
+                gameState.forEach { row -> row.forEach { it.isMoveValid = false } }
+
+                // Chuyển đổi trạng thái game state một lần để tái sử dụng
+                val readableGameState = ChineseChessUtils.convertGameStateToReadableArray(gameState)
+
+                // Dùng map để gọi callBackCheckMove tránh lặp code
+                val newState = when (val pieceType = piece.piece) {
+                    in setOf(
+                        ChineseChessPiece.PAWN,
+                        ChineseChessPiece.ROOK,
+                        ChineseChessPiece.KNIGHT,
+                        ChineseChessPiece.BISHOP,
+                        ChineseChessPiece.ADVISOR,
+                        ChineseChessPiece.CANNON,
+                        ChineseChessPiece.KING
+                    ) -> ChineseChessUtils.parseGameStateArray(
+                        callBackCheckMove(readableGameState, pieceMap, pieceType)
+                    )
+
+                    else -> gameState
+                }
+
+                // Kiểm tra nước đi hợp lệ và thêm vào danh sách
+                potentialMoves += checkValidMove(newState, piece)
+
+                promise.resolve(
+                    ChineseChessUtils.convertPotentialMovesToReadableArray(
+                        potentialMoves
+                    )
+                )
+            } catch (e: Exception) {
+                promise.resolve(arrayListOf<WritableArray>())
             }
         }
     }
@@ -916,44 +895,41 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
         gameState: Array<Array<ChineseChessBoardPiece>>,
         chessPiece: ChineseChessBoardPiece
     ): List<PotentialMovePiece> {
-        val newGameState = gameState.map { row ->
-            row.map { square -> square.copy() }.toTypedArray()
-        }.toTypedArray()
-
         val potentialMoves = mutableListOf<PotentialMovePiece>()
 
-        newGameState.forEach { rowArray ->
-            rowArray.forEachIndexed() { index, square ->
+        for (row in gameState) {
+            for (square in row) {
                 if (square.isMoveValid && square.pieceColor != chessPiece.pieceColor) {
-                    val (_, _, row, column) = square
-                    val temp = newGameState.map { r ->
-                        r.map { sq -> sq.copy() }.toTypedArray()
-                    }.toTypedArray()
+                    val targetRow = square.row
+                    val targetColumn = square.column
 
-                    temp[chessPiece.row][chessPiece.column].piece = ChineseChessPiece.EMPTY
-                    temp[chessPiece.row][chessPiece.column].pieceColor = ""
-                    temp[chessPiece.row][chessPiece.column].isMoveValid = false
+                    // Thay đổi trực tiếp trên bản sao duy nhất
+                    val tempState = gameState.map { it.copyOf() }.toTypedArray()
+                    val pieceCopy = chessPiece.copy()
 
-                    temp[row][column].piece = chessPiece.piece
-                    temp[row][column].pieceColor = chessPiece.pieceColor
-                    temp[row][column].isMoveValid = false
+                    // Xóa quân cờ khỏi vị trí cũ
+                    tempState[chessPiece.row][chessPiece.column] = chessPiece.copy(
+                        piece = ChineseChessPiece.EMPTY,
+                        pieceColor = "",
+                        isMoveValid = false
+                    )
 
-                    val res = callBackIsInCheck(temp, chessPiece.pieceColor)
+                    // Đặt quân cờ vào vị trí mới
+                    tempState[targetRow][targetColumn] = pieceCopy.copy(
+                        row = targetRow,
+                        column = targetColumn,
+                        isMoveValid = false
+                    )
 
-                    if (!res) {
-                        val potentialMove = ChineseChessBoardPiece(
-                            piece = chessPiece.piece,
-                            pieceColor = chessPiece.pieceColor,
-                            row = square.row,
-                            column = square.column,
-                            isMoveValid = false
+                    // Kiểm tra nước đi có chặn chiếu không
+                    if (!callBackIsInCheck(tempState, chessPiece.pieceColor)) {
+                        potentialMoves.add(
+                            PotentialMovePiece(
+                                tempState[targetRow][targetColumn],
+                                pieceCopy
+                            )
                         )
-                        potentialMoves.add(PotentialMovePiece(potentialMove, chessPiece))
                     }
-
-                    temp[row][column].piece = square.piece
-                    temp[row][column].pieceColor = square.pieceColor
-                    temp[row][column].isMoveValid = square.isMoveValid
                 }
             }
         }
@@ -970,35 +946,35 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
         pieceColor: String
     ): Boolean {
         try {
-            var isFaceToFace = false;
+            var isFaceToFace = false
 
             if (pieceColor == "black") { //Nếu là black thì quét từ dưới lên để tối ưu hiệu suất (ít vòng lặp)
                 for (i in curKingRow + 1..9) {
-                    val blockSquare = gameState[i][curKingCol];
+                    val blockSquare = gameState[i][curKingCol]
                     if (blockSquare.pieceColor != pieceColor && blockSquare.piece == ChineseChessPiece.KING) {
-                        isFaceToFace = true;
-                        break;
+                        isFaceToFace = true
+                        break
                     } else if (blockSquare.pieceColor != "" && blockSquare.piece != ChineseChessPiece.KING) {
-                        isFaceToFace = false;
-                        break;
+                        isFaceToFace = false
+                        break
                     }
                 }
             } else { //Nếu là red thì quét từ trên xuống để tối ưu hiệu suất (ít vòng lặp)
                 for (i in 9 downTo curKingRow) {
-                    val blockSquare = gameState[i][curKingCol];
+                    val blockSquare = gameState[i][curKingCol]
                     if (blockSquare.pieceColor != pieceColor && blockSquare.piece == ChineseChessPiece.KING) {
-                        isFaceToFace = true;
-                        break;
+                        isFaceToFace = true
+                        break
                     } else if (blockSquare.pieceColor != "" && blockSquare.piece != ChineseChessPiece.KING) {
-                        isFaceToFace = false;
-                        break;
+                        isFaceToFace = false
+                        break
                     }
                 }
             }
 
-            return isFaceToFace;
+            return isFaceToFace
         } catch (e: Exception) {
-            return false;
+            return false
         }
     }
 
@@ -1016,11 +992,11 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
             val tempGameState = gameState.map { it.copyOf() }.toTypedArray()
 
             //Xóa quân cờ ở vị trí hiện tại
-            tempGameState[currentPiece.row][currentPiece.column].isMoveValid = false;
-            tempGameState[currentPiece.row][currentPiece.column].piece = ChineseChessPiece.EMPTY;
-            tempGameState[currentPiece.row][currentPiece.column].pieceColor = "";
-            tempGameState[currentPiece.row][currentPiece.column].row = currentPiece.row;
-            tempGameState[currentPiece.row][currentPiece.column].column = currentPiece.column;
+            tempGameState[currentPiece.row][currentPiece.column].isMoveValid = false
+            tempGameState[currentPiece.row][currentPiece.column].piece = ChineseChessPiece.EMPTY
+            tempGameState[currentPiece.row][currentPiece.column].pieceColor = ""
+            tempGameState[currentPiece.row][currentPiece.column].row = currentPiece.row
+            tempGameState[currentPiece.row][currentPiece.column].column = currentPiece.column
 
             //Đi quân cờ vào vị trí mới
             if (tempGameState[newRow][newCol].piece == ChineseChessPiece.EMPTY ||
@@ -1028,18 +1004,18 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
             ) { // Nếu chỗ đó có quân mình thì nhả về false luôn
 
                 tempGameState[newRow][newCol].isMoveValid =
-                    false; //Lưu ý là false vì kiểu bưng sang đó để chứ ko di chuyển sang đó, thì mới áp dụng isInCheck được
-                tempGameState[newRow][newCol].piece = currentPiece.piece;
-                tempGameState[newRow][newCol].pieceColor = currentPiece.pieceColor;
-                tempGameState[newRow][newCol].row = newRow;
-                tempGameState[newRow][newCol].column = newCol;
+                    false //Lưu ý là false vì kiểu bưng sang đó để chứ ko di chuyển sang đó, thì mới áp dụng isInCheck được
+                tempGameState[newRow][newCol].piece = currentPiece.piece
+                tempGameState[newRow][newCol].pieceColor = currentPiece.pieceColor
+                tempGameState[newRow][newCol].row = newRow
+                tempGameState[newRow][newCol].column = newCol
 
-                return callBackIsInCheck(tempGameState, currentPiece.pieceColor);
+                return callBackIsInCheck(tempGameState, currentPiece.pieceColor)
             } else {
                 return false
             }
         } catch (e: Exception) {
-            return false;
+            return false
         }
     }
 
@@ -1048,13 +1024,13 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
         pieceColor: String
     ): Boolean {
         val convertTempGameState =
-            ChineseChessUtils.convertGameStateToReadableArray(gameState);
+            ChineseChessUtils.convertGameStateToReadableArray(gameState)
         return awaitPromise { promise: Promise ->
             isInCheck(
                 convertTempGameState,
                 pieceColor,
                 promise
-            );
+            )
         }
     }
 
