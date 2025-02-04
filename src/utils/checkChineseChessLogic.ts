@@ -823,6 +823,64 @@ export const isInCheck = async (gameState: ChineseChessBoardPiece[][], pieceColo
     return isCheck;
 }
 
+//Check if current player win by provide opponent pieceColor. Ý tưởng là nếu chỉ cần đối phương còn đi đuược ÍT NHẤT 1 NƯỚC thì chúng ta chưa Win
+export const checkPlayerWinner = async (
+    gameState: ChineseChessBoardPiece[][],
+    pieceColor: string
+): Promise<boolean> => {
+    let newGameState: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(gameState));
+
+    // Reset isMoveValid cho tất cả quân cờ
+    for (const row of newGameState) {
+        for (const piece of row) {
+            piece.isMoveValid = false;
+        }
+    }
+
+    for (const row of newGameState) {
+        for (const piece of row) {
+            if (piece.piece !== "" && piece.pieceColor === pieceColor) {
+                let tempState: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(newGameState));
+
+                // Kiểm tra loại quân cờ để gọi hàm tương ứng
+                switch (piece.piece) {
+                    case "pawn":
+                        tempState = await checkPawnMove(tempState, piece);
+                        break;
+                    case "rook":
+                        tempState = await checkRookMove(tempState, piece);
+                        break;
+                    case "knight":
+                        tempState = await checkKnightMove(tempState, piece);
+                        break;
+                    case "bishop":
+                        tempState = await checkBishopMove(tempState, piece);
+                        break;
+                    case "advisor":
+                        tempState = await checkAdvisorMove(tempState, piece);
+                        break;
+                    case "cannon":
+                        tempState = await checkCannonMove(tempState, piece);
+                        break;
+                    case "king":
+                        tempState = await checkKingMove(tempState, piece);
+                        break;
+                    default:
+                        break;
+                }
+
+                // Kiểm tra nước đi hợp lệ
+                const res = await checkValidMove(tempState, piece);
+                if (res.length > 0) {
+                    return false; // Đối thủ có nước đi => chưa thắng
+                }
+            }
+        }
+    }
+
+    return true; // Không có nước đi hợp lệ nào, đối thủ bị chiếu bí
+};
+
 // Find and return potential moves to block the check
 export const checkPotentialBlockMoves = async (gameState: ChineseChessBoardPiece[][], pieceColor: string) => {
     let newGameState = [...gameState]
@@ -881,6 +939,53 @@ export const checkPotentialBlockMoves = async (gameState: ChineseChessBoardPiece
                     }
                 }))
         }))
+
+    return potentialMoves
+}
+
+// Find and return potential moves for current piece
+export const checkPotentialMovesForCurrPiece = async (gameState: ChineseChessBoardPiece[][], piece: ChineseChessBoardPiece) => {
+    let newGameState: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(gameState));
+    let potentialMoves: PotentialMovePiece[] = []
+
+    newGameState.map((innerArray) => {
+        innerArray.map((obj) => {
+            obj.isMoveValid = false
+        })
+    })
+
+    switch (piece.piece) {
+        case 'pawn':
+            newGameState = await checkPawnMove(newGameState, piece)
+            break;
+        case 'rook':
+            newGameState = await checkRookMove(newGameState, piece)
+            break;
+        case 'knight':
+            newGameState = await checkKnightMove(newGameState, piece)
+            break;
+        case 'bishop':
+            newGameState = await checkBishopMove(newGameState, piece)
+            break;
+        case 'advisor':
+            newGameState = await checkAdvisorMove(newGameState, piece)
+            break;
+        case 'cannon':
+            newGameState = await checkCannonMove(newGameState, piece)
+            break;
+        case 'king':
+            newGameState = await checkKingMove(newGameState, piece)
+            break;
+        default:
+            break;
+    }
+
+    const res = await checkValidMove(newGameState, piece);
+    if (res.length !== 0) {
+        res.forEach((move => {
+            potentialMoves.push(move)
+        }))
+    }
 
     return potentialMoves
 }
@@ -1083,32 +1188,7 @@ export const getBestChineseChessMove = async (board: ChineseChessBoardPiece[][],
 
     const availableMoves = await checkPotentialBlockMoves(board, "black")
 
-    //Tìm nước đi phù hợp cho quân đã chọn
-    const filteredMoves = (
-        await Promise.all(
-            availableMoves.map(async (element, index) => {
-                let newGameState2: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(board));
-                newGameState2[element.fromMove.row][element.fromMove.column] = {
-                    piece: "",
-                    pieceColor: "",
-                    row: element.fromMove.row,
-                    column: element.fromMove.column,
-                    isMoveValid: false
-                };
-
-                newGameState2[element.potentialMove.row][element.potentialMove.column] = element.potentialMove;
-
-                const isCheck = await isInCheck(newGameState2, "black");
-                // Trả về nước không bị chiếu
-                if (!isCheck) {
-                    return element; // Phần tử hợp lệ
-                }
-                return undefined; // Loại bỏ phần tử không hợp lệ
-            })
-        )
-    ).filter((el) => el !== undefined); // Loại bỏ undefined ngay sau Promise.all
-
-    for (const move of filteredMoves) {
+    for (const move of availableMoves) {
         const newBoard = simulateMove(board, move);
         const moveScore = await minimax(newBoard, depth - 1, false, -Infinity, Infinity);
 

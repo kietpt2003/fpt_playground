@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, Pressable, Text, Image, NativeModules } from 'react-native';
-import { checkAdvisorMove, checkBishopMove, checkCannonMove, checkKingMove, checkKnightMove, checkPawnMove, checkPotentialBlockMoves, checkRookMove, convertToChessCoordinate, getBestChineseChessMove, isInCheck, updateNewGameState } from '../utils/checkChineseChessLogic';
+import { checkPlayerWinner, checkPotentialMovesForCurrPiece, getBestChineseChessMove, isInCheck, updateNewGameState } from '../utils/checkChineseChessLogic';
 import { ScreenHeight, ScreenWidth } from '@rneui/base';
-import { ChineseChessBoardPiece, chineseChessRowSize, PotentialMovePiece } from '../screens/types/chineseChessTypes';
+import { ChineseChessBoardPiece, ChineseChessPiece as ChineseChessPieceType, chineseChessRowSize, PotentialMovePiece } from '../screens/types/chineseChessTypes';
 import { Xiangqi } from 'xiangqi.js';
 import ChineseChessSquare from './ChineseChessSquare';
 import ChineseChessPiece from './ChineseChessPiece';
@@ -18,6 +18,9 @@ import { User } from '../constants/entities/User';
 import { faker } from '@faker-js/faker/.';
 import { formatNumber } from '../utils/formatNumber';
 import { useTranslation } from 'react-i18next';
+import CheckmateText from './CheckmateText';
+import CheckmateEnd from './CheckmateEnd';
+import { Audio, AVPlaybackSource } from 'expo-av';
 
 const { ChineseChessLogical } = NativeModules;
 
@@ -184,6 +187,141 @@ const ChineseChessBoard = () => {
 
     const [game, setGame] = useState(new Xiangqi());
 
+    const selectSfxRef = useRef<Audio.Sound | null>(null);
+    const makeMoveSfxRef = useRef<Audio.Sound | null>(null);
+    const winnerSfxRef = useRef<Audio.Sound | null>(null);
+    const AISfxRef = useRef<Audio.Sound | null>(null);
+
+    const selectSfx = async (piece: ChineseChessPieceType, pieceColor: string) => {
+        if (selectSfxRef.current) {
+            await selectSfxRef.current.unloadAsync(); // Dừng bài hát hiện tại
+        }
+
+        if (piece != "" && pieceColor == "red") {
+            let sfx: AVPlaybackSource | undefined;
+            switch (piece) {
+                case "advisor":
+                    sfx = require("../../assets/audios/chinese_chess/advisor/advisorSelect.mp3")
+                    break;
+                case "bishop":
+                    sfx = require("../../assets/audios/chinese_chess/bishop/bishopSelect.mp3")
+                    break;
+                case "cannon":
+                    sfx = require("../../assets/audios/chinese_chess/cannon/cannonSelect.mp3")
+                    break;
+                case "king":
+                    sfx = require("../../assets/audios/chinese_chess/king/kingSelect.mp3")
+                    break;
+                case "knight":
+                    sfx = require("../../assets/audios/chinese_chess/knight/knightSelect.mp3")
+                    break;
+                case "pawn":
+                    sfx = require("../../assets/audios/chinese_chess/pawn/pawnSelect.mp3")
+                    break;
+                case "rook":
+                    sfx = require("../../assets/audios/chinese_chess/rook/rookSelect.mp3")
+                    break;
+                default:
+                    break;
+            }
+            if (sfx != undefined) {
+                const { sound } = await Audio.Sound.createAsync(sfx, {
+                    shouldPlay: true,
+                    isLooping: false,
+                });
+                selectSfxRef.current = sound;
+            }
+        }
+    };
+
+    const makeMoveSfx = async (piece: ChineseChessPieceType, pieceColor: string, newPosPiece: ChineseChessPieceType) => {
+        if (makeMoveSfxRef.current) {
+            await makeMoveSfxRef.current.unloadAsync(); // Dừng bài hát hiện tại
+        }
+
+        if (piece != "" && pieceColor == "red" && newPosPiece == "") {
+            let sfx: AVPlaybackSource | undefined;
+            switch (piece) {
+                case "advisor":
+                    sfx = require("../../assets/audios/chinese_chess/advisor/advisorMakeMove.mp3")
+                    break;
+                case "bishop":
+                    sfx = require("../../assets/audios/chinese_chess/bishop/bishopMakeMove.mp3")
+                    break;
+                case "king":
+                    sfx = require("../../assets/audios/chinese_chess/king/kingMakeMove.mp3")
+                    break;
+                case "knight":
+                    sfx = require("../../assets/audios/chinese_chess/knight/knightMakeMove.mp3")
+                    break;
+                case "pawn":
+                    sfx = require("../../assets/audios/chinese_chess/pawn/pawnMakeMove.mp3")
+                    break;
+                case "rook":
+                    sfx = require("../../assets/audios/chinese_chess/rook/rookMakeMove.mp3")
+                    break;
+                case "cannon":
+                    sfx = require("../../assets/audios/chinese_chess/chinese-chess-move-explosion.mp3")
+                    break;
+                default:
+                    break;
+            }
+            if (sfx != undefined) {
+                const { sound } = await Audio.Sound.createAsync(sfx, {
+                    shouldPlay: true,
+                    isLooping: false,
+                });
+                makeMoveSfxRef.current = sound;
+            }
+        }
+
+        if (piece != "" && pieceColor == "red" && newPosPiece != "") {
+            let sfx: AVPlaybackSource | undefined;
+            switch (piece) {
+                case "cannon":
+                    sfx = require("../../assets/audios/chinese_chess/cannon/cannonMakeMove.mp3")
+                    break;
+                case "advisor":
+                case "bishop":
+                case "king":
+                case "pawn":
+                case "knight":
+                case "rook":
+                    sfx = require("../../assets/audios/chinese_chess/chinese-chess-move-explosion.mp3")
+                    break;
+                default:
+                    break;
+            }
+            if (sfx != undefined) {
+                const { sound } = await Audio.Sound.createAsync(sfx, {
+                    shouldPlay: true,
+                    isLooping: false,
+                });
+                makeMoveSfxRef.current = sound;
+            }
+        }
+    };
+
+    const AIMakeMoveSfx = async (piece: ChineseChessPieceType) => {
+        if (AISfxRef.current) {
+            await AISfxRef.current.unloadAsync(); // Dừng bài hát hiện tại
+        }
+
+        let sfx: AVPlaybackSource | undefined;
+        if (piece == "") {
+            sfx = require("../../assets/audios/chinese_chess/chinese-chess-move-explosion.mp3")
+        } else {
+            sfx = require("../../assets/audios/chinese_chess/man-down.mp3")
+        }
+        if (sfx != undefined) {
+            const { sound } = await Audio.Sound.createAsync(sfx, {
+                shouldPlay: true,
+                isLooping: false,
+            });
+            AISfxRef.current = sound;
+        }
+    };
+
     const handleChessMove = (from: string, to: string) => {
         const move = game.move({ from: from, to: to }); // Kiểm tra nước đi
         if (move) {
@@ -194,9 +332,9 @@ const ChineseChessBoard = () => {
     // Checks if the king is in check or not
     const checkKingState = async () => {
         if (player === "red") {
-            setBlackIsCheck(await ChineseChessLogical.isInCheck(gameState, "black"));
+            setBlackIsCheck(await isInCheck(gameState, "black"));
         } else {
-            setRedIsCheck(await ChineseChessLogical.isInCheck(gameState, "red"));
+            setRedIsCheck(await isInCheck(gameState, "red"));
         }
     }
 
@@ -207,11 +345,12 @@ const ChineseChessBoard = () => {
             return
         }
 
+        await selectSfx(piece, pieceColor);
 
         let newGameState2: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(newGameState));
         console.log("Start check potential");
 
-        const availableMoves = await ChineseChessLogical.checkPotentialMovesForCurrPiece(newGameState2, { piece, pieceColor, row, column, isMoveValid })
+        const availableMoves = await checkPotentialMovesForCurrPiece(newGameState2, { piece, pieceColor, row, column, isMoveValid })
         console.log("End check potential");
 
         setAvailableForSelected(availableMoves);
@@ -276,6 +415,8 @@ const ChineseChessBoard = () => {
         await checkKingState();
         console.log("End check king state");
 
+        await makeMoveSfx(selectedPiece.piece, selectedPiece.pieceColor, piece);
+
         newGameState.map((innerArray) => {
             innerArray.map((obj) => {
                 newGameState[obj.row][obj.column].isMoveValid = false
@@ -303,10 +444,21 @@ const ChineseChessBoard = () => {
 
     // Check if the game is over or not
     const checkIsWinner = async () => {
-        const isWinner = await ChineseChessLogical.checkPlayerWinner(gameState, player === "red" ? "black" : "red")
+        const isWinner = await checkPlayerWinner(gameState, player === "red" ? "black" : "red")
 
         if (isWinner) {
+            if (winnerSfxRef.current) {
+                await winnerSfxRef.current.unloadAsync();
+            }
+            const { sound } = await Audio.Sound.createAsync(
+                require("../../assets/audios/chinese_chess/tada-fanfare.mp3"),
+                {
+                    shouldPlay: true,
+                    isLooping: false,
+                    volume: 0.7
+                });
             setIsWinner(`Player ${player === 'red' ? 'Red' : 'Black'} has won the game`)
+            winnerSfxRef.current = sound;
         }
     }
 
@@ -341,36 +493,37 @@ const ChineseChessBoard = () => {
             // Chuyển đổi WritableArray thành mảng đơn giản
             // Tạo đối tượng quân cờ
 
-            // runOnJS(async () => {
-            //     let newGameState: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(gameState));
-            //     if (player === "black") { //Nếu là lượt của đen (AI) thì mới được đi
-            //         const aiMove = await getBestChineseChessMove(newGameState, 3);
+            // let newGameState: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(gameState));
+            // if (player === "black") { //Nếu là lượt của đen (AI) thì mới được đi
+            //     const aiMove = await getBestChineseChessMove(newGameState, 3);
 
-            //         console.log("ai", aiMove);
+            //     console.log("ai", aiMove);
 
 
-            //         if (aiMove) {
-            //             let newGameState2: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(gameState));
-            //             newGameState2[aiMove.fromMove.row][aiMove.fromMove.column] = {
-            //                 row: aiMove.fromMove.row,
-            //                 column: aiMove.fromMove.column,
-            //                 piece: "",
-            //                 pieceColor: "",
-            //                 isMoveValid: false,
-            //             };
+            //     if (aiMove) {
+            //         let newGameState2: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(gameState));
+            //         newGameState2[aiMove.fromMove.row][aiMove.fromMove.column] = {
+            //             row: aiMove.fromMove.row,
+            //             column: aiMove.fromMove.column,
+            //             piece: "",
+            //             pieceColor: "",
+            //             isMoveValid: false,
+            //         };
 
-            //             newGameState2[aiMove.potentialMove.row][aiMove.potentialMove.column] = {
-            //                 piece: aiMove.potentialMove.piece,
-            //                 pieceColor: aiMove.potentialMove.pieceColor,
-            //                 isMoveValid: false,
-            //                 row: aiMove.potentialMove.row,
-            //                 column: aiMove.potentialMove.column
-            //             };
-            //             setGameState(newGameState2);
-            //             setPlayer("red");
-            //         }
+            //         newGameState2[aiMove.potentialMove.row][aiMove.potentialMove.column] = {
+            //             piece: aiMove.potentialMove.piece,
+            //             pieceColor: aiMove.potentialMove.pieceColor,
+            //             isMoveValid: false,
+            //             row: aiMove.potentialMove.row,
+            //             column: aiMove.potentialMove.column
+            //         };
+            //         await AIMakeMoveSfx(gameState[aiMove.potentialMove.row][aiMove.potentialMove.column].piece);
+            //         setGameState(newGameState2);
+            //         setPlayer("red");
+            //     } else {
+            //         setIsWinner("Player Red has won the game")
             //     }
-            // })
+            // }
         }
 
         handleAIMove();
@@ -689,6 +842,19 @@ const ChineseChessBoard = () => {
                         }}>{isWinner}</Text>
                     }
                 </View>
+                {
+                    ((redIsCheck || blackIsCheck) && isWinner === "") &&
+                    <CheckmateText onComplete={() => {
+                        setBlackIsCheck(false);
+                        setRedIsCheck(false);
+                    }} />
+                }
+                {
+                    isWinner != "" &&
+                    <CheckmateEnd onComplete={() => {
+
+                    }} />
+                }
             </View>
         </SafeAreaView>
     );

@@ -51,6 +51,7 @@ export default function App() {
         RobotoSemiBold: require('./assets/fonts/Roboto-SemiBold.ttf'),
         RobotoMedium: require('./assets/fonts/Roboto-Medium.ttf'),
         RobotoLight: require('./assets/fonts/Roboto-Light.ttf'),
+        DLThuPhap: require('./assets/fonts/DL-ThuPhap.otf'),
       });
     }
     loadFonts();
