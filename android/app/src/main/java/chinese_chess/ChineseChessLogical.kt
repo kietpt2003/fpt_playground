@@ -1,5 +1,6 @@
 package chinese_chess
 
+import android.util.Log
 import chinese_chess.entities.ChineseChessBoardPiece
 import chinese_chess.entities.ChineseChessPiece
 import chinese_chess.entities.PotentialMovePiece
@@ -890,6 +891,249 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
         }
     }
 
+    @ReactMethod
+    fun getBestChineseChessMove(boardArray: ReadableArray, depth: Int, promise: Promise) {
+        CoroutineScope(Dispatchers.Default).launch {
+            try {
+                val board = ChineseChessUtils.parseGameStateArray(boardArray)
+                var bestMove: PotentialMovePiece? = null
+                var bestScore = Int.MIN_VALUE
+                Log.e("Kiet", "check potential")
+
+                bestMove = iterativeDeepeningMinimax(board, depth, 10000)
+//                val availableMovesWritableArray =
+//                    callBackCheckPotentialBlockMoves(board, "black")
+//                val availableMoves = ChineseChessUtils.parsePotentialMovesArray(availableMovesWritableArray)
+//
+//                for (move in availableMoves) {
+//                    try {
+//                        val newBoard = simulateMove(board, move)
+//                        Log.e("Kiet", "mini")
+//                        val moveScore =
+//                            minimax(newBoard, depth - 1, false, Int.MIN_VALUE, Int.MAX_VALUE)
+//
+//                        if (moveScore > bestScore) {
+//                            bestScore = moveScore
+//                            bestMove = move
+//                        }
+//                    } catch (e:Exception) {
+//                        promise.reject("ERROR_GETTING_MINI", "Failed to minimax", e)
+//                    }
+//                }
+
+                if (bestMove != null) {
+                    Log.e("Kiet", "co bestMove")
+                    promise.resolve(ChineseChessUtils.convertPotentialMoveToWritableMap(bestMove))
+                } else {
+                    Log.e("Kiet", "ko co bestMove")
+                    promise.resolve(null)
+                }
+
+            } catch (e: Exception) {
+                promise.reject("ERROR_GETTING_MOVE", "Failed to get best move", e)
+            }
+        }
+    }
+
+    private suspend fun iterativeDeepeningMinimax(
+        board: Array<Array<ChineseChessBoardPiece>>,
+        maxDepth: Int,
+        maxTime: Long // Giới hạn thời gian tối đa (ms)
+    ): PotentialMovePiece? {
+        var bestMove: PotentialMovePiece? = null
+        val startTime = System.currentTimeMillis() // Thời gian bắt đầu
+
+        // Lặp qua các độ sâu từ 1 đến maxDepth
+        for (depth in 1..maxDepth) {
+            val currentMove = iterativeDeepeningSearch(board, depth)
+
+            // Nếu thời gian đã quá lâu, dừng sớm
+            if (System.currentTimeMillis() - startTime > maxTime) {
+                if (currentMove == null) { //Nếu đã quá 10 giây mà còn chưa tìm được nước đi thì break
+                    break //TH này đã bao gồm chiếu bí rồi
+                } else {
+                    return currentMove.move
+                }
+            }
+
+            if (currentMove != null) {
+                bestMove = currentMove.move
+            }
+        }
+
+        return bestMove
+    }
+
+    private suspend fun iterativeDeepeningSearch(
+        board: Array<Array<ChineseChessBoardPiece>>,
+        depth: Int
+    ): MoveWithScore? {
+        var bestMove: PotentialMovePiece? = null
+        var bestScore = Int.MIN_VALUE
+        val startTime = System.currentTimeMillis() // Thời gian bắt đầu
+
+        // Lấy danh sách các nước đi hợp lệ (có thể sắp xếp các nước đi theo ưu tiên)
+        val availableMovesWritableArray =
+            callBackCheckPotentialBlockMoves(board, "black") // Đoạn này bạn có thể tùy chỉnh
+        val availableMoves = ChineseChessUtils.parsePotentialMovesArray(availableMovesWritableArray)
+
+        // Duyệt qua từng nước đi hợp lệ
+        for (move in availableMoves) {
+            // Tạo bảng cờ mới sau khi di chuyển
+            val newBoard = simulateMove(board, move)
+
+            // Tính điểm cho nước đi này
+            val evalScore = minimax(newBoard, depth - 1, false, Int.MIN_VALUE, Int.MAX_VALUE)
+
+            // Cập nhật nước đi tốt nhất
+            if (evalScore > bestScore) {
+                bestScore = evalScore
+                bestMove = move
+            }
+
+            // Nếu thời gian đã quá lâu, dừng sớm
+            if (System.currentTimeMillis() - startTime > 10000) {
+                return bestMove?.let { MoveWithScore(it, bestScore) }
+            }
+
+            // Nếu đã có một nước đi tốt nhất, có thể dừng sớm tại đây nếu cần
+            if (bestScore >= MAX_SCORE_THRESHOLD) {
+                break
+            }
+        }
+
+        return bestMove?.let { MoveWithScore(it, bestScore) }
+    }
+
+    // Cấu trúc chứa nước đi và điểm đánh giá
+    data class MoveWithScore(val move: PotentialMovePiece, val score: Int)
+
+    private val transpositionTable = mutableMapOf<String, Int>()
+
+    private fun boardToString(board: Array<Array<ChineseChessBoardPiece>>): String {
+        return board.joinToString { row -> row.joinToString { it.piece.name } }
+    }
+
+    private suspend fun minimax(
+        board: Array<Array<ChineseChessBoardPiece>>,
+        depth: Int,
+        isMaximizing: Boolean,
+        alpha: Int,
+        beta: Int
+    ): Int {
+        val boardKey = boardToString(board)
+
+        // Nếu đã tính toán vị trí này trước đó, trả về kết quả ngay
+        transpositionTable[boardKey]?.let { return it }
+
+        if (depth == 0) return evaluateChineseBoard(board)
+
+        val availableMovesWritableArray = callBackCheckPotentialBlockMoves(board, if (isMaximizing) "black" else "red")
+        val availableMoves = ChineseChessUtils.parsePotentialMovesArray(availableMovesWritableArray)
+
+        if (availableMoves.isEmpty()) return evaluateChineseBoard(board)
+
+        val sortedMoves = availableMoves.sortedByDescending { evaluateMoveImpact(board, it) }
+        val limitedMoves = sortedMoves.take(8) // Chỉ xét top 8 nước đi tốt nhất
+
+        var alphaVar = alpha
+        var betaVar = beta
+        var bestEval = if (isMaximizing) Int.MIN_VALUE else Int.MAX_VALUE
+
+        for (move in limitedMoves) {
+            val newBoard = simulateMove(board, move)
+            val evalScore = minimax(newBoard, depth - 1, !isMaximizing, alphaVar, betaVar)
+
+            bestEval = if (isMaximizing) maxOf(bestEval, evalScore) else minOf(bestEval, evalScore)
+            if (isMaximizing) alphaVar = maxOf(alphaVar, evalScore) else betaVar = minOf(betaVar, evalScore)
+            if (betaVar <= alphaVar) break // Alpha-Beta Pruning
+
+        }
+
+        transpositionTable[boardKey] = bestEval // Lưu kết quả vào HashMap
+        return bestEval
+    }
+
+    private fun evaluateMoveImpact(board: Array<Array<ChineseChessBoardPiece>>, move: PotentialMovePiece): Int {
+        val movingPiece = move.fromMove.piece
+        val targetPiece = board[move.potentialMove.row][move.potentialMove.column].piece
+
+        val movingPieceValue = chinesePieceValues[movingPiece] ?: 0
+        val targetPieceValue = chinesePieceValues[targetPiece] ?: 0
+
+        var score = 0
+
+        // 1️⃣ Nếu ăn quân => Cộng điểm
+        if (targetPiece != ChineseChessPiece.EMPTY) {
+            score += targetPieceValue - (movingPieceValue / 10) // Ăn quân quan trọng hơn di chuyển
+        }
+
+        // 2️⃣ Nếu di chuyển đến vị trí quan trọng (giữa bàn cờ) => Cộng điểm
+        val centralPositions = listOf(Pair(4, 4), Pair(5, 4), Pair(4, 5), Pair(5, 5)) // Trung tâm bàn cờ
+        if (Pair(move.potentialMove.row, move.potentialMove.column) in centralPositions) {
+            score += 30
+        }
+
+        // 3️⃣ Nếu di chuyển quân yếu để mở đường cho quân mạnh => Cộng điểm
+        if (movingPiece == ChineseChessPiece.PAWN || movingPiece == ChineseChessPiece.ADVISOR) {
+            score += 10
+        }
+
+        // 4️⃣ Nếu di chuyển tạo cơ hội bắt vua => Cộng điểm lớn
+        if (targetPiece == ChineseChessPiece.KING) {
+            score += 10000
+        }
+
+        return score
+    }
+
+    private val MAX_SCORE_THRESHOLD = 600
+    private val chinesePieceValues = mapOf(
+        ChineseChessPiece.KING to 10000,  // Vua có giá trị cao nhất
+        ChineseChessPiece.ROOK to 500,    // Xe mạnh hơn Mã/Tượng
+        ChineseChessPiece.CANNON to 350,  // Pháo mạnh, có thể bắt quân từ xa
+        ChineseChessPiece.KNIGHT to 300,  // Mã linh hoạt
+        ChineseChessPiece.BISHOP to 250,  // Tượng
+        ChineseChessPiece.ADVISOR to 200, // Sĩ
+        ChineseChessPiece.PAWN to 100     // Tốt có giá trị thấp nhất
+    )
+
+    private fun evaluateChineseBoard(board: Array<Array<ChineseChessBoardPiece>>): Int {
+        var score = 0
+        for (y in board.indices) {
+            for (x in board[y].indices) {
+                val piece = board[y][x]
+                val value = chinesePieceValues[piece.piece] ?: 0
+                score += if (piece.pieceColor == "black") value else -value //AI (quân đen) cố gắng làm tăng điểm, Người chơi (quân đỏ) cố gắng làm giảm điểm
+            }
+        }
+        return score
+    }
+
+    private fun simulateMove(
+        board: Array<Array<ChineseChessBoardPiece>>,
+        move: PotentialMovePiece
+    ): Array<Array<ChineseChessBoardPiece>> {
+        // Clone bảng cờ
+        val newBoard = board.map { row -> row.map { it.copy() }.toTypedArray() }.toTypedArray()
+
+        // Xóa quân cờ ở vị trí cũ
+        newBoard[move.fromMove.row][move.fromMove.column].apply {
+            piece = ChineseChessUtils.stringToChineseChessPiece("")
+            pieceColor = ""
+            isMoveValid = false
+        }
+
+        // Đặt quân cờ vào vị trí mới
+        newBoard[move.potentialMove.row][move.potentialMove.column].apply {
+            piece = move.potentialMove.piece
+            pieceColor = move.potentialMove.pieceColor
+            isMoveValid = false
+        }
+
+        return newBoard
+    }
+
     // Checks if the move can block the check or not
     private suspend fun checkValidMove(
         gameState: Array<Array<ChineseChessBoardPiece>>,
@@ -1027,6 +1271,21 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
             ChineseChessUtils.convertGameStateToReadableArray(gameState)
         return awaitPromise { promise: Promise ->
             isInCheck(
+                convertTempGameState,
+                pieceColor,
+                promise
+            )
+        }
+    }
+
+    private suspend fun callBackCheckPotentialBlockMoves(
+        board: Array<Array<ChineseChessBoardPiece>>,
+        pieceColor: String,
+    ): WritableArray {
+        val convertTempGameState =
+            ChineseChessUtils.convertGameStateToReadableArray(board)
+        return awaitPromise { promise: Promise ->
+            checkPotentialBlockMoves(
                 convertTempGameState,
                 pieceColor,
                 promise

@@ -1121,34 +1121,9 @@ const minimax = async (
 
     const availableMoves = await checkPotentialBlockMoves(board, isMaximizing ? "black" : "red")
 
-    //Tìm nước đi phù hợp cho quân đã chọn
-    const filteredMoves = (
-        await Promise.all(
-            availableMoves.map(async (element, index) => {
-                let newGameState2: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(board));
-                newGameState2[element.fromMove.row][element.fromMove.column] = {
-                    piece: "",
-                    pieceColor: "",
-                    row: element.fromMove.row,
-                    column: element.fromMove.column,
-                    isMoveValid: false
-                };
-
-                newGameState2[element.potentialMove.row][element.potentialMove.column] = element.potentialMove;
-
-                const isCheck = await isInCheck(newGameState2, isMaximizing ? "black" : "red");
-                // Trả về nước không bị chiếu
-                if (!isCheck) {
-                    return element; // Phần tử hợp lệ
-                }
-                return undefined; // Loại bỏ phần tử không hợp lệ
-            })
-        )
-    ).filter((el) => el !== undefined); // Loại bỏ undefined ngay sau Promise.all
-
     if (isMaximizing) {
         let maxEval = -Infinity;
-        for (const move of filteredMoves) {
+        for (const move of availableMoves) {
             const newBoard = simulateMove(board, move);
             const evalScore = await minimax(newBoard, depth - 1, false, alpha, beta);
             maxEval = Math.max(maxEval, evalScore);
@@ -1158,7 +1133,7 @@ const minimax = async (
         return maxEval;
     } else {
         let minEval = Infinity;
-        for (const move of filteredMoves) {
+        for (const move of availableMoves) {
             const newBoard = simulateMove(board, move);
             const evalScore = await minimax(newBoard, depth - 1, true, alpha, beta);
             minEval = Math.min(minEval, evalScore);

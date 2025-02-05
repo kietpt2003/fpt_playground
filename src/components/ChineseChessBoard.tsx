@@ -478,7 +478,7 @@ const ChineseChessBoard = () => {
 
     useEffect(() => {
         // Nếu thời gian còn lại > 0, thiết lập interva4
-        if (timeLeft > 0) {
+        if (timeLeft > 0 && isWinner == "") {
             const interval = setInterval(() => {
                 setTimeLeft((prev) => prev - 1);
             }, 1000); // Cập nhật mỗi giây
@@ -492,38 +492,44 @@ const ChineseChessBoard = () => {
         const handleAIMove = async () => {
             // Chuyển đổi WritableArray thành mảng đơn giản
             // Tạo đối tượng quân cờ
+            try {
 
-            // let newGameState: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(gameState));
-            // if (player === "black") { //Nếu là lượt của đen (AI) thì mới được đi
-            //     const aiMove = await getBestChineseChessMove(newGameState, 3);
+                let newGameState: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(gameState));
+                if (player === "black") { //Nếu là lượt của đen (AI) thì mới được đi
+                    const aiMove = await ChineseChessLogical.getBestChineseChessMove(newGameState, 3);
 
-            //     console.log("ai", aiMove);
+                    console.log("ai", aiMove);
 
 
-            //     if (aiMove) {
-            //         let newGameState2: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(gameState));
-            //         newGameState2[aiMove.fromMove.row][aiMove.fromMove.column] = {
-            //             row: aiMove.fromMove.row,
-            //             column: aiMove.fromMove.column,
-            //             piece: "",
-            //             pieceColor: "",
-            //             isMoveValid: false,
-            //         };
+                    if (aiMove) {
+                        let newGameState2: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(gameState));
+                        newGameState2[aiMove.fromMove.row][aiMove.fromMove.column] = {
+                            row: aiMove.fromMove.row,
+                            column: aiMove.fromMove.column,
+                            piece: "",
+                            pieceColor: "",
+                            isMoveValid: false,
+                        };
 
-            //         newGameState2[aiMove.potentialMove.row][aiMove.potentialMove.column] = {
-            //             piece: aiMove.potentialMove.piece,
-            //             pieceColor: aiMove.potentialMove.pieceColor,
-            //             isMoveValid: false,
-            //             row: aiMove.potentialMove.row,
-            //             column: aiMove.potentialMove.column
-            //         };
-            //         await AIMakeMoveSfx(gameState[aiMove.potentialMove.row][aiMove.potentialMove.column].piece);
-            //         setGameState(newGameState2);
-            //         setPlayer("red");
-            //     } else {
-            //         setIsWinner("Player Red has won the game")
-            //     }
-            // }
+                        newGameState2[aiMove.potentialMove.row][aiMove.potentialMove.column] = {
+                            piece: aiMove.potentialMove.piece,
+                            pieceColor: aiMove.potentialMove.pieceColor,
+                            isMoveValid: false,
+                            row: aiMove.potentialMove.row,
+                            column: aiMove.potentialMove.column
+                        };
+                        await AIMakeMoveSfx(gameState[aiMove.potentialMove.row][aiMove.potentialMove.column].piece);
+                        setGameState(newGameState2);
+                        setPlayer("red");
+                    } else {
+                        setIsWinner("Player Red has won the game")
+                    }
+                    resetTime();
+                }
+            } catch (error) {
+                console.log("loi r", error);
+
+            }
         }
 
         handleAIMove();
@@ -562,7 +568,7 @@ const ChineseChessBoard = () => {
                             }
 
                         }}
-                        disabled={isWinner !== ""}
+                        disabled={isWinner !== "" || player == "black"}
                     >
                         <ChineseChessSquare
                             size={chineseChessRowSize}
