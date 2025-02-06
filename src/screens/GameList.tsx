@@ -156,15 +156,15 @@ export default function GameList() {
                             const inputRange = [
                                 -1,
                                 0,
-                                ITEM_SIZE * index,
-                                ITEM_SIZE * (index + 2)
+                                (ITEM_SIZE + 30) * index,
+                                (ITEM_SIZE + 30) * (index + 2)
                             ]
 
                             const opacityInputRange = [
                                 -1,
                                 0,
-                                ITEM_SIZE * index,
-                                ITEM_SIZE * (index + .5)
+                                (ITEM_SIZE + 30) * index,
+                                (ITEM_SIZE + 30) * (index + .5)
                             ]
 
                             const scale = scrollY.interpolate({

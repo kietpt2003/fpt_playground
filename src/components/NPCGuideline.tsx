@@ -199,10 +199,10 @@ export default function NPCGuideline({ scrollViewRef, onScrolling, setOnScrollin
                     <View style={[
                         npcGuidelineStyleSheet.bottomBlur,
                         {
-                            height: (currentDialogue == 0 || currentDialogue == 1 || currentDialogue == 2 || currentDialogue == 3) ? (ScreenHeight - homeHeaderImageHeight - featureComponentHeight - coveredNumber)
-                                : (currentDialogue == 4 || currentDialogue == 5 || currentDialogue == 6) ? (ScreenHeight - homeHeaderImageHeight - dailyCheckPointHeight - coveredNumber)
-                                    : (currentDialogue == 7 || currentDialogue == 8 || currentDialogue == 9) ? (ScreenHeight - homeHeaderImageHeight - featureComponentHeight - coveredNumber)
-                                        : (ScreenHeight - homeHeaderImageHeight - dailyCheckPointHeight - coveredNumber)
+                            top: (currentDialogue == 0 || currentDialogue == 1 || currentDialogue == 2 || currentDialogue == 3) ? ("59%")
+                                : (currentDialogue == 4 || currentDialogue == 5 || currentDialogue == 6) ? ("61.5%")
+                                    : (currentDialogue == 7 || currentDialogue == 8 || currentDialogue == 9) ? ("57.5%")
+                                        : ("60%"),
                         }
                     ]} />
                 </>

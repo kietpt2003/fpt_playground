@@ -22,7 +22,7 @@ export default function GameFlatListItem({ item, ITEM_SIZE, SPACING, opacity, sc
                 height: ITEM_SIZE,
                 marginBottom: SPACING * 2,
                 marginTop: index == 0 ? SPACING : 0,
-                borderRadius: SPACING
+                borderRadius: SPACING,
             },
             {
                 transform: [{ scale }],
@@ -43,13 +43,16 @@ export default function GameFlatListItem({ item, ITEM_SIZE, SPACING, opacity, sc
             />
             <Image style={gameListStyleSheet.imageContainer} source={item.gameImageUrl} />
             <View style={gameListStyleSheet.gameDescription}>
-                <Text style={gameListStyleSheet.gameName}>{item.gameName}</Text>
+                <Text
+                    style={gameListStyleSheet.gameName}
+                    numberOfLines={1}
+                >{item.gameName}</Text>
                 <Text style={gameListStyleSheet.totalOnline}>{item.totalPeopleOnline}</Text>
             </View>
 
             <AntDesign
                 name="doubleright"
-                size={26}
+                size={ScreenWidth > 350 ? 26 : 20}
                 color={colors.white}
                 style={gameListStyleSheet.gameIcon}
             />

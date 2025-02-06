@@ -36,7 +36,7 @@ const CheckmateEnd = ({ onComplete }: { onComplete: () => void }) => {
                 position: "absolute",
                 alignSelf: "center",
                 zIndex: 2,
-                height: ScreenHeight - statusBarHeight - chineseChessRowSize * 1.5,
+                top: chineseChessRowSize * 4 - 5
             },
             animatedStyle
         ]}>

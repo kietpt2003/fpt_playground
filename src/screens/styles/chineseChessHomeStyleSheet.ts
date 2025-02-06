@@ -6,7 +6,7 @@ import { statusBarHeight } from "../../constants/statusBarHeight";
 const chineseChessHomeStyleSheet = StyleSheet.create({
     backgroundImage: {
         width: ScreenWidth,
-        height: ScreenHeight - statusBarHeight,
+        height: ScreenHeight,
     },
     menuContainer: {
         width: ScreenWidth / 1.2,
@@ -42,7 +42,7 @@ const chineseChessHomeStyleSheet = StyleSheet.create({
         color: "white"
     },
     menuOptionContainer: {
-        width: ScreenHeight / 22 + 20,
+        width: ScreenWidth > 350 ? ScreenHeight / 22 + 20 : (ScreenHeight / 18 + 20),
         position: "absolute",
         top: 50,
         right: 10,
@@ -51,14 +51,15 @@ const chineseChessHomeStyleSheet = StyleSheet.create({
         borderRadius: 10,
         paddingTop: 5,
         gap: 5,
-        overflow: "hidden"
+        overflow: "hidden",
+        zIndex: 2
     },
     menuOptionItemContainer: {
         alignItems: "center"
     },
     menuOptionItemIconContainer: {
-        width: ScreenHeight / 22,
-        height: ScreenHeight / 22,
+        width: ScreenWidth > 350 ? ScreenHeight / 22 : ScreenHeight / 18,
+        height: ScreenWidth > 350 ? ScreenHeight / 22 : ScreenHeight / 18,
         borderRadius: 30,
         justifyContent: "center",
         alignItems: "center",
@@ -78,7 +79,7 @@ const chineseChessHomeStyleSheet = StyleSheet.create({
     },
     menuOptionItemTxt: {
         fontFamily: "Roboto",
-        fontSize: 13,
+        fontSize: 12,
         textAlign: "center",
     },
     menuOptionExpand: {
@@ -105,7 +106,8 @@ const chineseChessHomeStyleSheet = StyleSheet.create({
         position: "absolute",
         bottom: 0,
         width: ScreenWidth,
-        height: ScreenHeight - statusBarHeight
+        height: ScreenHeight,
+        zIndex: 3
     },
     loadingContainer: {
         position: "absolute",

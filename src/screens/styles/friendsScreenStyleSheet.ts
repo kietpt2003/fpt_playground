@@ -6,18 +6,19 @@ import { statusBarHeight } from "../../constants/statusBarHeight";
 const friendsScreenStyleSheet = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    bgContainer: {
         backgroundColor: colors.milkyWhite
     },
     headerContainer: {
         width: ScreenWidth,
-        height: ScreenHeight / 5.5,
+        height: "20%",
     },
     headerTopContainer: {
         flexDirection: "row",
         justifyContent: 'flex-start',
         alignItems: "center",
         gap: 10,
-        marginTop: statusBarHeight
     },
     headerContainerLinear: {
         position: "absolute",
@@ -32,7 +33,8 @@ const friendsScreenStyleSheet = StyleSheet.create({
         borderRadius: 30,
         marginLeft: 20,
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        marginTop: 30
     },
     userImage: {
         width: ScreenWidth / 9,
@@ -50,7 +52,8 @@ const friendsScreenStyleSheet = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 20,
-        fontFamily: "RobotoSemiBold"
+        fontFamily: "RobotoSemiBold",
+        marginTop: 30
     },
     searhContainer: {
         width: ScreenWidth - 40,
@@ -79,7 +82,7 @@ const friendsScreenStyleSheet = StyleSheet.create({
     },
     flatListContainer: {
         width: ScreenWidth,
-        height: ScreenHeight - ScreenHeight / 5.5 + statusBarHeight,
+        height: "80%",
     },
 });
 

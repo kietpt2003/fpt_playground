@@ -154,5 +154,7 @@
     "sound": "Sound",
     "expand": "Expand",
     "shrink": "Shrink",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "opponent-thinking": "The opponent is thinking...",
+    "sfx": "Sfx"
 }

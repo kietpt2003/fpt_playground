@@ -11,9 +11,14 @@ import { ScreenHeight, ScreenWidth } from "@rneui/base";
 import { WaveAnimationProps } from "./types/waveAnimationTypes";
 import { colors } from "../constants/colors";
 import waveAnimationStyleSheet from "./styles/waveAnimationStyleSheet";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 const WaveAnimation = ({ children }: WaveAnimationProps) => {
+    const theme = useSelector((state: RootState) => state.theme.theme);
+
     // Shared value để điều khiển chuyển động sóng
     const waveOffset = useSharedValue(0);
 
@@ -60,28 +65,35 @@ const WaveAnimation = ({ children }: WaveAnimationProps) => {
         return { d };
     });
     return (
-        <View
+        <SafeAreaView
             style={waveAnimationStyleSheet.container}
         >
-            <Svg
-                width={ScreenWidth} // Chiều rộng SVG bằng chiều rộng màn hình
-                height={ScreenHeight / 1.2} // Chiều cao cố định
-                viewBox={`0 0 ${ScreenWidth} ${ScreenHeight / 1.2}`}
-                style={waveAnimationStyleSheet.svg}>
-                <AnimatedPath
-                    animatedProps={animatedProps}
-                    fill={colors.white} // Màu sóng
-                />
+            <View style={[
+                waveAnimationStyleSheet.bgContainer,
+                {
+                    backgroundColor: theme == "dark" ? colors.darkBlue : colors.mediumOrange
+                }
+            ]}>
+                <Svg
+                    width={ScreenWidth} // Chiều rộng SVG bằng chiều rộng màn hình
+                    height={ScreenHeight / 1.2} // Chiều cao cố định
+                    viewBox={`0 0 ${ScreenWidth} ${ScreenHeight / 1.2}`}
+                    style={waveAnimationStyleSheet.svg}>
+                    <AnimatedPath
+                        animatedProps={animatedProps}
+                        fill={colors.white} // Màu sóng
+                    />
 
-                {/* Lớp sóng thứ hai */}
-                <AnimatedPath
-                    animatedProps={animatedProps2}
-                    fill={colors.blurWhite}
-                />
-            </Svg>
+                    {/* Lớp sóng thứ hai */}
+                    <AnimatedPath
+                        animatedProps={animatedProps2}
+                        fill={colors.blurWhite}
+                    />
+                </Svg>
 
-            {children}
-        </View>
+                {children}
+            </View>
+        </SafeAreaView>
     );
 };
 

@@ -154,5 +154,7 @@
     "sound": "Âm thanh",
     "expand": "Xem thêm",
     "shrink": "Thu nhỏ",
-    "loading": "Đang tải..."
+    "loading": "Đang tải...",
+    "opponent-thinking": "Đối thủ đang suy nghĩ...",
+    "sfx": "Hiệu ứng"
 }

@@ -7,9 +7,9 @@ import { featureComponentHeight } from "../../constants/scrollHeight";
 const npcGuidelineStyleSheet = StyleSheet.create({
     container: {
         width: ScreenWidth,
-        height: ScreenHeight + statusBarHeight,
+        height: "100%",
         position: "absolute",
-        top: 0,
+        top: statusBarHeight,
     },
     npcBlurContainer: {
         width: ScreenWidth - 10,
@@ -53,7 +53,7 @@ const npcGuidelineStyleSheet = StyleSheet.create({
     bottomBlur: {
         width: ScreenWidth,
         position: "absolute",
-        bottom: 0,
+        height: "100%",
         backgroundColor: colors.grey
     },
 });

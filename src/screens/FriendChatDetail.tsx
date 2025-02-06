@@ -12,13 +12,14 @@ import { RootState } from '../store/store';
 import { useTranslation } from 'react-i18next';
 import { enUS, vi } from 'date-fns/locale';
 import { formatDistanceToNowStrict } from 'date-fns';
-import { ScreenHeight } from '@rneui/base';
+import { ScreenHeight, ScreenWidth } from '@rneui/base';
 import usePhoto from '../hooks/usePhoto';
 import BottomSheetGallery from '../components/BottomSheetGallery';
 import { statusBarHeight } from '../constants/statusBarHeight';
 import { BottomSheetGalleryMethods } from '../components/types/bottomSheetGaleryTypes';
 import useCamera from '../hooks/useCamera';
 import { FriendChatDetailNavigationProp } from './types/friendChatDetailTypes';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function FriendChatDetail() {
     const route = useRoute<FriendChatDetailRouteProp>();
@@ -71,25 +72,9 @@ export default function FriendChatDetail() {
         }
     }
 
-    //Check keyboard open
-    useEffect(() => {
-        const keyboardDidShowListener = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
-            (event) => {
-                setKeyboardHeight(event.endCoordinates.height);
-            });
-        const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-            setKeyboardHeight(0);
-        });
-
-        // Cleanup các listener khi component unmount
-        return () => {
-            keyboardDidShowListener.remove();
-            keyboardDidHideListener.remove();
-        };
-    }, []);
-
     return (
-        <View>
+        <SafeAreaView>
+            {/* Header */}
             <View style={[
                 friendChatDetailStyleSheet.chatHeaderContainer,
                 {
@@ -144,7 +129,7 @@ export default function FriendChatDetail() {
             </View>
 
             <View style={[
-                friendChatDetailStyleSheet.chatContaienr,
+                friendChatDetailStyleSheet.chatContainer,
                 {
                     backgroundColor: theme === "dark" ? colors.lighterBlue2 : colors.milkyWhite
                 }
@@ -177,11 +162,15 @@ export default function FriendChatDetail() {
                         onPress={() => {
                             if (bottomSheetGalleryRef.current != null) {
                                 if (!requestPermission) {
+                                    if (Keyboard.isVisible()) {
+                                        Keyboard.dismiss();
+                                    }
                                     bottomSheetGalleryRef.current.handleBottomSheetGallery();
                                     if (bottomSheetGalleryRef.current.isBottomSheetGalleryOpen) {
                                         setKeyboardHeight(0);
-                                    } else {
-                                        setKeyboardHeight(ScreenHeight / 3);
+                                    }
+                                    else {
+                                        setKeyboardHeight(ScreenWidth > 350 ? ScreenHeight / 3.7 : ScreenHeight / 3);
                                     }
                                 } else {
                                     bottomSheetGalleryRef.current.handleOpenPhoneSetting();
@@ -199,6 +188,18 @@ export default function FriendChatDetail() {
                             placeholder={t("chat-input-msg")}
                             multiline={true}
                             numberOfLines={6}
+                            onPressIn={() => {
+                                if (bottomSheetGalleryRef.current != null) {
+                                    if (!requestPermission) {
+                                        if (bottomSheetGalleryRef.current.isBottomSheetGalleryOpen) {
+                                            bottomSheetGalleryRef.current.handleBottomSheetGallery();
+                                            setKeyboardHeight(0);
+                                        }
+                                    } else {
+                                        bottomSheetGalleryRef.current.handleOpenPhoneSetting();
+                                    }
+                                }
+                            }}
                         />
 
                         {/* Icon/Sticker function */}
@@ -218,8 +219,8 @@ export default function FriendChatDetail() {
 
             <BottomSheetGallery
                 ref={bottomSheetGalleryRef}
-                snapTo={ScreenHeight - (ScreenHeight / 3) + statusBarHeight}
+                snapTo={ScreenHeight - (ScreenHeight / 3.5)}
             />
-        </View>
+        </SafeAreaView>
     )
 }

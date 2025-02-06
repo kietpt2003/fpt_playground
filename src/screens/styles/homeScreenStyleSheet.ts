@@ -14,7 +14,7 @@ const homeScreenStyleSheet = StyleSheet.create({
     },
     headerRightContainer: {
         position: "absolute",
-        top: 50,
+        top: 20,
         right: 0,
         paddingRight: 10,
         flexDirection: "row",

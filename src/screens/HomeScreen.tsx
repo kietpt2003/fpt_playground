@@ -14,11 +14,11 @@ import HeaderLeft from '../components/HeaderLeft';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { GroupChatNavigationProp } from './types/groupChatTypes';
 import DailyCheckPoint from '../components/DailyCheckPoint';
-import { StatusBar } from 'expo-status-bar';
 import NPCGuideline from '../components/NPCGuideline';
 import PTKCoinIcon from '../components/PTKCoinIcon';
 import { ScreenWidth } from '@rneui/base';
 import useAudio from '../hooks/useAudio';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
     const theme = useSelector((state: RootState) => state.theme.theme);
@@ -56,7 +56,7 @@ export default function HomeScreen() {
     );
 
     return (
-        <>
+        <SafeAreaView style={{ flex: 1 }}>
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 ref={scrollViewRef}
@@ -406,10 +406,6 @@ export default function HomeScreen() {
                     </TouchableOpacity>
                 </View>
 
-                <StatusBar backgroundColor={
-                    (!isGuideline && isOpenDailyCheckPoint) ? "rgba(0,0,0,0.7)" : undefined
-                } />
-
                 {
                     !isGuideline &&
                     <DailyCheckPoint
@@ -431,6 +427,6 @@ export default function HomeScreen() {
                     setOnScrolling={setOnScrolling}
                 />
             }
-        </>
+        </SafeAreaView>
     )
 }

@@ -1,26 +1,18 @@
 import { ScreenHeight, ScreenWidth } from "@rneui/base";
 import { StyleSheet } from "react-native";
 import { colors } from "../../constants/colors";
-import { statusBarHeight } from "../../constants/statusBarHeight";
 
 const gameListStyleSheet = StyleSheet.create({
     container: {
-        flex: 1,
-        marginTop: statusBarHeight
+        flex: 1
     },
     headerContainer: {
         width: ScreenWidth,
-        height: ScreenHeight / 5.5,
+        height: 180,
         zIndex: 0,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "flex-start",
-    },
-    headerTopContainer: {
-        flexDirection: "row",
-        justifyContent: 'flex-start',
-        alignItems: "center",
-        gap: 10,
     },
     headerContainerLinear: {
         position: "absolute",
@@ -125,12 +117,13 @@ const gameListStyleSheet = StyleSheet.create({
     gameName: {
         fontFamily: "RobotoBold",
         color: colors.white,
-        fontSize: 26,
+        fontSize: ScreenWidth > 350 ? 26 : 20,
+        width: ScreenWidth > 350 ? ScreenWidth / 2.5 : ScreenWidth / 3,
     },
     totalOnline: {
         fontFamily: "RobotoMedium",
         color: colors.white,
-        fontSize: 22,
+        fontSize: ScreenWidth > 350 ? 26 : 18,
     },
     gameIcon: {
         position: "absolute",
@@ -139,8 +132,9 @@ const gameListStyleSheet = StyleSheet.create({
     },
     flatListContainer: {
         width: ScreenWidth,
-        height: ScreenHeight - ScreenHeight / 3.2 + statusBarHeight,
+        height: ScreenHeight - 180,
         zIndex: 2,
+        paddingBottom: 20,
     },
     onlinePeopleContainer: {
         position: "absolute",
@@ -152,7 +146,7 @@ const gameListStyleSheet = StyleSheet.create({
     activePeopleTxt: {
         fontFamily: "Roboto",
         color: colors.white,
-        fontSize: 18
+        fontSize: ScreenWidth > 350 ? 18 : 16
     },
     flatListStyle: {
         flexGrow: 0

@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Pressable, Text, Image, NativeModules } from 'react-native';
-import { checkPlayerWinner, checkPotentialMovesForCurrPiece, getBestChineseChessMove, isInCheck, updateNewGameState } from '../utils/checkChineseChessLogic';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { View, StyleSheet, Pressable, Text, Image, NativeModules, BackHandler } from 'react-native';
+import { checkPlayerWinner, checkPotentialMovesForCurrPiece, isInCheck, updateNewGameState } from '../utils/checkChineseChessLogic';
 import { ScreenHeight, ScreenWidth } from '@rneui/base';
-import { ChineseChessBoardPiece, ChineseChessPiece as ChineseChessPieceType, chineseChessRowSize, PotentialMovePiece } from '../screens/types/chineseChessTypes';
+import { ChineseChessBoardPiece, ChineseChessBoardRouteProp, ChineseChessPiece as ChineseChessPieceType, chineseChessRowSize, PotentialMovePiece } from '../screens/types/chineseChessTypes';
 import { Xiangqi } from 'xiangqi.js';
 import ChineseChessSquare from './ChineseChessSquare';
 import ChineseChessPiece from './ChineseChessPiece';
@@ -21,6 +21,9 @@ import { useTranslation } from 'react-i18next';
 import CheckmateText from './CheckmateText';
 import CheckmateEnd from './CheckmateEnd';
 import { Audio, AVPlaybackSource } from 'expo-av';
+import LottieView from 'lottie-react-native';
+import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
+import ConfirmModal from './ConfirmModal';
 
 const { ChineseChessLogical } = NativeModules;
 
@@ -170,6 +173,9 @@ const ChineseChessBoard = () => {
         );
     };
 
+    const route = useRoute<ChineseChessBoardRouteProp>();
+    const isPlaySfx = route.params.isPlaySfx;
+
     const [timeLeft, setTimeLeft] = useState<number>(3 * 60);
 
     const [player, setPlayer] = useState('red');
@@ -185,12 +191,17 @@ const ChineseChessBoard = () => {
 
     const { t } = useTranslation();
 
+    const navigation = useNavigation();
+
     const [game, setGame] = useState(new Xiangqi());
 
     const selectSfxRef = useRef<Audio.Sound | null>(null);
     const makeMoveSfxRef = useRef<Audio.Sound | null>(null);
     const winnerSfxRef = useRef<Audio.Sound | null>(null);
     const AISfxRef = useRef<Audio.Sound | null>(null);
+
+    const [stringConfirm, setStringConfirm] = useState<string>("");
+    const [isConfirm, setIsConfirm] = useState<boolean>(false);
 
     const selectSfx = async (piece: ChineseChessPieceType, pieceColor: string) => {
         if (selectSfxRef.current) {
@@ -345,14 +356,12 @@ const ChineseChessBoard = () => {
             return
         }
 
-        await selectSfx(piece, pieceColor);
+        if (isPlaySfx) {
+            await selectSfx(piece, pieceColor);
+        }
 
         let newGameState2: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(newGameState));
-        console.log("Start check potential");
-
         const availableMoves = await checkPotentialMovesForCurrPiece(newGameState2, { piece, pieceColor, row, column, isMoveValid })
-        console.log("End check potential");
-
         setAvailableForSelected(availableMoves);
 
         if (availableMoves.length != 0) {// Nếu có nước đi phù hợp thì cập nhật lại state
@@ -395,6 +404,12 @@ const ChineseChessBoard = () => {
             }
         }
 
+        newGameState.map((innerArray) => {
+            innerArray.map((obj) => {
+                newGameState[obj.row][obj.column].isMoveValid = false
+            })
+        })
+
         newGameState[row][column] = {
             row: row,
             column: column,
@@ -411,17 +426,11 @@ const ChineseChessBoard = () => {
             column: selectedPiece.column
         };
 
-        console.log("Start check king state");
         await checkKingState();
-        console.log("End check king state");
 
-        await makeMoveSfx(selectedPiece.piece, selectedPiece.pieceColor, piece);
-
-        newGameState.map((innerArray) => {
-            innerArray.map((obj) => {
-                newGameState[obj.row][obj.column].isMoveValid = false
-            })
-        })
+        if (isPlaySfx) {
+            await makeMoveSfx(selectedPiece.piece, selectedPiece.pieceColor, piece);
+        }
 
         setSelectedPiece(
             { piece: '', pieceColor: '', row: 0, column: 0, isMoveValid: false }
@@ -435,9 +444,7 @@ const ChineseChessBoard = () => {
         // console.log("turn", game.turn());
         // console.log("check board", game.ascii());
 
-        console.log("Start check winner");
         await checkIsWinner()
-        console.log("End check winner");
         setPlayer(selectedPiece.pieceColor === 'red' ? 'black' : 'red')
         resetTime();
     }
@@ -447,18 +454,22 @@ const ChineseChessBoard = () => {
         const isWinner = await checkPlayerWinner(gameState, player === "red" ? "black" : "red")
 
         if (isWinner) {
-            if (winnerSfxRef.current) {
-                await winnerSfxRef.current.unloadAsync();
+            if (isPlaySfx) {
+                if (winnerSfxRef.current) {
+                    await winnerSfxRef.current.unloadAsync();
+                }
+                const { sound } = await Audio.Sound.createAsync(
+                    require("../../assets/audios/chinese_chess/tada-fanfare.mp3"),
+                    {
+                        shouldPlay: true,
+                        isLooping: false,
+                        volume: 0.7
+                    });
+                setIsWinner(`Player ${player === 'red' ? 'Red' : 'Black'} has won the game`)
+                winnerSfxRef.current = sound;
+            } else {
+                setIsWinner(`Player ${player === 'red' ? 'Red' : 'Black'} has won the game`)
             }
-            const { sound } = await Audio.Sound.createAsync(
-                require("../../assets/audios/chinese_chess/tada-fanfare.mp3"),
-                {
-                    shouldPlay: true,
-                    isLooping: false,
-                    volume: 0.7
-                });
-            setIsWinner(`Player ${player === 'red' ? 'Red' : 'Black'} has won the game`)
-            winnerSfxRef.current = sound;
         }
     }
 
@@ -476,6 +487,17 @@ const ChineseChessBoard = () => {
         setTimeLeft(3 * 60);
     };
 
+    const handleClickBack = () => {
+        setStringConfirm("Bạn có muốn thoát trò chơi không? Mọi dữ liệu có thể bị mất. Bạn chắc chắn chứ?");
+        setIsConfirm(true);
+        return true; // Chặn hành động mặc định của nút back
+    }
+
+    const handleBackPress = async () => {
+        navigation.goBack();
+    };
+
+    // Time count down
     useEffect(() => {
         // Nếu thời gian còn lại > 0, thiết lập interva4
         if (timeLeft > 0 && isWinner == "") {
@@ -490,16 +512,10 @@ const ChineseChessBoard = () => {
     //Handle AI move
     useEffect(() => {
         const handleAIMove = async () => {
-            // Chuyển đổi WritableArray thành mảng đơn giản
-            // Tạo đối tượng quân cờ
             try {
-
                 let newGameState: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(gameState));
                 if (player === "black") { //Nếu là lượt của đen (AI) thì mới được đi
-                    const aiMove = await ChineseChessLogical.getBestChineseChessMove(newGameState, 3);
-
-                    console.log("ai", aiMove);
-
+                    const aiMove = await ChineseChessLogical.getBestChineseChessMove2(newGameState, 3);
 
                     if (aiMove) {
                         let newGameState2: ChineseChessBoardPiece[][] = JSON.parse(JSON.stringify(gameState));
@@ -518,7 +534,10 @@ const ChineseChessBoard = () => {
                             row: aiMove.potentialMove.row,
                             column: aiMove.potentialMove.column
                         };
-                        await AIMakeMoveSfx(gameState[aiMove.potentialMove.row][aiMove.potentialMove.column].piece);
+
+                        if (isPlaySfx) {
+                            await AIMakeMoveSfx(gameState[aiMove.potentialMove.row][aiMove.potentialMove.column].piece);
+                        }
                         setGameState(newGameState2);
                         setPlayer("red");
                     } else {
@@ -528,13 +547,23 @@ const ChineseChessBoard = () => {
                 }
             } catch (error) {
                 console.log("loi r", error);
-
             }
         }
 
         handleAIMove();
 
     }, [player])
+
+    //Back handler
+    useFocusEffect(
+        useCallback(() => {
+            // Gắn sự kiện BackHandler
+            BackHandler.addEventListener('hardwareBackPress', handleClickBack);
+
+            // Gỡ sự kiện khi component unmount
+            return () => BackHandler.removeEventListener('hardwareBackPress', handleClickBack);
+        }, [])
+    );
 
     const renderRow = (data: ChineseChessBoardPiece[], rowIndex: number) => {
         return (
@@ -823,45 +852,43 @@ const ChineseChessBoard = () => {
                         </Svg>
                     </View>
                     {
-                        (redIsCheck && isWinner === "") &&
-                        <Text style={{
-                            position: "absolute",
-                            bottom: -130
-                        }}>Red bị chiếu</Text>
+                        ((redIsCheck || blackIsCheck) && isWinner === "") &&
+                        <CheckmateText onComplete={() => {
+                            setBlackIsCheck(false);
+                            setRedIsCheck(false);
+                        }} />
                     }
                     {
-                        (blackIsCheck && isWinner === "") &&
-                        <Text style={{
-                            position: "absolute",
-                            bottom: -130
-                        }}>Black bị chiếu</Text>
-                    }
-                    <Text style={{
-                        position: "absolute",
-                        bottom: -150
-                    }}>Moves {availableForSelected.length}</Text>
-                    {
-                        isWinner &&
-                        <Text style={{
-                            position: "absolute",
-                            bottom: -160
-                        }}>{isWinner}</Text>
+                        isWinner != "" &&
+                        <CheckmateEnd onComplete={() => {
+
+                        }} />
                     }
                 </View>
-                {
-                    ((redIsCheck || blackIsCheck) && isWinner === "") &&
-                    <CheckmateText onComplete={() => {
-                        setBlackIsCheck(false);
-                        setRedIsCheck(false);
-                    }} />
-                }
-                {
-                    isWinner != "" &&
-                    <CheckmateEnd onComplete={() => {
 
-                    }} />
+                {
+                    (player == "black" && isWinner == "") &&
+                    <View style={styles.opponentBlurBg}>
+                        <View style={styles.opponentContainer}>
+                            <LottieView
+                                source={require("../../assets/animations/AIThinking.json")}
+                                style={styles.thinkingAnimation}
+                                autoPlay
+                                loop
+                                speed={0.8}
+                            />
+                            <Text style={styles.thinkingTxt}>{t("opponent-thinking")}</Text>
+                        </View>
+                    </View>
                 }
             </View>
+
+            <ConfirmModal
+                stringConfirm={stringConfirm}
+                isConfirm={isConfirm}
+                setIsConfirm={setIsConfirm}
+                handleConfirmFunction={handleBackPress}
+            />
         </SafeAreaView>
     );
 };
@@ -869,7 +896,7 @@ const ChineseChessBoard = () => {
 const styles = StyleSheet.create({
     container: {
         width: ScreenWidth,
-        height: ScreenHeight - statusBarHeight,
+        height: ScreenHeight,
     },
     containerLiner: {
         position: "absolute",
@@ -934,7 +961,7 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         justifyContent: "center",
         alignItems: "center",
-        marginTop: 20,
+        marginTop: 30,
         backgroundColor: chessBoardOutline,
         borderWidth: 4.5,
         borderRadius: 10,
@@ -971,6 +998,29 @@ const styles = StyleSheet.create({
         left: 16,
         zIndex: 1
     },
+    opponentBlurBg: {
+        width: "100%",
+        height: ScreenHeight - ScreenHeight / 5.5,
+        backgroundColor: colors.blurBlack,
+        position: "absolute",
+        bottom: 0,
+        alignItems: "center",
+        zIndex: 2
+    },
+    opponentContainer: {
+        position: "absolute",
+        top: chineseChessRowSize * 4 - 20,
+        alignItems: "center"
+    },
+    thinkingAnimation: {
+        width: chineseChessRowSize * 3,
+        height: chineseChessRowSize * 3,
+    },
+    thinkingTxt: {
+        fontFamily: "RobotoMedium",
+        fontSize: 20,
+        color: colors.white
+    }
 });
 
 export default ChineseChessBoard;

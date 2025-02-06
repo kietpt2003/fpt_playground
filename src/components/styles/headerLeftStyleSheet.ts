@@ -5,7 +5,7 @@ import { colors } from "../../constants/colors";
 const headerLeftStyleSheet = StyleSheet.create({
     container: {
         position: "absolute",
-        top: 50,
+        top: 20,
         paddingLeft: 10,
         paddingVertical: 10,
         justifyContent: "center",

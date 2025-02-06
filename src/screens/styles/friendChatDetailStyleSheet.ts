@@ -7,9 +7,8 @@ const friendChatDetailStyleSheet = StyleSheet.create({
     chatHeaderContainer: {
         flexDirection: "row",
         width: ScreenWidth,
-        height: 60 + statusBarHeight,
+        height: "8%",
         alignItems: "center",
-        paddingTop: statusBarHeight,
         paddingHorizontal: 10,
         borderBottomWidth: 1,
         borderColor: colors.blurBlack
@@ -33,9 +32,9 @@ const friendChatDetailStyleSheet = StyleSheet.create({
         right: 10,
         bottom: 10
     },
-    chatContaienr: {
+    chatContainer: {
         width: ScreenWidth,
-        height: ScreenHeight - 60,
+        height: "92%",
     },
     bottomContentContainer: {
         position: "absolute",

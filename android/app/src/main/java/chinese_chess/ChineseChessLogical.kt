@@ -892,6 +892,53 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
     }
 
     @ReactMethod
+    fun getBestChineseChessMove2(boardArray: ReadableArray, depth: Int, promise: Promise) {
+        CoroutineScope(Dispatchers.Default).launch {
+            try {
+                val board = ChineseChessUtils.parseGameStateArray(boardArray)
+
+                // Lấy danh sách các nước đi hợp lệ (có thể sắp xếp các nước đi theo ưu tiên)
+                val availableMovesWritableArray =
+                    callBackCheckPotentialBlockMoves(board, "black")
+                val availableMoves = ChineseChessUtils.parsePotentialMovesArray(availableMovesWritableArray)
+
+                val opponentMovesWritableArray =
+                    callBackCheckPotentialBlockMoves(board, "red")
+                val opponentMoves = ChineseChessUtils.parsePotentialMovesArray(opponentMovesWritableArray)
+
+                if (availableMoves.size == 0) {
+                    promise.resolve(null)
+                } else {
+                    val randomNumber = getRandomNumber()
+                    val filteredMoves: MutableList<PotentialMovePiece> = when(randomNumber) {
+                        1 -> filterAttackMoves(board, availableMoves, opponentMoves)
+                        2 -> filterMiddleMoves(board, availableMoves, opponentMoves)
+                        3 -> filterDefendMoves(availableMoves, opponentMoves)
+                        else -> filterDefendMoves(availableMoves, opponentMoves)
+                    }
+                    if (filteredMoves.isEmpty()) {
+                        promise.resolve(ChineseChessUtils.convertPotentialMoveToWritableMap(
+                            availableMoves[getRandomWithRange(0, availableMoves.lastIndex)]
+                        ))
+                    } else {
+                        val opponentPiece = filteredMoves.find{m -> m.potentialMove.pieceColor == "red"}
+                        if (opponentPiece != null) {
+                            promise.resolve(ChineseChessUtils.convertPotentialMoveToWritableMap(
+                                opponentPiece
+                            ))
+                        }
+                        promise.resolve(ChineseChessUtils.convertPotentialMoveToWritableMap(
+                            availableMoves[getRandomWithRange(0, filteredMoves.lastIndex)]
+                        ))
+                    }
+                }
+            } catch (e: Exception) {
+                promise.reject("ERROR_GETTING_MOVE", "Failed to get best move", e)
+            }
+        }
+    }
+
+    @ReactMethod
     fun getBestChineseChessMove(boardArray: ReadableArray, depth: Int, promise: Promise) {
         CoroutineScope(Dispatchers.Default).launch {
             try {
@@ -901,25 +948,6 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
                 Log.e("Kiet", "check potential")
 
                 bestMove = iterativeDeepeningMinimax(board, depth, 10000)
-//                val availableMovesWritableArray =
-//                    callBackCheckPotentialBlockMoves(board, "black")
-//                val availableMoves = ChineseChessUtils.parsePotentialMovesArray(availableMovesWritableArray)
-//
-//                for (move in availableMoves) {
-//                    try {
-//                        val newBoard = simulateMove(board, move)
-//                        Log.e("Kiet", "mini")
-//                        val moveScore =
-//                            minimax(newBoard, depth - 1, false, Int.MIN_VALUE, Int.MAX_VALUE)
-//
-//                        if (moveScore > bestScore) {
-//                            bestScore = moveScore
-//                            bestMove = move
-//                        }
-//                    } catch (e:Exception) {
-//                        promise.reject("ERROR_GETTING_MINI", "Failed to minimax", e)
-//                    }
-//                }
 
                 if (bestMove != null) {
                     Log.e("Kiet", "co bestMove")
@@ -933,6 +961,79 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
                 promise.reject("ERROR_GETTING_MOVE", "Failed to get best move", e)
             }
         }
+    }
+
+    private fun filterDefendMoves(
+        availableMoves: MutableList<PotentialMovePiece>,
+        opponentMoves: MutableList<PotentialMovePiece>,
+    ): MutableList<PotentialMovePiece> {
+        // Sử dụng một danh sách để chứa các nước đi hợp lệ
+        val filteredMoves = mutableListOf<PotentialMovePiece>()
+
+        for (move in availableMoves) {
+            val opponentMove = opponentMoves.find { m -> m.potentialMove.row == move.potentialMove.row && m.potentialMove.column == move.potentialMove.column}
+
+            if (move.potentialMove.row in 0..4 && opponentMove != null && move.potentialMove.piece == ChineseChessPiece.EMPTY) { //Tập trung vào những nước đi bên bản đồ mình và không bị quân địch ăn
+                filteredMoves.add(move)
+            } else if ((move.potentialMove.piece == ChineseChessPiece.ADVISOR || move.potentialMove.piece == ChineseChessPiece.BISHOP) && move.potentialMove.pieceColor == "black") { //Thêm vào những nước đi là sĩ hoặc tượng
+                filteredMoves.add(move)
+            } else if (move.potentialMove.pieceColor == "red") { //Lấy những nước đi nào ăn được đối thủ
+                filteredMoves.add(move)
+            }
+        }
+
+        return filteredMoves
+    }
+
+    private suspend fun filterMiddleMoves(
+        board: Array<Array<ChineseChessBoardPiece>>,
+        availableMoves: MutableList<PotentialMovePiece>,
+        opponentMoves: MutableList<PotentialMovePiece>,
+    ): MutableList<PotentialMovePiece> {
+        // Sử dụng một danh sách để chứa các nước đi hợp lệ
+        val filteredMoves = mutableListOf<PotentialMovePiece>()
+
+        for (move in availableMoves) {
+            val opponentMove = opponentMoves.find { m -> m.potentialMove.row == move.potentialMove.row && m.potentialMove.column == move.potentialMove.column}
+            val newBoard = simulateMove(board, move)
+            val isOppentCheck = callBackIsInCheck(newBoard, "red")
+
+            if ((move.fromMove.piece == ChineseChessPiece.ROOK || move.fromMove.piece == ChineseChessPiece.CANNON) && move.potentialMove.row in 2..5 && move.potentialMove.column in 2..6 && opponentMove != null) { //Lấy những nước đi ở giữa và là xe hoặc pháo và không bị ăn
+                filteredMoves.add(move)
+            } else if (isOppentCheck) { //Lấy những nước đi có thể chiếu tướng đối thủ
+                filteredMoves.add(move)
+            } else if (move.potentialMove.pieceColor == "red") { //Lấy những nước đi nào ăn được đối thủ
+                filteredMoves.add(move)
+            }
+        }
+
+        return filteredMoves
+    }
+
+    private suspend fun filterAttackMoves(
+        board: Array<Array<ChineseChessBoardPiece>>,
+        availableMoves: MutableList<PotentialMovePiece>,
+        opponentMoves: MutableList<PotentialMovePiece>,
+    ): MutableList<PotentialMovePiece> {
+        // Sử dụng một danh sách để chứa các nước đi hợp lệ
+        val filteredMoves = mutableListOf<PotentialMovePiece>()
+
+        for (move in availableMoves) {
+            val opponentMove = opponentMoves.find { m -> m.potentialMove.row == move.potentialMove.row && m.potentialMove.column == move.potentialMove.column}
+            val newBoard = simulateMove(board, move)
+            val isOppentCheck = callBackIsInCheck(newBoard, "red")
+
+            if ((move.potentialMove.pieceColor != "black" && move.potentialMove.piece != ChineseChessPiece.EMPTY) ||
+                (move.potentialMove.row in 5..9 && opponentMove != null)) { //Lấy những nước đi sang bên bạn nhưng không bị ăn
+                filteredMoves.add(move)
+            } else if (isOppentCheck) { //Lấy những nước đi có thể chiếu tướng đối thủ
+                filteredMoves.add(move)
+            } else if (move.potentialMove.pieceColor == "red") { //Lấy những nước đi nào ăn được đối thủ
+                filteredMoves.add(move)
+            }
+        }
+
+        return filteredMoves
     }
 
     private suspend fun iterativeDeepeningMinimax(
@@ -1003,6 +1104,15 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
         }
 
         return bestMove?.let { MoveWithScore(it, bestScore) }
+    }
+
+    private fun getRandomWithRange(min: Int, max: Int): Int {
+        return (min..max).random()
+    }
+
+    private fun getRandomNumber(): Int {
+        val numbers = listOf(1, 2, 3) // Danh sách các số cần random
+        return numbers.random()
     }
 
     // Cấu trúc chứa nước đi và điểm đánh giá

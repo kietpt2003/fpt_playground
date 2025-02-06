@@ -16,6 +16,7 @@ import UserAvatar from '../components/UserAvatar'
 import usePhoto from '../hooks/usePhoto'
 import useAudio from '../hooks/useAudio'
 import { useFocusEffect } from '@react-navigation/native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 faker.seed(20);
 
@@ -64,7 +65,7 @@ export default function FriendsScreen() {
     const { t } = useTranslation();
 
     const { changeStateFriendsScreen } = usePhoto();
-    const { pauseSong, resumeSong } = useAudio();
+    const { pauseSong, resumeSong, isPlaying } = useAudio();
 
     const [isHaveNoti, setIsHaveNoti] = useState(true);
 
@@ -79,125 +80,139 @@ export default function FriendsScreen() {
         handleChangeState();
     }, []);
 
-    //Handle back press to resume song
+    // //Handle back press to resume song
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         // Hàm xử lý khi nút Back được nhấn
+    //         const onBackPress = () => {
+    //             resumeSong();
+    //             return false; // Không ngăn hành động mặc định
+    //         };
+
+    //         // Thêm listener
+    //         BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+    //         // Cleanup: Xóa listener khi component bị unmount
+    //         return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    //     }, [])
+    // );
+
+    //Chạy nhạc khi thoát khởi FriendsScreen
     useFocusEffect(
         useCallback(() => {
-            // Hàm xử lý khi nút Back được nhấn
-            const onBackPress = () => {
-                resumeSong();
-                return false; // Không ngăn hành động mặc định
+            return () => {
+                // Khi màn hình bị unfocus (rời khỏi màn hình)
+                if (!isPlaying) {
+                    resumeSong();
+                }
             };
-
-            // Thêm listener
-            BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
-            // Cleanup: Xóa listener khi component bị unmount
-            return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
         }, [])
     );
 
     return (
-        <View style={friendsScreenStyleSheet.container}>
-            {/* Header */}
-            <View style={friendsScreenStyleSheet.headerContainer}>
-                <LinearGradient
-                    colors={theme === "dark" ? [colors.lightBlue, colors.darkBlue] : [colors.milkyWhite, colors.mediumOrange]} // Hiệu ứng chuyển màu
-                    style={friendsScreenStyleSheet.headerContainerLinear}
-                />
-
-                <View style={friendsScreenStyleSheet.headerTopContainer}>
-                    <View style={friendsScreenStyleSheet.imageContainer}>
-                        <UserAvatar
-                            avatarUrl={user.imageUrl}
-                            imageBorderWidth={0}
-                            imageWidth={friendsScreenStyleSheet.userImage.width}
-                            imageHeight={friendsScreenStyleSheet.userImage.height}
-                            loadingIndicatorSize={friendsScreenStyleSheet.userImage.width / 3}
-                            imageBorderRadius={friendsScreenStyleSheet.userImage.borderRadius}
-                            imageBorderColor={undefined}
-                        />
-                        {
-                            isHaveNoti &&
-                            <View style={friendsScreenStyleSheet.notiDot} />
-                        }
-                    </View>
-                    <Text style={[
-                        friendsScreenStyleSheet.headerTitle,
-                        {
-                            color: theme === "dark" ? colors.white : colors.black
-                        }
-                    ]}>
-                        {t("chat-title-header")}
-                    </Text>
-                </View>
-
-                <View style={friendsScreenStyleSheet.searhContainer}>
+        <SafeAreaView style={friendsScreenStyleSheet.container}>
+            <View style={friendsScreenStyleSheet.bgContainer}>
+                {/* Header */}
+                <View style={friendsScreenStyleSheet.headerContainer}>
                     <LinearGradient
-                        colors={[colors.icyWhite, colors.white]} // Hiệu ứng chuyển màu
-                        style={friendsScreenStyleSheet.searhContainerLinear}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                    />
-                    <FontAwesome
-                        name={"search"}
-                        size={22}
-                        color={colors.blurBlack}
-                        style={friendsScreenStyleSheet.searchIcon}
+                        colors={theme === "dark" ? [colors.lightBlue, colors.darkBlue] : [colors.milkyWhite, colors.mediumOrange]} // Hiệu ứng chuyển màu
+                        style={friendsScreenStyleSheet.headerContainerLinear}
                     />
 
-                    <TextInput
-                        style={friendsScreenStyleSheet.searchInput}
-                        placeholder={t("search-friend-placeholder")}
+                    <View style={friendsScreenStyleSheet.headerTopContainer}>
+                        <View style={friendsScreenStyleSheet.imageContainer}>
+                            <UserAvatar
+                                avatarUrl={user.imageUrl}
+                                imageBorderWidth={0}
+                                imageWidth={friendsScreenStyleSheet.userImage.width}
+                                imageHeight={friendsScreenStyleSheet.userImage.height}
+                                loadingIndicatorSize={friendsScreenStyleSheet.userImage.width / 3}
+                                imageBorderRadius={friendsScreenStyleSheet.userImage.borderRadius}
+                                imageBorderColor={undefined}
+                            />
+                            {
+                                isHaveNoti &&
+                                <View style={friendsScreenStyleSheet.notiDot} />
+                            }
+                        </View>
+                        <Text style={[
+                            friendsScreenStyleSheet.headerTitle,
+                            {
+                                color: theme === "dark" ? colors.white : colors.black
+                            }
+                        ]}>
+                            {t("chat-title-header")}
+                        </Text>
+                    </View>
+
+                    <View style={friendsScreenStyleSheet.searhContainer}>
+                        <LinearGradient
+                            colors={[colors.icyWhite, colors.white]} // Hiệu ứng chuyển màu
+                            style={friendsScreenStyleSheet.searhContainerLinear}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                        />
+                        <FontAwesome
+                            name={"search"}
+                            size={22}
+                            color={colors.blurBlack}
+                            style={friendsScreenStyleSheet.searchIcon}
+                        />
+
+                        <TextInput
+                            style={friendsScreenStyleSheet.searchInput}
+                            placeholder={t("search-friend-placeholder")}
+                        />
+                    </View>
+                </View>
+
+                <View style={friendsScreenStyleSheet.flatListContainer}>
+                    <Animated.FlatList<FriendItemData>
+                        data={data}
+                        onScroll={Animated.event(
+                            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                            { useNativeDriver: true }
+                        )}
+                        keyExtractor={item => item.item.id}
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{
+                            padding: SPACING
+                        }}
+                        renderItem={({ item, index }) => {
+                            const inputRange = [
+                                -1,
+                                0,
+                                ITEM_SIZE * index,
+                                ITEM_SIZE * (index + 2)
+                            ]
+
+                            const opacityInputRange = [
+                                -1,
+                                0,
+                                ITEM_SIZE * index,
+                                ITEM_SIZE * (index + .5)
+                            ]
+
+                            const scale = scrollY.interpolate({
+                                inputRange,
+                                outputRange: [1, 1, 1, 0]
+                            })
+
+                            const opacity = scrollY.interpolate({
+                                inputRange: opacityInputRange,
+                                outputRange: [1, 1, 1, 0]
+                            })
+
+                            return <FriendItem
+                                AVATAR_SIZE={AVATAR_SIZE}
+                                opacity={opacity}
+                                scale={scale}
+                                item={item.item}
+                            />
+                        }}
                     />
                 </View>
             </View>
-
-            <View style={friendsScreenStyleSheet.flatListContainer}>
-                <Animated.FlatList<FriendItemData>
-                    data={data}
-                    onScroll={Animated.event(
-                        [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-                        { useNativeDriver: true }
-                    )}
-                    keyExtractor={item => item.item.id}
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{
-                        padding: SPACING
-                    }}
-                    renderItem={({ item, index }) => {
-                        const inputRange = [
-                            -1,
-                            0,
-                            ITEM_SIZE * index,
-                            ITEM_SIZE * (index + 2)
-                        ]
-
-                        const opacityInputRange = [
-                            -1,
-                            0,
-                            ITEM_SIZE * index,
-                            ITEM_SIZE * (index + .5)
-                        ]
-
-                        const scale = scrollY.interpolate({
-                            inputRange,
-                            outputRange: [1, 1, 1, 0]
-                        })
-
-                        const opacity = scrollY.interpolate({
-                            inputRange: opacityInputRange,
-                            outputRange: [1, 1, 1, 0]
-                        })
-
-                        return <FriendItem
-                            AVATAR_SIZE={AVATAR_SIZE}
-                            opacity={opacity}
-                            scale={scale}
-                            item={item.item}
-                        />
-                    }}
-                />
-            </View>
-        </View>
+        </SafeAreaView>
     )
 }
