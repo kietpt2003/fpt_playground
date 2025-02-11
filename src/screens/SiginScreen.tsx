@@ -1,5 +1,5 @@
 import { View, Text, ImageBackground, TextInput, TouchableOpacity, Image, Keyboard, Platform, PermissionsAndroid, Permission } from 'react-native';
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import signinStyleSheet from './styles/signinStyleSheet';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../constants/colors';
@@ -30,8 +30,23 @@ import { SigninScreenNavigationProp } from './types/signinScreenTypes';
 import * as Location from "expo-location";
 import usePhoto from '../hooks/usePhoto';
 import useCamera from '../hooks/useCamera';
+import { Server } from '../constants/entities/Server';
+import api from '../services/api';
+import { PaginatedResponse } from '../constants/Paginations/PaginationResponse';
+import { ErrorResponse } from '../constants/Errors/ErrorResponse';
+import { isPaginationResponse } from '../utils/isPaginationResponse';
 
 export default function SiginScreen() {
+    const [servers, setServers] = useState<Server[]>([
+        { id: "", name: "Xavalo", state: "Solitary", status: "Active" },
+        { id: "", name: "Fuda", state: "Solitary", status: "Active" },
+        { id: "", name: "Quy Nhơn", state: "Solitary", status: "Active" },
+        { id: "", name: "Hola", state: "Solitary", status: "Active" },
+        { id: "", name: "Hovilo", state: "Solitary", status: "Active" }
+    ]);
+    const [selectedServerId, setSelectedServerId] = useState<string>("");
+    const [openSelectServer, setOpenSelectServer] = useState(false);
+
     GoogleSignin.configure({
         webClientId: "10405435021-tn8n8j1vii065u1e9h4509glmaam12j5.apps.googleusercontent.com",
     })
@@ -156,6 +171,21 @@ export default function SiginScreen() {
             console.warn('Error requesting permissions: ', err);
         }
     };
+
+    //Fetch Servers
+    useEffect(() => {
+        const fetchServers = async () => {
+            const res = await api.get("/servers?SortColumn=createdAt");
+            const data: PaginatedResponse<Server> | ErrorResponse = res.data;
+            if (isPaginationResponse<Server>(data)) {
+                setServers(data.items)
+            } else {
+                setStringErr(data.title);
+                setIsError(true);
+            }
+        }
+        fetchServers();
+    }, [])
 
     //Check user permissions
     useFocusEffect(
@@ -294,6 +324,28 @@ export default function SiginScreen() {
                     placeholderTextColor="#aaa"
                     secureTextEntry
                 />
+
+                <TouchableOpacity
+                    style={[signinStyleSheet.serverButton]}
+                    onPress={() => {
+
+                    }}
+                    touchSoundDisabled={true}
+                >
+                    <LinearGradient
+                        colors={servers[0].state == "Solitary" ? [colors.darkGreen, colors.lightGreen] :
+                            servers[0].state == "Medium" ? [colors.darkYellow, colors.lightYellow] :
+                                [colors.darkRed, colors.lightRed]}
+                        style={signinStyleSheet.serverStatus}
+                    />
+                    <Text style={[signinStyleSheet.buttonText,
+                    {
+                        color: colors.black
+                    }
+                    ]}>
+                        {t("server")}{servers[0].name}
+                    </Text>
+                </TouchableOpacity>
 
                 <TouchableOpacity
                     style={signinStyleSheet.button}

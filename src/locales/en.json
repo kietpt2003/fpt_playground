@@ -156,5 +156,6 @@
     "shrink": "Shrink",
     "loading": "Loading...",
     "opponent-thinking": "The opponent is thinking...",
-    "sfx": "Sfx"
+    "sfx": "Sfx",
+    "server": "Server: "
 }

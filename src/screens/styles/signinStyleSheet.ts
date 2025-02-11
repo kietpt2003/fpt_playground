@@ -77,6 +77,23 @@ const signinStyleSheet = StyleSheet.create({
         height: 50,
         justifyContent: 'center',
         alignItems: 'center',
+        marginBottom: 20
+    },
+    serverButton: {
+        width: '100%',
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 20,
+        flexDirection: "row",
+        gap: 10,
+        borderRadius: 8,
+        backgroundColor: colors.white
+    },
+    serverStatus: {
+        width: 15,
+        height: 15,
+        borderRadius: 30
     },
     signinBtnLinear: {
         position: "absolute",
