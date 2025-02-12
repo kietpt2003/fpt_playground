@@ -69,8 +69,19 @@ const signupStyleSheet = StyleSheet.create({
         fontSize: ScreenWidth > 350 ? 16 : 14,
         marginBottom: 20,
         borderWidth: 1,
-        borderColor: "rgba(0,0,0.5)",
+        borderColor: "rgba(0,0,0,0.5)",
         fontFamily: "RobotoLight"
+    },
+    passwordInputContainer: {
+        width: '100%',
+        height: 50,
+        marginBottom: 20,
+    },
+    showHideButton: {
+        position: "absolute",
+        right: 20,
+        height: 50,
+        justifyContent: "center"
     },
     button: {
         width: '100%',

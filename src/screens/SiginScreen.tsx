@@ -4,7 +4,7 @@ import signinStyleSheet from './styles/signinStyleSheet';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../constants/colors';
 import { Menu, MenuItem } from 'react-native-material-menu';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useTranslation } from "react-i18next";
 import LanguageModal from '../components/LanguageModal';
 import VolumeModal from '../components/VolumeModal';
@@ -35,8 +35,29 @@ import api from '../services/api';
 import { PaginatedResponse } from '../constants/Paginations/PaginationResponse';
 import { ErrorResponse } from '../constants/Errors/ErrorResponse';
 import { isPaginationResponse } from '../utils/isPaginationResponse';
+import ServerModal from '../components/ServerModal';
+import useNotification from '../hooks/useNotification';
+import { handleValidEmail } from '../utils/handleValidEmail';
+import { handleValidPassword } from '../utils/handleValidPassword';
+import { env } from '../constants/environmentVariables';
+import axios, { AxiosError } from 'axios';
+import { jwtDecode } from 'jwt-decode';
+import { login } from '../store/reducers/authReducer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const { NODE_ENV, DEV_API, PROD_API } = env;
+const url =
+    NODE_ENV == "development"
+        ? DEV_API
+        : PROD_API;
 
 export default function SiginScreen() {
+    const [email, setEmail] = useState<string>("");
+    const [emailError, setEmailError] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
+    const [passwordError, setPasswordError] = useState<string>("");
+    const [showPassword, setShowPassword] = useState<boolean>(false);
+
     const [servers, setServers] = useState<Server[]>([
         { id: "", name: "Xavalo", state: "Solitary", status: "Active" },
         { id: "", name: "Fuda", state: "Solitary", status: "Active" },
@@ -44,7 +65,7 @@ export default function SiginScreen() {
         { id: "", name: "Hola", state: "Solitary", status: "Active" },
         { id: "", name: "Hovilo", state: "Solitary", status: "Active" }
     ]);
-    const [selectedServerId, setSelectedServerId] = useState<string>("");
+    const [selectedServer, setSelectedServer] = useState<Server | null>(null);
     const [openSelectServer, setOpenSelectServer] = useState(false);
 
     GoogleSignin.configure({
@@ -82,6 +103,7 @@ export default function SiginScreen() {
 
     const { requestMediaLibPermissionWithoutLinking } = usePhoto();
     const { requestCameraPermissionWithoutLinking } = useCamera();
+    const { deviceToken } = useNotification();
 
     // const handleLoginGoogle = async (accessToken) => {
     //     try {
@@ -117,6 +139,81 @@ export default function SiginScreen() {
     //       await GoogleSignin.signOut();
     //     }
     //   };
+
+    const validateEmail = () => {
+        if (email.length == 0) {
+            setEmailError(t("email-empty-error"));
+            return false;
+        } else if (!handleValidEmail(email)) {
+            setEmailError(t("email-other-error"));
+            return false;
+        } else {
+            setEmailError("");
+            return true;
+        }
+    }
+
+    const validatePassword = () => {
+        if (password.length == 0) {
+            setPasswordError(t("password-empty-error"));
+            return false;
+        } else if (!handleValidPassword(password)) {
+            setPasswordError(t("password-other-error"));
+            return false;
+        } else {
+            setPasswordError("");
+            return true;
+        }
+    }
+
+    const handleSigninAccount = async () => {
+        if (!validateEmail()) {
+            return;
+        }
+
+        if (!validatePassword()) {
+            return;
+        }
+
+        try {
+            const response = await axios.post(`${url}/auth/login`, {
+                email: email,
+                password: password,
+                serverId: selectedServer?.id,
+                deviceToken: deviceToken ? deviceToken : undefined
+            });
+            const { token: apiToken, refreshToken } = response.data;
+            await AsyncStorage.setItem("refreshToken", refreshToken);
+            await AsyncStorage.setItem("token", apiToken);
+
+
+        } catch (error: unknown) {
+            // Kiểm tra nếu error là AxiosError
+            if (axios.isAxiosError(error)) {
+                const errorData: ErrorResponse = error.response?.data;
+                console.log("API call error:", error.response?.data);
+                if (error.status == 503) {
+                    setStringErr(t("server-maintenance"));
+                } else if (errorData.code == "FPB_00" && errorData.reasons[0].title == "user") { //Nếu lỗi chưa có user ở server này thì chuyển sang trang tạo user
+                    navigation.navigate("RegisterUser");
+                } else {
+                    setStringErr(
+                        errorData?.reasons?.[0]?.message ??
+                        "Lỗi mạng, vui lòng thử lại sau"
+                    );
+                }
+            } else {
+                console.log("Unexpected error:", error);
+                setStringErr("Đã xảy ra lỗi không xác định.");
+            }
+
+            setIsError(true);
+        }
+    }
+
+    const handleChooseServer = (server: Server) => {
+        setSelectedServer(server);
+    }
 
     const handleGoogleSignIn = async () => {
         try {
@@ -175,12 +272,30 @@ export default function SiginScreen() {
     //Fetch Servers
     useEffect(() => {
         const fetchServers = async () => {
-            const res = await api.get("/servers?SortColumn=createdAt");
-            const data: PaginatedResponse<Server> | ErrorResponse = res.data;
-            if (isPaginationResponse<Server>(data)) {
-                setServers(data.items)
-            } else {
-                setStringErr(data.title);
+            try {
+                const res = await axios.get(`${url}/servers?SortColumn=createdAt`);
+                const data: PaginatedResponse<Server> = res.data;
+                setServers(data.items);
+                setSelectedServer(data.items[0]);
+
+            } catch (error: unknown) {
+                // Kiểm tra nếu error là AxiosError
+                if (axios.isAxiosError(error)) {
+                    const errorData: ErrorResponse = error.response?.data;
+                    console.log("API call error:", error.response?.data);
+                    if (error.status == 503) {
+                        setStringErr(t("server-maintenance"));
+                    } else {
+                        setStringErr(
+                            errorData?.reasons?.[0]?.message ??
+                            "Lỗi mạng, vui lòng thử lại sau"
+                        );
+                    }
+                } else {
+                    console.log("Unexpected error:", error);
+                    setStringErr("Lỗi mạng, vui lòng thử lại sau");
+                }
+
                 setIsError(true);
             }
         }
@@ -309,26 +424,85 @@ export default function SiginScreen() {
                     </Menu>
                 </View>
 
-                <Text style={signinStyleSheet.title}>
-                    {t("welcome-txt")}
-                </Text>
+                <TextInput
+                    style={[
+                        signinStyleSheet.input,
+                        {
+                            backgroundColor: emailError.length == 0 ? colors.white : colors.lightRed,
+                            borderColor: emailError.length == 0 ? "rgba(0,0,0,0.5)" : colors.darkRed,
+                            marginBottom: emailError.length == 0 ? 20 : 0,
+                        }
+                    ]}
+                    placeholder={t("emil-signin")}
+                    placeholderTextColor="#aaa"
+                    value={email}
+                    onChangeText={(text) => {
+                        setEmail(text);
+                    }}
+                    onEndEditing={() => {
+                        validateEmail();
+                    }}
+                />
+                {
+                    emailError.length != 0 &&
+                    <Text style={signinStyleSheet.errorInput}>{emailError}</Text>
+                }
 
-                <TextInput
-                    style={signinStyleSheet.input}
-                    placeholder={t("emil-username-signin")}
-                    placeholderTextColor="#aaa"
-                />
-                <TextInput
-                    style={signinStyleSheet.input}
-                    placeholder={t("password-input-signin")}
-                    placeholderTextColor="#aaa"
-                    secureTextEntry
-                />
+                <View style={[
+                    signinStyleSheet.passwordInputContainer,
+                    {
+                        marginBottom: passwordError.length == 0 ? 20 : 0,
+                    }
+                ]}>
+                    <TextInput
+                        style={[
+                            signinStyleSheet.input,
+                            {
+                                backgroundColor: passwordError.length == 0 ? colors.white : colors.lightRed,
+                                borderColor: passwordError.length == 0 ? "rgba(0,0,0,0.5)" : colors.darkRed,
+                                marginBottom: 0,
+                            }
+                        ]}
+                        placeholder={t("password-input-signin")}
+                        placeholderTextColor="#aaa"
+                        secureTextEntry={!showPassword}
+                        value={password}
+                        onChangeText={(text) => {
+                            if (text.length >= 0 && text.length <= 15) {
+                                setPassword(text);
+                            }
+                        }}
+                        onEndEditing={() => {
+                            validatePassword();
+                        }}
+                    />
+                    <TouchableOpacity
+                        style={signinStyleSheet.showHideButton}
+                        onPress={() => {
+                            setShowPassword(!showPassword);
+                        }}
+                        touchSoundDisabled={true}
+                    >
+                        <FontAwesome5 name={showPassword ? "eye" : "eye-slash"} size={18} color={passwordError.length == 0 ? colors.blurBlack : colors.darkRed} />
+                    </TouchableOpacity>
+                </View>
+                {
+                    passwordError.length != 0 &&
+                    <Text
+                        style={[
+                            signinStyleSheet.errorInput,
+                            {
+                                height: 40
+                            }
+                        ]}
+                        numberOfLines={2}
+                    >{passwordError}</Text>
+                }
 
                 <TouchableOpacity
                     style={[signinStyleSheet.serverButton]}
                     onPress={() => {
-
+                        setOpenSelectServer(true);
                     }}
                     touchSoundDisabled={true}
                 >
@@ -343,14 +517,14 @@ export default function SiginScreen() {
                         color: colors.black
                     }
                     ]}>
-                        {t("server")}{servers[0].name}
+                        {t("server")}{selectedServer == null ? servers[0].name : selectedServer.name}
                     </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                     style={signinStyleSheet.button}
                     onPress={() => {
-                        navigation.navigate("HomeScreen");
+                        handleSigninAccount();
                     }}
                     touchSoundDisabled={true}
                 >
@@ -422,6 +596,13 @@ export default function SiginScreen() {
             <LanguageModal
                 openChooseLanguage={openChooseLanguage}
                 setOpenChooseLanguage={setOpenChooseLanguage}
+            />
+
+            <ServerModal
+                openChooseServer={openSelectServer}
+                setOpenChooseServer={setOpenSelectServer}
+                servers={servers}
+                handleChangeServer={handleChooseServer}
             />
 
             <ErrorModal

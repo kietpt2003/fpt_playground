@@ -25,6 +25,7 @@ import CameraScreen from "../screens/CameraScreen";
 import GameList from "../screens/GameList";
 import ChineseChessHome from "../screens/ChineseChessHome";
 import ChineseChessBoard from "../components/ChineseChessBoard";
+import RegisterUser from "../screens/RegisterUser";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -105,6 +106,7 @@ export default function RootNavigator({ onMount }: RootNavigatorProps) {
             <Stack.Screen name="CameraScreen" component={CameraScreen} />
             <Stack.Screen name="GameList" component={GameList} />
             <Stack.Screen name="ChineseChessBoard" component={ChineseChessBoard} />
+            <Stack.Screen name="RegisterUser" component={RegisterUser} />
         </Stack.Navigator>
     )
 }

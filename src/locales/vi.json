@@ -4,7 +4,7 @@
     "signin-txt": "Có tài khoản?",
     "signup-btn": "Đăng ký",
     "signup-txt": "Tạo tài khoản",
-    "emil-username-signin": "Tên đăng nhập/Email",
+    "emil-signin": "Email",
     "password-input-signin": "Mật khẩu",
     "menu-item-background": "Màu nền",
     "menu-item-sound": "Âm thanh",
@@ -157,5 +157,14 @@
     "loading": "Đang tải...",
     "opponent-thinking": "Đối thủ đang suy nghĩ...",
     "sfx": "Hiệu ứng",
-    "server": "Máy chủ: "
+    "server": "Máy chủ: ",
+    "server-state": "Trạng thái: ",
+    "state-solitary": "Vắng",
+    "state-medium": "Vừa",
+    "state-full": "Đầy",
+    "email-empty-error": "Email không được để trống",
+    "email-other-error": "Format @gmail.com hoặc @fpt.edu.vn",
+    "password-empty-error": "Mật khẩu không được để trống",
+    "password-other-error": "8-15 ký tự, ít nhất 1 chữ in hoa, ít nhất 1 số, ít nhất 1 ký tự đặc biệt",
+    "server-maintenance": "Server đang bảo trì, vui lòng thử lại sau"
 }

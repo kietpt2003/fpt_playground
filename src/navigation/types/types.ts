@@ -20,6 +20,7 @@ export type RootStackParamList = {
     CameraScreen: undefined;
     GameList: undefined;
     ChineseChessBoard: { isPlaySfx: boolean };
+    RegisterUser: undefined;
 };
 
 export type NavigationProps = StackNavigationProp<RootStackParamList>;

@@ -4,7 +4,7 @@
     "signin-txt": "Have an Account",
     "signup-btn": "Sign up",
     "signup-txt": "Create an Account",
-    "emil-username-signin": "Username/Email",
+    "emil-signin": "Email",
     "password-input-signin": "Password",
     "menu-item-background": "Background",
     "menu-item-sound": "Sound",
@@ -157,5 +157,14 @@
     "loading": "Loading...",
     "opponent-thinking": "The opponent is thinking...",
     "sfx": "Sfx",
-    "server": "Server: "
+    "server": "Server: ",
+    "server-state": "Status: ",
+    "state-solitary": "Solitary",
+    "state-medium": "Medium",
+    "state-full": "Full",
+    "email-empty-error": "Email cannot be empty",
+    "email-other-error": "Format @gmail.com or @fpt.edu.vn",
+    "password-empty-error": "Password cannot be empty",
+    "password-other-error": "8-15 characters, at least 1 uppercase, at least 1 digit, at least 1 special",
+    "server-maintenance": "Server maintenance, please try again later"
 }

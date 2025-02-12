@@ -1,10 +1,9 @@
-import { View, Text, ImageBackground, TextInput, TouchableOpacity, Image, Keyboard } from 'react-native';
+import { View, Text, ImageBackground, TextInput, TouchableOpacity, Image, Keyboard, StyleSheet } from 'react-native';
 import React, { useCallback, useState } from 'react'
-import signupStyleSheet from './styles/signupStyleSheet';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../constants/colors';
 import { Menu, MenuItem } from 'react-native-material-menu';
-import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from "react-i18next";
 import LanguageModal from '../components/LanguageModal';
 import VolumeModal from '../components/VolumeModal';
@@ -19,17 +18,15 @@ import { RootState } from '../store/store';
 import ThemeModal from '../components/ThemeModal';
 import ErrorModal from '../components/ErrorModal';
 import useClick from '../hooks/useClick';
+import { ScreenHeight, ScreenWidth } from '@rneui/base';
 
-type SigninScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Signin'>;
+type RegisterUserNavigationProp = NativeStackNavigationProp<RootStackParamList, 'RegisterUser'>;
 
-export default function SignupScreen() {
-    const [email, setEmail] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
-    const [showPassword, setShowPassword] = useState<boolean>(false);
+export default function RegisterUser() {
 
     const [menuVisible, setMenuVisible] = useState(false);
 
-    const navigation = useNavigation<SigninScreenNavigationProp>();
+    const navigation = useNavigation<RegisterUserNavigationProp>();
 
     const { t, i18n } = useTranslation();
     const [openChooseLanguage, setOpenChooseLanguage] = useState(false);
@@ -81,13 +78,13 @@ export default function SignupScreen() {
                     require('../../assets/images/login-dark-background.webp') :
                     require('../../assets/images/login-light-background.webp')
             }
-            style={signupStyleSheet.backgroundImage}
+            style={styles.backgroundImage}
         >
-            <View style={signupStyleSheet.container}>
-                <View style={signupStyleSheet.header}>
+            <View style={styles.container}>
+                <View style={styles.header}>
                     <LinearGradient
                         colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
-                        style={signupStyleSheet.settingIcon}
+                        style={styles.settingIcon}
                     />
                     <Menu
                         visible={menuVisible}
@@ -115,12 +112,12 @@ export default function SignupScreen() {
                                 setOpenChooseTheme(true);
                             }}
                         >
-                            <View style={signupStyleSheet.menuItem}>
+                            <View style={styles.menuItem}>
                                 <Ionicons name={theme === "dark" ?
                                     "moon-outline" :
                                     "sunny-outline"
                                 } size={theme === "dark" ? 19 : 21} color={"black"} />
-                                <Text style={signupStyleSheet.menuItemTxt}>
+                                <Text style={styles.menuItemTxt}>
                                     {t("menu-item-background")}
                                 </Text>
                             </View>
@@ -133,9 +130,9 @@ export default function SignupScreen() {
                                 setOpenChangeVolume(true);
                             }}
                         >
-                            <View style={signupStyleSheet.menuItem}>
+                            <View style={styles.menuItem}>
                                 <Ionicons name={getVolumeIcon(volume * 10)} size={20} color={"black"} />
-                                <Text style={signupStyleSheet.menuItemTxt}>
+                                <Text style={styles.menuItemTxt}>
                                     {t("menu-item-sound")}
                                 </Text>
                             </View>
@@ -148,7 +145,7 @@ export default function SignupScreen() {
                                 setOpenChooseLanguage(true);
                             }}
                         >
-                            <View style={signupStyleSheet.menuItem}>
+                            <View style={styles.menuItem}>
                                 <Image
                                     style={{
                                         width: i18n.language === "vi" ? 19 : 18,
@@ -156,7 +153,7 @@ export default function SignupScreen() {
                                     }}
                                     source={i18n.language === "vi" ? require("../../assets/images/vn-flag.png") : require("../../assets/images/us-flag.png")}
                                 />
-                                <Text style={signupStyleSheet.menuItemTxt}>
+                                <Text style={styles.menuItemTxt}>
                                     {t("menu-item-language")}
                                 </Text>
                             </View>
@@ -164,43 +161,24 @@ export default function SignupScreen() {
                     </Menu>
                 </View>
 
-                <Text style={signupStyleSheet.title}>
+                <Text style={styles.title}>
                     {t("signup-title")}
                 </Text>
 
                 <TextInput
-                    style={signupStyleSheet.input}
-                    placeholder={t("emil-signin")}
+                    style={styles.input}
+                    placeholder={t("emil-username-signin")}
                     placeholderTextColor="#aaa"
-                    value={email}
-                    onChangeText={(text) => {
-                        setEmail(text);
-                    }}
                 />
-                <View style={signupStyleSheet.passwordInputContainer}>
-                    <TextInput
-                        style={signupStyleSheet.input}
-                        placeholder={t("password-input-signin")}
-                        placeholderTextColor="#aaa"
-                        secureTextEntry={!showPassword}
-                        value={password}
-                        onChangeText={(text) => {
-                            setPassword(text);
-                        }}
-                    />
-                    <TouchableOpacity
-                        style={signupStyleSheet.showHideButton}
-                        onPress={() => {
-                            setShowPassword(!showPassword);
-                        }}
-                        touchSoundDisabled={true}
-                    >
-                        <FontAwesome5 name={showPassword ? "eye" : "eye-slash"} size={18} color={colors.blurBlack} />
-                    </TouchableOpacity>
-                </View>
+                <TextInput
+                    style={styles.input}
+                    placeholder={t("password-input-signin")}
+                    placeholderTextColor="#aaa"
+                    secureTextEntry
+                />
 
                 <TouchableOpacity
-                    style={signupStyleSheet.button}
+                    style={styles.button}
                     onPress={() => {
                         navigation.replace("Signup");
                     }}
@@ -208,36 +186,36 @@ export default function SignupScreen() {
                 >
                     <LinearGradient
                         colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
-                        style={signupStyleSheet.signinBtnLinear}
+                        style={styles.signinBtnLinear}
                     />
-                    <Text style={signupStyleSheet.buttonText}>
+                    <Text style={styles.buttonText}>
                         {t("signup-btn")}
                     </Text>
                 </TouchableOpacity>
 
-                <View style={signupStyleSheet.signinForgotPassContainer}>
+                <View style={styles.signinForgotPassContainer}>
                     {/* Signin */}
                     <TouchableOpacity
-                        style={signupStyleSheet.signinForgotPassBtn}
+                        style={styles.signinForgotPassBtn}
                         onPress={() => {
                             navigation.goBack();
                         }}
                         touchSoundDisabled={true}
                     >
-                        <Text style={signupStyleSheet.signinTxt}>
+                        <Text style={styles.signinTxt}>
                             {t("signin-txt")}
                         </Text>
                     </TouchableOpacity>
 
                     {/* Forgot password */}
                     <TouchableOpacity
-                        style={signupStyleSheet.signinForgotPassBtn}
+                        style={styles.signinForgotPassBtn}
                         onPress={() => {
                             navigation.navigate("ForgotPassword");
                         }}
                         touchSoundDisabled={true}
                     >
-                        <Text style={signupStyleSheet.forgotPasswordTxt}>
+                        <Text style={styles.forgotPasswordTxt}>
                             {t("forgot-password")}
                         </Text>
                     </TouchableOpacity>
@@ -246,7 +224,7 @@ export default function SignupScreen() {
                 {/* Version control */}
                 {
                     !isOpenKeyboard &&
-                    <Text style={signupStyleSheet.versionControl}>
+                    <Text style={styles.versionControl}>
                         {t("app-version")}
                     </Text>
                 }
@@ -280,3 +258,123 @@ export default function SignupScreen() {
         </ImageBackground >
     )
 }
+
+const styles = StyleSheet.create({
+    backgroundImage: {
+        flex: 1,
+        resizeMode: 'cover', // Đảm bảo hình nền che toàn bộ màn hình
+        justifyContent: 'center',
+    },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+        backgroundColor: colors.grey, // Lớp overlay để làm mờ hình nền
+    },
+    header: {
+        position: 'absolute',
+        top: 50,
+        right: 20,
+        width: ScreenHeight / 22,
+        height: ScreenHeight / 22,
+        borderRadius: 30,
+        justifyContent: "center",
+        alignItems: "center",
+        borderColor: colors.white,
+        borderWidth: 2.8,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 5 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 10,
+    },
+    settingIcon: {
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        borderRadius: 30,
+    },
+    menuItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: "space-between",
+        paddingVertical: 6, // Giảm padding dọc
+        backgroundColor: colors.milkyWhite,
+        height: ScreenHeight / 8
+    },
+    menuItemTxt: {
+        fontSize: 16,
+        flex: 0.9,
+        textAlign: 'left',
+        flexWrap: "nowrap", // Ngăn xuống dòng
+        overflow: "hidden", // Ngăn tràn nội dung
+        fontFamily: "Roboto"
+    },
+    title: {
+        fontSize: ScreenWidth > 350 ? 32 : 30,
+        color: colors.white,
+        marginBottom: 40,
+        fontFamily: "RobotoMedium"
+    },
+    input: {
+        width: '100%',
+        height: 50,
+        backgroundColor: colors.white,
+        borderRadius: 8,
+        paddingHorizontal: 15,
+        fontSize: ScreenWidth > 350 ? 16 : 14,
+        marginBottom: 20,
+        borderWidth: 1,
+        borderColor: "rgba(0,0,0.5)",
+        fontFamily: "RobotoLight"
+    },
+    button: {
+        width: '100%',
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    signinBtnLinear: {
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        borderRadius: 8,
+    },
+    buttonText: {
+        fontSize: ScreenWidth > 350 ? 18 : 16,
+        color: colors.white,
+        fontFamily: "RobotoMedium"
+    },
+    signinForgotPassBtn: {
+        width: '50%',
+        padding: 5
+    },
+    forgotPasswordTxt: {
+        alignSelf: "flex-end",
+        fontSize: ScreenWidth > 350 ? 14 : 13,
+        opacity: 0.9,
+        letterSpacing: 1,
+        color: colors.white,
+        fontFamily: "RobotoMedium"
+    },
+    versionControl: {
+        position: "absolute",
+        bottom: 10,
+        right: 10,
+        color: colors.white,
+        fontFamily: "Roboto"
+    },
+    signinTxt: {
+        alignSelf: "flex-start",
+        fontSize: ScreenWidth > 350 ? 14 : 13,
+        opacity: 0.9,
+        letterSpacing: 1,
+        color: colors.white,
+        fontFamily: "RobotoMedium"
+    },
+    signinForgotPassContainer: {
+        flexDirection: "row",
+        width: '100%',
+    }
+});

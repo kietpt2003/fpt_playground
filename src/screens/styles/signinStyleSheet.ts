@@ -69,8 +69,26 @@ const signinStyleSheet = StyleSheet.create({
         fontSize: ScreenWidth > 350 ? 16 : 14,
         marginBottom: 20,
         borderWidth: 1,
-        borderColor: "rgba(0,0,0.5)",
+        // borderColor: "rgba(0,0,0.5)",
         fontFamily: "RobotoLight"
+    },
+    errorInput: {
+        color: colors.darkRed,
+        fontFamily: "RobotoMedium",
+        height: 20,
+        width: '100%',
+        paddingHorizontal: 15,
+    },
+    passwordInputContainer: {
+        width: '100%',
+        height: 50,
+        marginBottom: 20,
+    },
+    showHideButton: {
+        position: "absolute",
+        right: 15,
+        height: 50,
+        justifyContent: "center"
     },
     button: {
         width: '100%',

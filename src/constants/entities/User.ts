@@ -1,6 +1,8 @@
 export interface User {
     id: string;
     name: string;
-    gender: "Male" | "Female";
-    imageUrl: string;
+    gender: UserGender;
+    imageUrl?: string;
 }
+
+export type UserGender = "Male" | "Female"
