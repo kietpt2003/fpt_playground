@@ -166,5 +166,8 @@
     "email-other-error": "Format @gmail.com hoặc @fpt.edu.vn",
     "password-empty-error": "Mật khẩu không được để trống",
     "password-other-error": "8-15 ký tự, ít nhất 1 chữ in hoa, ít nhất 1 số, ít nhất 1 ký tự đặc biệt",
-    "server-maintenance": "Server đang bảo trì, vui lòng thử lại sau"
+    "server-maintenance": "Server đang bảo trì, vui lòng thử lại sau",
+    "loggedIn-current": "Đang chơi: ",
+    "change-account": "Đổi tài khoản",
+    "change-server": "Vui lòng đăng nhập lại để tạo thông tin người dùng"
 }

@@ -1,6 +1,6 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ServerName } from "../../constants/entities/Server";
 import { RootStackParamList } from "../../navigation/types/types";
+import { ServerName } from "../../constants/models/ServerResponse";
 
 export type RankingUser = {
     userId: string;

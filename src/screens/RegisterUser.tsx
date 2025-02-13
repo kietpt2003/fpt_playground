@@ -162,7 +162,7 @@ export default function RegisterUser() {
                 </View>
 
                 <Text style={styles.title}>
-                    {t("signup-title")}
+                    Register Screen
                 </Text>
 
                 <TextInput

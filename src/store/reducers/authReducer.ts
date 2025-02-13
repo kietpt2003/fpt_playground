@@ -1,12 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { User } from '../../constants/entities/User';
+import { UserResponse } from '../../constants/models/UserResponse';
 
 // Tạo một slice để quản lý trạng thái auth
 const authSlice = createSlice({
     name: 'auth',
     initialState: {
         isLoggedIn: false,
-        user: null as User | null,
+        user: null as UserResponse | null,
     },
     reducers: {
         login(state, action) {

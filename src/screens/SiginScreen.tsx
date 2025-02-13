@@ -1,4 +1,4 @@
-import { View, Text, ImageBackground, TextInput, TouchableOpacity, Image, Keyboard, Platform, PermissionsAndroid, Permission } from 'react-native';
+import { View, Text, ImageBackground, TextInput, TouchableOpacity, Image, Keyboard, Platform, PermissionsAndroid, Permission, ActivityIndicator } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react'
 import signinStyleSheet from './styles/signinStyleSheet';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -12,7 +12,7 @@ import getVolumeIcon from '../utils/getVolumeIcon';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AudioPlayer from '../components/AudioPlayer';
 import useAudio from '../hooks/useAudio';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import ThemeModal from '../components/ThemeModal';
 import { ScreenHeight, ScreenWidth } from '@rneui/base';
@@ -30,7 +30,6 @@ import { SigninScreenNavigationProp } from './types/signinScreenTypes';
 import * as Location from "expo-location";
 import usePhoto from '../hooks/usePhoto';
 import useCamera from '../hooks/useCamera';
-import { Server } from '../constants/entities/Server';
 import api from '../services/api';
 import { PaginatedResponse } from '../constants/Paginations/PaginationResponse';
 import { ErrorResponse } from '../constants/Errors/ErrorResponse';
@@ -42,8 +41,11 @@ import { handleValidPassword } from '../utils/handleValidPassword';
 import { env } from '../constants/environmentVariables';
 import axios, { AxiosError } from 'axios';
 import { jwtDecode } from 'jwt-decode';
-import { login } from '../store/reducers/authReducer';
+import { login, logout } from '../store/reducers/authReducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ServerResponse } from '../constants/models/ServerResponse';
+import { UserResponse } from '../constants/models/UserResponse';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 const { NODE_ENV, DEV_API, PROD_API } = env;
 const url =
@@ -57,15 +59,18 @@ export default function SiginScreen() {
     const [password, setPassword] = useState<string>("");
     const [passwordError, setPasswordError] = useState<string>("");
     const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [isFetching, setIsFetching] = useState<boolean>(false);
+    const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
+    const user = useSelector((state: RootState) => state.auth.user);
 
-    const [servers, setServers] = useState<Server[]>([
+    const [servers, setServers] = useState<ServerResponse[]>([
         { id: "", name: "Xavalo", state: "Solitary", status: "Active" },
         { id: "", name: "Fuda", state: "Solitary", status: "Active" },
         { id: "", name: "Quy Nhơn", state: "Solitary", status: "Active" },
         { id: "", name: "Hola", state: "Solitary", status: "Active" },
         { id: "", name: "Hovilo", state: "Solitary", status: "Active" }
     ]);
-    const [selectedServer, setSelectedServer] = useState<Server | null>(null);
+    const [selectedServer, setSelectedServer] = useState<ServerResponse | null>(null);
     const [openSelectServer, setOpenSelectServer] = useState(false);
 
     GoogleSignin.configure({
@@ -86,6 +91,8 @@ export default function SiginScreen() {
     const [openChooseTheme, setOpenChooseTheme] = useState(false);
 
     const [isOpenKeyboard, setIsOpenKeyboard] = useState(false);
+
+    const dispatch = useDispatch();
 
     const { playSound } = useClick();
 
@@ -140,6 +147,36 @@ export default function SiginScreen() {
     //     }
     //   };
 
+    const getCurrentUser = async () => {
+        try {
+            const res = await api.get(`${url}/users/current`);
+            const data: UserResponse = res.data;
+            dispatch(login(data));
+        } catch (error: unknown) {
+            // Kiểm tra nếu error là AxiosError
+            if (axios.isAxiosError(error)) {
+                const errorData: ErrorResponse = error.response?.data;
+                console.log("API call error:", error.response?.data);
+                if (error.status == 503) {
+                    setStringErr(t("server-maintenance"));
+                    await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
+                        dispatch(logout());
+                    });
+                } else {
+                    setStringErr(
+                        errorData?.reasons?.[0]?.message ??
+                        "Lỗi mạng, vui lòng thử lại sau"
+                    );
+                }
+            } else {
+                console.log("Unexpected error:", error);
+                setStringErr("Đã xảy ra lỗi không xác định.");
+            }
+
+            setIsError(true);
+        }
+    }
+
     const validateEmail = () => {
         if (email.length == 0) {
             setEmailError(t("email-empty-error"));
@@ -167,15 +204,19 @@ export default function SiginScreen() {
     }
 
     const handleSigninAccount = async () => {
+        let isError = false;
         if (!validateEmail()) {
-            return;
+            isError = true;
         }
 
         if (!validatePassword()) {
-            return;
+            isError = true;
         }
 
+        if (isError) return;
+
         try {
+            setIsFetching(true);
             const response = await axios.post(`${url}/auth/login`, {
                 email: email,
                 password: password,
@@ -185,8 +226,9 @@ export default function SiginScreen() {
             const { token: apiToken, refreshToken } = response.data;
             await AsyncStorage.setItem("refreshToken", refreshToken);
             await AsyncStorage.setItem("token", apiToken);
-
-
+            await getCurrentUser();
+            setIsFetching(false);
+            navigation.replace("HomeScreen");
         } catch (error: unknown) {
             // Kiểm tra nếu error là AxiosError
             if (axios.isAxiosError(error)) {
@@ -194,6 +236,7 @@ export default function SiginScreen() {
                 console.log("API call error:", error.response?.data);
                 if (error.status == 503) {
                     setStringErr(t("server-maintenance"));
+                    setIsError(true);
                 } else if (errorData.code == "FPB_00" && errorData.reasons[0].title == "user") { //Nếu lỗi chưa có user ở server này thì chuyển sang trang tạo user
                     navigation.navigate("RegisterUser");
                 } else {
@@ -201,17 +244,18 @@ export default function SiginScreen() {
                         errorData?.reasons?.[0]?.message ??
                         "Lỗi mạng, vui lòng thử lại sau"
                     );
+                    setIsError(true);
                 }
             } else {
                 console.log("Unexpected error:", error);
                 setStringErr("Đã xảy ra lỗi không xác định.");
+                setIsError(true);
             }
-
-            setIsError(true);
+            setIsFetching(false);
         }
     }
 
-    const handleChooseServer = (server: Server) => {
+    const handleChooseServer = (server: ServerResponse) => {
         setSelectedServer(server);
     }
 
@@ -269,12 +313,98 @@ export default function SiginScreen() {
         }
     };
 
+    const handleChangeAccount = async () => {
+        setIsFetching(true);
+        await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
+            dispatch(logout());
+        });
+        setIsFetching(false);
+    }
+
+    const handleChangeServer = async (server: ServerResponse) => {
+        try {
+            setIsFetching(true);
+            const response = await axios.post(`${url}/auth/change-server`, {
+                serverId: server.id,
+            });
+            const { token: apiToken, refreshToken } = response.data;
+            await AsyncStorage.setItem("refreshToken", refreshToken);
+            await AsyncStorage.setItem("token", apiToken);
+            await getCurrentUser();
+            setIsFetching(false);
+        } catch (error: unknown) {
+            // Kiểm tra nếu error là AxiosError
+            if (axios.isAxiosError(error)) {
+                const errorData: ErrorResponse = error.response?.data;
+                console.log("API call error:", error.response?.data);
+                if (error.status == 503) {
+                    setStringErr(t("server-maintenance"));
+                    await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
+                        dispatch(logout());
+                    });
+                } else if (errorData.code == "FPB_00" && errorData.reasons[0].title == "user") { //Nếu lỗi chưa có user ở server này thì đăng xuất người dùng ra luôn
+                    await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
+                        dispatch(logout());
+                    });
+                    setStringErr(t("change-server"));
+                } else {
+                    setStringErr(
+                        errorData?.reasons?.[0]?.message ??
+                        "Lỗi mạng, vui lòng thử lại sau"
+                    );
+                }
+            } else {
+                console.log("Unexpected error:", error);
+                setStringErr("Đã xảy ra lỗi không xác định.");
+            }
+            setIsFetching(false);
+            setIsError(true);
+        }
+    }
+
+    //Check token auto login. TH auto này nếu có lỗi do token hết hạn hay ntn đó thì đều Logout hết mà không báo lỗi.
+    //Ngoại trừ TH server bảo trì thì mới thông báo server bảo trì thôi
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const token = await AsyncStorage.getItem("token");
+
+                if (token) {
+                    setIsFetching(true);
+                    await getCurrentUser();
+                    setIsFetching(false);
+                }
+            } catch (error: unknown) {
+                // Kiểm tra nếu error là AxiosError
+                if (axios.isAxiosError(error)) {
+                    const errorData: ErrorResponse = error.response?.data;
+                    console.log("API call error:", error.response?.data);
+                    if (error.status == 503) {
+                        setStringErr(t("server-maintenance"));
+                        setIsError(true);
+                    } else {
+                        console.log(errorData?.reasons?.[0]?.message ??
+                            "Lỗi mạng, vui lòng thử lại sau");
+                    }
+                } else {
+                    console.log("Unexpected error:", error);
+                }
+
+                setIsFetching(false);
+                await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
+                    dispatch(logout());
+                });
+            }
+        }
+        fetchUser();
+    }, [])
+
     //Fetch Servers
     useEffect(() => {
         const fetchServers = async () => {
             try {
                 const res = await axios.get(`${url}/servers?SortColumn=createdAt`);
-                const data: PaginatedResponse<Server> = res.data;
+                const data: PaginatedResponse<ServerResponse> = res.data;
                 setServers(data.items);
                 setSelectedServer(data.items[0]);
 
@@ -285,18 +415,14 @@ export default function SiginScreen() {
                     console.log("API call error:", error.response?.data);
                     if (error.status == 503) {
                         setStringErr(t("server-maintenance"));
+                        setIsError(true);
                     } else {
-                        setStringErr(
-                            errorData?.reasons?.[0]?.message ??
-                            "Lỗi mạng, vui lòng thử lại sau"
-                        );
+                        console.log(errorData?.reasons?.[0]?.message ??
+                            "Lỗi mạng, vui lòng thử lại sau");
                     }
                 } else {
                     console.log("Unexpected error:", error);
-                    setStringErr("Lỗi mạng, vui lòng thử lại sau");
                 }
-
-                setIsError(true);
             }
         }
         fetchServers();
@@ -335,281 +461,362 @@ export default function SiginScreen() {
     );
 
     return (
-        <ImageBackground
-            source={
-                theme === "dark" ?
-                    require('../../assets/images/login-dark-background.webp') :
-                    require('../../assets/images/login-light-background.webp')
-            }
-            style={signinStyleSheet.backgroundImage}
-        >
-            <View style={signinStyleSheet.container}>
-                <View style={signinStyleSheet.header}>
-                    <LinearGradient
-                        colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
-                        style={signinStyleSheet.settingIcon}
-                    />
-                    <Menu
-                        visible={menuVisible}
-                        anchor={
-                            <TouchableOpacity
-                                onPress={showMenu}
-                                touchSoundDisabled={true}
+        <SafeAreaView>
+            <ImageBackground
+                source={
+                    theme === "dark" ?
+                        require('../../assets/images/login-dark-background.webp') :
+                        require('../../assets/images/login-light-background.webp')
+                }
+                style={signinStyleSheet.backgroundImage}
+            >
+                <View style={signinStyleSheet.container}>
+                    <View style={signinStyleSheet.header}>
+                        <LinearGradient
+                            colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
+                            style={signinStyleSheet.settingIcon}
+                        />
+                        <Menu
+                            visible={menuVisible}
+                            anchor={
+                                <TouchableOpacity
+                                    onPress={showMenu}
+                                    touchSoundDisabled={true}
+                                >
+                                    <MaterialIcons name="settings" size={24} color={colors.white} />
+                                </TouchableOpacity>
+                            }
+                            onRequestClose={hideMenu}
+                            style={{
+                                position: "absolute",
+                                top: 45,
+                                borderRadius: 10,
+                                width: i18n.language === "vi" ? 170 : 190,
+                                backgroundColor: colors.milkyWhite,
+                            }}
+                        >
+                            {/* Background */}
+                            <MenuItem
+                                onPress={() => {
+                                    hideMenu();
+                                    setOpenChooseTheme(true);
+                                }}
                             >
-                                <MaterialIcons name="settings" size={24} color={colors.white} />
-                            </TouchableOpacity>
-                        }
-                        onRequestClose={hideMenu}
-                        style={{
-                            position: "absolute",
-                            top: 45,
-                            borderRadius: 10,
-                            width: i18n.language === "vi" ? 170 : 190,
-                            backgroundColor: colors.milkyWhite,
-                        }}
-                    >
-                        {/* Background */}
-                        <MenuItem
-                            onPress={() => {
-                                hideMenu();
-                                setOpenChooseTheme(true);
-                            }}
-                        >
-                            <View style={signinStyleSheet.menuItem}>
-                                <Ionicons name={theme === "dark" ?
-                                    "moon-outline" :
-                                    "sunny-outline"
-                                } size={theme === "dark" ? 19 : 21} color={"black"} />
-                                <Text style={signinStyleSheet.menuItemTxt}>
-                                    {t("menu-item-background")}
-                                </Text>
-                            </View>
-                        </MenuItem>
+                                <View style={signinStyleSheet.menuItem}>
+                                    <Ionicons name={theme === "dark" ?
+                                        "moon-outline" :
+                                        "sunny-outline"
+                                    } size={theme === "dark" ? 19 : 21} color={"black"} />
+                                    <Text style={signinStyleSheet.menuItemTxt}>
+                                        {t("menu-item-background")}
+                                    </Text>
+                                </View>
+                            </MenuItem>
 
-                        {/* Sound */}
-                        <MenuItem
-                            onPress={() => {
-                                hideMenu();
-                                setOpenChangeVolume(true);
-                            }}
-                        >
-                            <View style={signinStyleSheet.menuItem}>
-                                <Ionicons name={getVolumeIcon(volume * 10)} size={20} color={"black"} />
-                                <Text style={signinStyleSheet.menuItemTxt}>
-                                    {t("menu-item-sound")}
-                                </Text>
-                            </View>
-                        </MenuItem>
+                            {/* Sound */}
+                            <MenuItem
+                                onPress={() => {
+                                    hideMenu();
+                                    setOpenChangeVolume(true);
+                                }}
+                            >
+                                <View style={signinStyleSheet.menuItem}>
+                                    <Ionicons name={getVolumeIcon(volume * 10)} size={20} color={"black"} />
+                                    <Text style={signinStyleSheet.menuItemTxt}>
+                                        {t("menu-item-sound")}
+                                    </Text>
+                                </View>
+                            </MenuItem>
 
-                        {/* Language */}
-                        <MenuItem
-                            onPress={() => {
-                                hideMenu();
-                                setOpenChooseLanguage(true);
-                            }}
-                        >
-                            <View style={signinStyleSheet.menuItem}>
-                                <Image
-                                    style={{
-                                        width: i18n.language === "vi" ? 19 : 18,
-                                        height: i18n.language === "vi" ? 19 : 18,
+                            {/* Language */}
+                            <MenuItem
+                                onPress={() => {
+                                    hideMenu();
+                                    setOpenChooseLanguage(true);
+                                }}
+                            >
+                                <View style={signinStyleSheet.menuItem}>
+                                    <Image
+                                        style={{
+                                            width: i18n.language === "vi" ? 19 : 18,
+                                            height: i18n.language === "vi" ? 19 : 18,
+                                        }}
+                                        source={i18n.language === "vi" ? require("../../assets/images/vn-flag.png") : require("../../assets/images/us-flag.png")}
+                                    />
+                                    <Text style={signinStyleSheet.menuItemTxt}>
+                                        {t("menu-item-language")}
+                                    </Text>
+                                </View>
+                            </MenuItem>
+                        </Menu>
+                    </View>
+
+                    {
+                        !isLoggedIn ?
+                            <>
+                                {/* Email input */}
+                                <TextInput
+                                    style={[
+                                        signinStyleSheet.input,
+                                        {
+                                            backgroundColor: emailError.length == 0 ? colors.white : colors.lightRed,
+                                            borderColor: emailError.length == 0 ? "rgba(0,0,0,0.5)" : colors.darkRed,
+                                            marginBottom: emailError.length == 0 ? 20 : 0,
+                                        }
+                                    ]}
+                                    placeholder={t("emil-signin")}
+                                    placeholderTextColor={emailError.length == 0 ? "#aaa" : colors.white}
+                                    value={email}
+                                    onChangeText={(text) => {
+                                        setEmail(text);
                                     }}
-                                    source={i18n.language === "vi" ? require("../../assets/images/vn-flag.png") : require("../../assets/images/us-flag.png")}
+                                    onEndEditing={() => {
+                                        validateEmail();
+                                    }}
+                                    editable={!isFetching}
                                 />
-                                <Text style={signinStyleSheet.menuItemTxt}>
-                                    {t("menu-item-language")}
-                                </Text>
-                            </View>
-                        </MenuItem>
-                    </Menu>
-                </View>
+                                {
+                                    emailError.length != 0 &&
+                                    <Text style={signinStyleSheet.errorInput}>{emailError}</Text>
+                                }
 
-                <TextInput
-                    style={[
-                        signinStyleSheet.input,
+                                {/* Password input */}
+                                <View style={[
+                                    signinStyleSheet.passwordInputContainer,
+                                    {
+                                        marginBottom: passwordError.length == 0 ? 20 : 0,
+                                    }
+                                ]}>
+                                    <TextInput
+                                        style={[
+                                            signinStyleSheet.input,
+                                            {
+                                                backgroundColor: passwordError.length == 0 ? colors.white : colors.lightRed,
+                                                borderColor: passwordError.length == 0 ? "rgba(0,0,0,0.5)" : colors.darkRed,
+                                                marginBottom: 0,
+                                            }
+                                        ]}
+                                        placeholder={t("password-input-signin")}
+                                        placeholderTextColor={passwordError.length == 0 ? "#aaa" : colors.white}
+                                        secureTextEntry={!showPassword}
+                                        value={password}
+                                        onChangeText={(text) => {
+                                            if (text.length >= 0 && text.length <= 15) {
+                                                setPassword(text);
+                                            }
+                                        }}
+                                        onEndEditing={() => {
+                                            validatePassword();
+                                        }}
+                                        editable={!isFetching}
+                                    />
+                                    <TouchableOpacity
+                                        style={signinStyleSheet.showHideButton}
+                                        onPress={() => {
+                                            setShowPassword(!showPassword);
+                                        }}
+                                        touchSoundDisabled={true}
+                                        disabled={isFetching}
+                                    >
+                                        <FontAwesome5 name={showPassword ? "eye" : "eye-slash"} size={18} color={passwordError.length == 0 ? colors.blurBlack : colors.darkRed} />
+                                    </TouchableOpacity>
+                                </View>
+                                {
+                                    passwordError.length != 0 &&
+                                    <Text
+                                        style={[
+                                            signinStyleSheet.errorInput,
+                                            {
+                                                height: 40
+                                            }
+                                        ]}
+                                        numberOfLines={2}
+                                    >{passwordError}</Text>
+                                }
+                            </> :
+                            <>
+                                <TouchableOpacity
+                                    style={signinStyleSheet.loggedInButtonContainer}
+                                    onPress={() => {
+                                        navigation.replace("HomeScreen");
+                                    }}
+                                    touchSoundDisabled={true}
+                                    disabled={isFetching}
+                                >
+                                    <LinearGradient
+                                        colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
+                                        style={signinStyleSheet.signinBtnLinear}
+                                    />
+                                    <Text
+                                        style={signinStyleSheet.loggedInText}
+                                        numberOfLines={1}
+                                    >
+                                        {t("loggedIn-current")}{user?.account?.email}
+                                    </Text>
+                                </TouchableOpacity>
+                            </>
+                    }
+
+                    {/* Change account */}
+                    {
+                        isLoggedIn &&
+                        <TouchableOpacity
+                            style={[signinStyleSheet.serverButton]}
+                            onPress={() => {
+                                handleChangeAccount();
+                            }}
+                            touchSoundDisabled={true}
+                            disabled={isFetching}
+                        >
+                            <LinearGradient
+                                colors={theme === "dark" ? [colors.black, colors.grey] : [colors.milkyWhite, colors.white]} // Hiệu ứng chuyển màu
+                                style={signinStyleSheet.serverButtonLinear}
+                            />
+                            <Text style={[signinStyleSheet.buttonText,
+                            {
+                                color: colors.black
+                            }
+                            ]}>
+                                {t("change-account")}
+                            </Text>
+                        </TouchableOpacity>
+                    }
+
+                    {/* Choose server */}
+                    <TouchableOpacity
+                        style={[signinStyleSheet.serverButton]}
+                        onPress={() => {
+                            setOpenSelectServer(true);
+                        }}
+                        touchSoundDisabled={true}
+                        disabled={isFetching}
+                    >
+                        <LinearGradient
+                            colors={theme === "dark" ? [colors.black, colors.grey] : [colors.milkyWhite, colors.white]} // Hiệu ứng chuyển màu
+                            style={signinStyleSheet.serverButtonLinear}
+                        />
+                        <LinearGradient
+                            colors={servers[0].state == "Solitary" ? [colors.darkGreen, colors.lightGreen] :
+                                servers[0].state == "Medium" ? [colors.darkYellow, colors.lightYellow] :
+                                    [colors.darkRed, colors.lightRed]}
+                            style={signinStyleSheet.serverStatus}
+                        />
+                        <Text style={[signinStyleSheet.buttonText,
                         {
-                            backgroundColor: emailError.length == 0 ? colors.white : colors.lightRed,
-                            borderColor: emailError.length == 0 ? "rgba(0,0,0,0.5)" : colors.darkRed,
-                            marginBottom: emailError.length == 0 ? 20 : 0,
+                            color: colors.black
                         }
-                    ]}
-                    placeholder={t("emil-signin")}
-                    placeholderTextColor="#aaa"
-                    value={email}
-                    onChangeText={(text) => {
-                        setEmail(text);
-                    }}
-                    onEndEditing={() => {
-                        validateEmail();
-                    }}
+                        ]}>
+                            {t("server")}{selectedServer == null ? servers[0].name : selectedServer.name}
+                        </Text>
+                    </TouchableOpacity>
+
+                    {
+                        !isLoggedIn &&
+                        <>
+                            {/* Signin button */}
+                            <TouchableOpacity
+                                style={signinStyleSheet.button}
+                                onPress={() => {
+                                    handleSigninAccount();
+                                }}
+                                touchSoundDisabled={true}
+                                disabled={isFetching}
+                            >
+                                <LinearGradient
+                                    colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
+                                    style={signinStyleSheet.signinBtnLinear}
+                                />
+                                <Text style={signinStyleSheet.buttonText}>
+                                    {t("signin-btn")}
+                                </Text>
+                            </TouchableOpacity>
+
+                            <GoogleSignInButton
+                                onPress={() => {
+                                    handleGoogleSignIn();
+                                }}
+                                isFetching={isFetching}
+                            />
+
+                            <View style={signinStyleSheet.signupForgotPassContainer}>
+                                {/* Signup */}
+                                <TouchableOpacity
+                                    style={signinStyleSheet.signupForgotPassBtn}
+                                    onPress={() => {
+                                        navigation.navigate("Signup");
+                                    }}
+                                    touchSoundDisabled={true}
+                                >
+                                    <Text style={signinStyleSheet.signupTxt}>
+                                        {t("signup-txt")}
+                                    </Text>
+                                </TouchableOpacity>
+
+                                {/* Forgot password */}
+                                <TouchableOpacity
+                                    style={signinStyleSheet.signupForgotPassBtn}
+                                    onPress={() => {
+                                        navigation.navigate("ForgotPassword");
+                                    }}
+                                    touchSoundDisabled={true}
+                                >
+                                    <Text style={signinStyleSheet.forgotPasswordTxt}>
+                                        {t("forgot-password")}
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </>
+                    }
+
+                    {/* Version control */}
+                    {
+                        !isOpenKeyboard &&
+                        <Text style={signinStyleSheet.versionControl}>
+                            {t("app-version")}
+                        </Text>
+                    }
+
+                    <AudioPlayer />
+                </View>
+
+                {/* Change background */}
+                <ThemeModal
+                    openChooseTheme={openChooseTheme}
+                    setOpenChooseTheme={setOpenChooseTheme}
                 />
+
+                {/* Change sound setting */}
+                <VolumeModal
+                    openChangeVolume={openChangeVolume}
+                    setOpenChangeVolume={setOpenChangeVolume}
+                />
+
+                {/* Choose language */}
+                <LanguageModal
+                    openChooseLanguage={openChooseLanguage}
+                    setOpenChooseLanguage={setOpenChooseLanguage}
+                />
+
+                <ServerModal
+                    openChooseServer={openSelectServer}
+                    setOpenChooseServer={setOpenSelectServer}
+                    servers={servers}
+                    handleChangeServer={isLoggedIn ? handleChangeServer : handleChooseServer}
+                />
+
+                <ErrorModal
+                    stringErr={stringErr}
+                    isError={isError}
+                    setIsError={setIsError}
+                />
+
                 {
-                    emailError.length != 0 &&
-                    <Text style={signinStyleSheet.errorInput}>{emailError}</Text>
+                    isFetching &&
+                    <View style={signinStyleSheet.loadingContainer}>
+                        <ActivityIndicator color={colors.grey} size={40} />
+                    </View>
                 }
-
-                <View style={[
-                    signinStyleSheet.passwordInputContainer,
-                    {
-                        marginBottom: passwordError.length == 0 ? 20 : 0,
-                    }
-                ]}>
-                    <TextInput
-                        style={[
-                            signinStyleSheet.input,
-                            {
-                                backgroundColor: passwordError.length == 0 ? colors.white : colors.lightRed,
-                                borderColor: passwordError.length == 0 ? "rgba(0,0,0,0.5)" : colors.darkRed,
-                                marginBottom: 0,
-                            }
-                        ]}
-                        placeholder={t("password-input-signin")}
-                        placeholderTextColor="#aaa"
-                        secureTextEntry={!showPassword}
-                        value={password}
-                        onChangeText={(text) => {
-                            if (text.length >= 0 && text.length <= 15) {
-                                setPassword(text);
-                            }
-                        }}
-                        onEndEditing={() => {
-                            validatePassword();
-                        }}
-                    />
-                    <TouchableOpacity
-                        style={signinStyleSheet.showHideButton}
-                        onPress={() => {
-                            setShowPassword(!showPassword);
-                        }}
-                        touchSoundDisabled={true}
-                    >
-                        <FontAwesome5 name={showPassword ? "eye" : "eye-slash"} size={18} color={passwordError.length == 0 ? colors.blurBlack : colors.darkRed} />
-                    </TouchableOpacity>
-                </View>
-                {
-                    passwordError.length != 0 &&
-                    <Text
-                        style={[
-                            signinStyleSheet.errorInput,
-                            {
-                                height: 40
-                            }
-                        ]}
-                        numberOfLines={2}
-                    >{passwordError}</Text>
-                }
-
-                <TouchableOpacity
-                    style={[signinStyleSheet.serverButton]}
-                    onPress={() => {
-                        setOpenSelectServer(true);
-                    }}
-                    touchSoundDisabled={true}
-                >
-                    <LinearGradient
-                        colors={servers[0].state == "Solitary" ? [colors.darkGreen, colors.lightGreen] :
-                            servers[0].state == "Medium" ? [colors.darkYellow, colors.lightYellow] :
-                                [colors.darkRed, colors.lightRed]}
-                        style={signinStyleSheet.serverStatus}
-                    />
-                    <Text style={[signinStyleSheet.buttonText,
-                    {
-                        color: colors.black
-                    }
-                    ]}>
-                        {t("server")}{selectedServer == null ? servers[0].name : selectedServer.name}
-                    </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={signinStyleSheet.button}
-                    onPress={() => {
-                        handleSigninAccount();
-                    }}
-                    touchSoundDisabled={true}
-                >
-                    <LinearGradient
-                        colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
-                        style={signinStyleSheet.signinBtnLinear}
-                    />
-                    <Text style={signinStyleSheet.buttonText}>
-                        {t("signin-btn")}
-                    </Text>
-                </TouchableOpacity>
-
-                <GoogleSignInButton onPress={() => {
-                    handleGoogleSignIn();
-                }} />
-
-                <View style={signinStyleSheet.signupForgotPassContainer}>
-                    {/* Signup */}
-                    <TouchableOpacity
-                        style={signinStyleSheet.signupForgotPassBtn}
-                        onPress={() => {
-                            navigation.navigate("Signup");
-                        }}
-                        touchSoundDisabled={true}
-                    >
-                        <Text style={signinStyleSheet.signupTxt}>
-                            {t("signup-txt")}
-                        </Text>
-                    </TouchableOpacity>
-
-                    {/* Forgot password */}
-                    <TouchableOpacity
-                        style={signinStyleSheet.signupForgotPassBtn}
-                        onPress={() => {
-                            navigation.navigate("ForgotPassword");
-                        }}
-                        touchSoundDisabled={true}
-                    >
-                        <Text style={signinStyleSheet.forgotPasswordTxt}>
-                            {t("forgot-password")}
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-
-                {/* Version control */}
-                {
-                    !isOpenKeyboard &&
-                    <Text style={signinStyleSheet.versionControl}>
-                        {t("app-version")}
-                    </Text>
-                }
-
-                <AudioPlayer />
-            </View>
-
-            {/* Change background */}
-            <ThemeModal
-                openChooseTheme={openChooseTheme}
-                setOpenChooseTheme={setOpenChooseTheme}
-            />
-
-            {/* Change sound setting */}
-            <VolumeModal
-                openChangeVolume={openChangeVolume}
-                setOpenChangeVolume={setOpenChangeVolume}
-            />
-
-            {/* Choose language */}
-            <LanguageModal
-                openChooseLanguage={openChooseLanguage}
-                setOpenChooseLanguage={setOpenChooseLanguage}
-            />
-
-            <ServerModal
-                openChooseServer={openSelectServer}
-                setOpenChooseServer={setOpenSelectServer}
-                servers={servers}
-                handleChangeServer={handleChooseServer}
-            />
-
-            <ErrorModal
-                stringErr={stringErr}
-                isError={isError}
-                setIsError={setIsError}
-            />
-        </ImageBackground >
+            </ImageBackground >
+        </SafeAreaView>
     )
 }

@@ -166,5 +166,8 @@
     "email-other-error": "Format @gmail.com or @fpt.edu.vn",
     "password-empty-error": "Password cannot be empty",
     "password-other-error": "8-15 characters, at least 1 uppercase, at least 1 digit, at least 1 special",
-    "server-maintenance": "Server maintenance, please try again later"
+    "server-maintenance": "Server maintenance, please try again later",
+    "loggedIn-current": "Playing: ",
+    "change-account": "Change account",
+    "change-server": "Please signin again to register user information"
 }

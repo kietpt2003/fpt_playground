@@ -3,7 +3,7 @@ export type ServerNameAll = ServerName | "All"
 export type ServerState = "Solitary" | "Medium" | "Full"
 export type ServerStatus = "Active" | "Inactive"
 
-export type Server = {
+export type ServerResponse = {
     id: string;
     name: ServerName;
     state: ServerState;

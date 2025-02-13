@@ -9,22 +9,22 @@ import Modal from "react-native-modal";
 import { ScreenHeight, ScreenWidth } from "@rneui/base";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Server } from "../constants/entities/Server";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors } from "../constants/colors";
 import { useTranslation } from "react-i18next";
+import { ServerResponse } from "../constants/models/ServerResponse";
 
 export type ServerModalProps = {
     openChooseServer: boolean;
     setOpenChooseServer: Dispatch<SetStateAction<boolean>>;
-    servers: Server[];
-    handleChangeServer: (server: Server) => void;
+    servers: ServerResponse[];
+    handleChangeServer: (server: ServerResponse) => void;
 }
 
 export default function ServerModal({ openChooseServer, setOpenChooseServer, servers, handleChangeServer }: ServerModalProps) {
-    const [serverChoose, setServerChoose] = useState<Server>(servers[0]);
+    const [serverChoose, setServerChoose] = useState<ServerResponse>(servers[0]);
 
     const { t } = useTranslation();
 
@@ -56,7 +56,7 @@ export default function ServerModal({ openChooseServer, setOpenChooseServer, ser
                     />
 
                     <View style={styles.serversContainer}>
-                        <FlatList<Server>
+                        <FlatList<ServerResponse>
                             data={servers}
                             keyExtractor={(item, index) => index.toString()}
                             renderItem={({ item, index }) => (

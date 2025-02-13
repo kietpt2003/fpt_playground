@@ -11,7 +11,6 @@ import { ScreenHeight, ScreenWidth } from '@rneui/base';
 import UserAvatar from '../components/UserAvatar';
 import RankingRibbon from '../components/RankingRibbon';
 import { Image } from 'react-native';
-import { ServerNameAll } from '../constants/entities/Server';
 import { useTranslation } from 'react-i18next';
 import { RankingNavigationProp, RankingUser, RankingUserProps } from './types/rankingTypes';
 import RankingUserItem from '../components/RankingUserItem';
@@ -21,6 +20,7 @@ import { Menu, MenuItem } from 'react-native-material-menu';
 import useClick from '../hooks/useClick';
 import RankingRulesModal from '../components/RankingRulesModal';
 import { StatusBar } from 'expo-status-bar';
+import { ServerNameAll } from '../constants/models/ServerResponse';
 
 const rankingUsers: RankingUser[] = [
     {

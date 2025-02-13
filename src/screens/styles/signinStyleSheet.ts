@@ -4,7 +4,8 @@ import { colors } from "../../constants/colors";
 
 const signinStyleSheet = StyleSheet.create({
     backgroundImage: {
-        flex: 1,
+        width: "100%",
+        height: "100%",
         resizeMode: 'cover', // Đảm bảo hình nền che toàn bộ màn hình
         justifyContent: 'center',
     },
@@ -17,7 +18,7 @@ const signinStyleSheet = StyleSheet.create({
     },
     header: {
         position: 'absolute',
-        top: 50,
+        top: 30,
         right: 20,
         width: ScreenHeight / 22,
         height: ScreenHeight / 22,
@@ -95,7 +96,7 @@ const signinStyleSheet = StyleSheet.create({
         height: 50,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 20
+        marginBottom: 20,
     },
     serverButton: {
         width: '100%',
@@ -106,7 +107,16 @@ const signinStyleSheet = StyleSheet.create({
         flexDirection: "row",
         gap: 10,
         borderRadius: 8,
-        backgroundColor: colors.white
+        borderColor: colors.black,
+        borderWidth: 2,
+    },
+    serverButtonLinear: {
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        borderRadius: 8,
+        borderColor: colors.black,
+        borderWidth: 1,
     },
     serverStatus: {
         width: 15,
@@ -118,6 +128,8 @@ const signinStyleSheet = StyleSheet.create({
         width: "100%",
         height: "100%",
         borderRadius: 8,
+        borderColor: colors.milkyWhite,
+        borderWidth: 2,
     },
     buttonText: {
         fontSize: ScreenWidth > 350 ? 18 : 16,
@@ -154,6 +166,29 @@ const signinStyleSheet = StyleSheet.create({
     signupForgotPassContainer: {
         flexDirection: "row",
         width: '100%',
+    },
+    loggedInButtonContainer: {
+        width: '100%',
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    loggedInText: {
+        width: '70%',
+        fontFamily: "RobotoMedium",
+        fontSize: ScreenWidth > 350 ? 18 : 16,
+        paddingLeft: 15,
+        textAlign: "left",
+        color: colors.white
+    },
+    loadingContainer: {
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        backgroundColor: colors.blurBlack,
+        alignItems: "center",
+        justifyContent: "center"
     }
 });
 

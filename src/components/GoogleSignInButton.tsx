@@ -8,7 +8,7 @@ import { RootState } from '../store/store'
 import { colors } from '../constants/colors'
 import { useTranslation } from 'react-i18next'
 
-export default function GoogleSignInButton({ onPress }: GoogleSigninButtonProps) {
+export default function GoogleSignInButton({ onPress, isFetching }: GoogleSigninButtonProps) {
     const theme = useSelector((state: RootState) => state.theme.theme);
     const { t } = useTranslation();
 
@@ -17,6 +17,7 @@ export default function GoogleSignInButton({ onPress }: GoogleSigninButtonProps)
             style={googleButtonStyleSheet.button}
             onPress={onPress}
             touchSoundDisabled={true}
+            disabled={isFetching}
         >
             <LinearGradient
                 colors={theme === "dark" ? [colors.black, colors.grey] : [colors.milkyWhite, colors.white]} // Hiệu ứng chuyển màu

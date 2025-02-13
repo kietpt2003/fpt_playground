@@ -5,7 +5,7 @@ import { colors } from "../../constants/colors";
 const audioPlayerStyleSheet = StyleSheet.create({
     container: {
         position: "absolute",
-        top: 50,
+        top: 30,
         left: 20,
         flexDirection: 'row',
         justifyContent: 'space-between',
