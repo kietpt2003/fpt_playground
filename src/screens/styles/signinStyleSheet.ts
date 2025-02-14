@@ -97,6 +97,8 @@ const signinStyleSheet = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 20,
+        gap: 10,
+        flexDirection: "row"
     },
     serverButton: {
         width: '100%',

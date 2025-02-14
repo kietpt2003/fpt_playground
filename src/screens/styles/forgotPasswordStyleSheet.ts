@@ -4,7 +4,8 @@ import { colors } from "../../constants/colors";
 
 const forgotPasswordStyleSheet = StyleSheet.create({
     backgroundImage: {
-        flex: 1,
+        width: "100%",
+        height: "100%",
         resizeMode: 'cover', // Đảm bảo hình nền che toàn bộ màn hình
         justifyContent: 'center'
     },
@@ -30,12 +31,12 @@ const forgotPasswordStyleSheet = StyleSheet.create({
         shadowOpacity: 0.25, // Độ mờ của bóng (0-1)
         shadowRadius: 3.84, // Bán kính mờ của bóng
         elevation: 5,
-        marginTop: ScreenHeight / 30,
+        marginTop: ScreenHeight / 50,
         gap: 20
     },
     header: {
         position: 'absolute',
-        top: 50,
+        top: 30,
         right: 20,
         width: ScreenHeight / 22,
         height: ScreenHeight / 22,

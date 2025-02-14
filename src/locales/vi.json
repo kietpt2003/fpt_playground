@@ -1,5 +1,4 @@
 {
-    "welcome-txt": "Chào mừng, quay trở lại!",
     "signin-btn": "Đăng nhập",
     "signin-txt": "Có tài khoản?",
     "signup-btn": "Đăng ký",
@@ -25,7 +24,6 @@
     "verify-code-input": "Mã xác thực",
     "change-pass-txt": "Cập nhật mật khẩu",
     "signin-google": "Đăng nhập bằng Google",
-    "signup-title": "Đăng Ký FPT Playground",
     "settings": "Cài đặt",
     "hello": "Chào",
     "change-coin": "Đổi Xu",
@@ -169,5 +167,12 @@
     "server-maintenance": "Server đang bảo trì, vui lòng thử lại sau",
     "loggedIn-current": "Đang chơi: ",
     "change-account": "Đổi tài khoản",
-    "change-server": "Vui lòng đăng nhập lại để tạo thông tin người dùng"
+    "change-server": "Vui lòng đăng nhập lại để tạo thông tin người dùng",
+    "is-admin-error": "Người dùng không đủ thậm quyền để sử dụng ứng dụng này",
+    "check-mail-msg": "Vui lòng kiểm tra mail và nhập mã mới.",
+    "confirm-account": "XÁC NHẬN TÀI KHOẢN",
+    "confirm-account-guideline": "Hãy nhập mã xác nhận, chúng tôi đã gửi qua email",
+    "verify": "XÁC NHẬN",
+    "not-have-code": "Bạn không nhận được mã?",
+    "resend": "Gửi lại mã"
 }

@@ -1,5 +1,6 @@
 import { ScreenWidth } from "@rneui/base";
 import { StyleSheet } from "react-native";
+import { colors } from "../../constants/colors";
 
 const googleButtonStyleSheet = StyleSheet.create({
     button: {
@@ -15,6 +16,8 @@ const googleButtonStyleSheet = StyleSheet.create({
         width: "100%",
         height: "100%",
         borderRadius: 8,
+        borderColor: colors.black,
+        borderWidth: 2,
     },
     buttonText: {
         fontSize: ScreenWidth > 350 ? 18 : 16,

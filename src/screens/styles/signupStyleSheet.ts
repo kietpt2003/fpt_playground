@@ -4,7 +4,8 @@ import { colors } from "../../constants/colors";
 
 const signupStyleSheet = StyleSheet.create({
     backgroundImage: {
-        flex: 1,
+        width: "100%",
+        height: "100%",
         resizeMode: 'cover', // Đảm bảo hình nền che toàn bộ màn hình
         justifyContent: 'center',
     },
@@ -17,7 +18,7 @@ const signupStyleSheet = StyleSheet.create({
     },
     header: {
         position: 'absolute',
-        top: 50,
+        top: 30,
         right: 20,
         width: ScreenHeight / 22,
         height: ScreenHeight / 22,
@@ -54,12 +55,6 @@ const signupStyleSheet = StyleSheet.create({
         overflow: "hidden", // Ngăn tràn nội dung
         fontFamily: "Roboto"
     },
-    title: {
-        fontSize: ScreenWidth > 350 ? 32 : 30,
-        color: colors.white,
-        marginBottom: 40,
-        fontFamily: "RobotoMedium"
-    },
     input: {
         width: '100%',
         height: 50,
@@ -67,15 +62,20 @@ const signupStyleSheet = StyleSheet.create({
         borderRadius: 8,
         paddingHorizontal: 15,
         fontSize: ScreenWidth > 350 ? 16 : 14,
-        marginBottom: 20,
         borderWidth: 1,
         borderColor: "rgba(0,0,0,0.5)",
         fontFamily: "RobotoLight"
     },
+    errorInput: {
+        color: colors.darkRed,
+        fontFamily: "RobotoMedium",
+        height: 20,
+        width: '100%',
+        paddingHorizontal: 15,
+    },
     passwordInputContainer: {
         width: '100%',
         height: 50,
-        marginBottom: 20,
     },
     showHideButton: {
         position: "absolute",
@@ -88,12 +88,16 @@ const signupStyleSheet = StyleSheet.create({
         height: 50,
         justifyContent: 'center',
         alignItems: 'center',
+        flexDirection: "row",
+        gap: 10
     },
     signinBtnLinear: {
         position: "absolute",
         width: "100%",
         height: "100%",
         borderRadius: 8,
+        borderWidth: 2,
+        borderColor: colors.white
     },
     buttonText: {
         fontSize: ScreenWidth > 350 ? 18 : 16,

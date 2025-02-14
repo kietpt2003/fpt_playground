@@ -1,5 +1,4 @@
 {
-    "welcome-txt": "Welcome Back!",
     "signin-btn": "Sign in",
     "signin-txt": "Have an Account",
     "signup-btn": "Sign up",
@@ -25,7 +24,6 @@
     "verify-code-input": "Verify code",
     "change-pass-txt": "Reset password",
     "signin-google": "Sign in with Google",
-    "signup-title": "Signup to FPT Playground",
     "settings": "Settings",
     "hello": "Hi",
     "change-coin": "Change Coin",
@@ -169,5 +167,12 @@
     "server-maintenance": "Server maintenance, please try again later",
     "loggedIn-current": "Playing: ",
     "change-account": "Change account",
-    "change-server": "Please signin again to register user information"
+    "change-server": "Please signin again to register user information",
+    "is-admin-error": "User don't have permission to use our applicaiton",
+    "check-mail-msg": "Please check your email and type new code.",
+    "confirm-account": "ACCOUNT CONFIRMATION",
+    "confirm-account-guideline": "Please enter the confirmation code we sent via email",
+    "verify": "VERIFY",
+    "not-have-code": "Didn't have code?",
+    "resend": "Resend"
 }

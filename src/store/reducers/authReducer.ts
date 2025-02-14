@@ -7,18 +7,26 @@ const authSlice = createSlice({
     initialState: {
         isLoggedIn: false,
         user: null as UserResponse | null,
+        mail: null as string | null,
     },
     reducers: {
         login(state, action) {
             state.isLoggedIn = true;
             state.user = action.payload;
+            state.mail = null;
+        },
+        loginWithoutUser(state, action) {
+            state.isLoggedIn = true;
+            state.user = null;
+            state.mail = action.payload;
         },
         logout(state) {
             state.isLoggedIn = false;
             state.user = null;
+            state.mail = null;
         },
     },
 });
 
-export const { login, logout } = authSlice.actions;
+export const { login, loginWithoutUser, logout } = authSlice.actions;
 export default authSlice.reducer;

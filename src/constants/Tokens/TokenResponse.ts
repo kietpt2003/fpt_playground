@@ -1,4 +1,4 @@
 export type TokenResponse = {
-    email: string;
-    userId: string;
+    Email: string;
+    UserId?: string;
 }

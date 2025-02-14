@@ -31,6 +31,7 @@ import LanguageModal from "../components/LanguageModal";
 import { env } from "../constants/environmentVariables";
 import { NavigationProps } from "../navigation/types/types";
 import useClick from "../hooks/useClick";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const ForgotPassword = () => {
     const { NODE_ENV, DEV_API, PROD_API } = env;
@@ -111,196 +112,198 @@ const ForgotPassword = () => {
     );
 
     return (
-        <ImageBackground
-            source={
-                theme === "dark" ?
-                    require('../../assets/images/login-dark-background.webp') :
-                    require('../../assets/images/login-light-background.webp')
-            } // Đường dẫn tới file hình nền trong thư mục dự án
-            style={forgotPasswordStyleSheet.backgroundImage}
-        >
-            <View style={forgotPasswordStyleSheet.container}>
-                <View style={forgotPasswordStyleSheet.header}>
-                    <LinearGradient
-                        colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
-                        style={forgotPasswordStyleSheet.settingIcon}
-                    />
-                    <Menu
-                        visible={menuVisible}
-                        anchor={
-                            <TouchableOpacity
-                                onPress={showMenu}
-                                touchSoundDisabled={true}
+        <SafeAreaView>
+            <ImageBackground
+                source={
+                    theme === "dark" ?
+                        require('../../assets/images/login-dark-background.webp') :
+                        require('../../assets/images/login-light-background.webp')
+                } // Đường dẫn tới file hình nền trong thư mục dự án
+                style={forgotPasswordStyleSheet.backgroundImage}
+            >
+                <View style={forgotPasswordStyleSheet.container}>
+                    <View style={forgotPasswordStyleSheet.header}>
+                        <LinearGradient
+                            colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
+                            style={forgotPasswordStyleSheet.settingIcon}
+                        />
+                        <Menu
+                            visible={menuVisible}
+                            anchor={
+                                <TouchableOpacity
+                                    onPress={showMenu}
+                                    touchSoundDisabled={true}
+                                >
+                                    <MaterialIcons name="settings" size={24} color={colors.white} />
+                                </TouchableOpacity>
+                            }
+                            onRequestClose={hideMenu}
+                            style={{
+                                position: "absolute",
+                                top: 45,
+                                borderRadius: 10,
+                                width: i18n.language === "vi" ? 170 : 190,
+                                backgroundColor: colors.milkyWhite,
+                            }}
+                        >
+                            {/* Background */}
+                            <MenuItem
+                                onPress={() => {
+                                    hideMenu();
+                                    setOpenChooseTheme(true);
+                                }}
                             >
-                                <MaterialIcons name="settings" size={24} color={colors.white} />
-                            </TouchableOpacity>
-                        }
-                        onRequestClose={hideMenu}
-                        style={{
-                            position: "absolute",
-                            top: 45,
-                            borderRadius: 10,
-                            width: i18n.language === "vi" ? 170 : 190,
-                            backgroundColor: colors.milkyWhite,
-                        }}
-                    >
-                        {/* Background */}
-                        <MenuItem
-                            onPress={() => {
-                                hideMenu();
-                                setOpenChooseTheme(true);
-                            }}
-                        >
-                            <View style={forgotPasswordStyleSheet.menuItem}>
-                                <Ionicons name={theme === "dark" ?
-                                    "moon-outline" :
-                                    "sunny-outline"
-                                } size={theme === "dark" ? 19 : 21} color={"black"} />
-                                <Text style={forgotPasswordStyleSheet.menuItemTxt}>
-                                    {t("menu-item-background")}
-                                </Text>
-                            </View>
-                        </MenuItem>
+                                <View style={forgotPasswordStyleSheet.menuItem}>
+                                    <Ionicons name={theme === "dark" ?
+                                        "moon-outline" :
+                                        "sunny-outline"
+                                    } size={theme === "dark" ? 19 : 21} color={"black"} />
+                                    <Text style={forgotPasswordStyleSheet.menuItemTxt}>
+                                        {t("menu-item-background")}
+                                    </Text>
+                                </View>
+                            </MenuItem>
 
-                        {/* Sound */}
-                        <MenuItem
-                            onPress={() => {
-                                hideMenu();
-                                setOpenChangeVolume(true);
-                            }}
-                        >
-                            <View style={forgotPasswordStyleSheet.menuItem}>
-                                <Ionicons name={getVolumeIcon(volume * 10)} size={20} color={"black"} />
-                                <Text style={forgotPasswordStyleSheet.menuItemTxt}>
-                                    {t("menu-item-sound")}
-                                </Text>
-                            </View>
-                        </MenuItem>
+                            {/* Sound */}
+                            <MenuItem
+                                onPress={() => {
+                                    hideMenu();
+                                    setOpenChangeVolume(true);
+                                }}
+                            >
+                                <View style={forgotPasswordStyleSheet.menuItem}>
+                                    <Ionicons name={getVolumeIcon(volume * 10)} size={20} color={"black"} />
+                                    <Text style={forgotPasswordStyleSheet.menuItemTxt}>
+                                        {t("menu-item-sound")}
+                                    </Text>
+                                </View>
+                            </MenuItem>
 
-                        {/* Language */}
-                        <MenuItem
-                            onPress={() => {
-                                hideMenu();
-                                setOpenChooseLanguage(true);
-                            }}
+                            {/* Language */}
+                            <MenuItem
+                                onPress={() => {
+                                    hideMenu();
+                                    setOpenChooseLanguage(true);
+                                }}
+                            >
+                                <View style={forgotPasswordStyleSheet.menuItem}>
+                                    <Image
+                                        style={{
+                                            width: i18n.language === "vi" ? 19 : 18,
+                                            height: i18n.language === "vi" ? 19 : 18,
+                                        }}
+                                        source={i18n.language === "vi" ? require("../../assets/images/vn-flag.png") : require("../../assets/images/us-flag.png")}
+                                    />
+                                    <Text style={forgotPasswordStyleSheet.menuItemTxt}>
+                                        {t("menu-item-language")}
+                                    </Text>
+                                </View>
+                            </MenuItem>
+                        </Menu>
+                    </View>
+
+                    <View style={forgotPasswordStyleSheet.formContainer}>
+                        <Text style={[
+                            forgotPasswordStyleSheet.formTitlte,
+                            {
+                                fontSize: i18n.language === "vi" ? 24 : 21,
+                            }
+                        ]}>
+                            {t("forgot-pass-title")}
+                        </Text>
+
+                        <Text style={forgotPasswordStyleSheet.formGuide}>
+                            {t("forgot-pass-guide")}
+                        </Text>
+
+                        {/* Email */}
+                        <TextInput
+                            style={forgotPasswordStyleSheet.mailInput}
+                            placeholder={t("your-email")}
+                            value={userEmail}
+                            onChangeText={(text) => setUserEmail(text)}
+                        />
+
+                        {/* Request code button */}
+                        <TouchableOpacity
+                            style={[
+                                forgotPasswordStyleSheet.requestCodeBtnContainer,
+                                (isRecentPushed || userEmail === "") && {
+                                    backgroundColor: colors.grey,
+                                },
+                            ]}
+                            onPress={() => handleRequestCode()}
+                            disabled={isRecentPushed || userEmail === ""}
+                            touchSoundDisabled={true}
                         >
-                            <View style={forgotPasswordStyleSheet.menuItem}>
-                                <Image
-                                    style={{
-                                        width: i18n.language === "vi" ? 19 : 18,
-                                        height: i18n.language === "vi" ? 19 : 18,
-                                    }}
-                                    source={i18n.language === "vi" ? require("../../assets/images/vn-flag.png") : require("../../assets/images/us-flag.png")}
+                            {
+                                !(isRecentPushed || userEmail === "") &&
+                                <LinearGradient
+                                    colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
+                                    style={forgotPasswordStyleSheet.requestCodeBtnLinear}
                                 />
-                                <Text style={forgotPasswordStyleSheet.menuItemTxt}>
-                                    {t("menu-item-language")}
-                                </Text>
-                            </View>
-                        </MenuItem>
-                    </Menu>
-                </View>
+                            }
+                            <Text
+                                style={forgotPasswordStyleSheet.requestCodeTxt}
+                            >
+                                {t("request-code-txt")}
+                            </Text>
+                            {
+                                isRecentPushed &&
+                                <ActivityIndicator color={colors.white} />
+                            }
+                        </TouchableOpacity>
 
-                <View style={forgotPasswordStyleSheet.formContainer}>
-                    <Text style={[
-                        forgotPasswordStyleSheet.formTitlte,
-                        {
-                            fontSize: i18n.language === "vi" ? 24 : 21,
-                        }
-                    ]}>
-                        {t("forgot-pass-title")}
-                    </Text>
-
-                    <Text style={forgotPasswordStyleSheet.formGuide}>
-                        {t("forgot-pass-guide")}
-                    </Text>
-
-                    {/* Email */}
-                    <TextInput
-                        style={forgotPasswordStyleSheet.mailInput}
-                        placeholder={t("your-email")}
-                        value={userEmail}
-                        onChangeText={(text) => setUserEmail(text)}
-                    />
-
-                    {/* Request code button */}
-                    <TouchableOpacity
-                        style={[
-                            forgotPasswordStyleSheet.requestCodeBtnContainer,
-                            (isRecentPushed || userEmail === "") && {
-                                backgroundColor: colors.grey,
-                            },
-                        ]}
-                        onPress={() => handleRequestCode()}
-                        disabled={isRecentPushed || userEmail === ""}
-                        touchSoundDisabled={true}
-                    >
-                        {
-                            !(isRecentPushed || userEmail === "") &&
-                            <LinearGradient
-                                colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
-                                style={forgotPasswordStyleSheet.requestCodeBtnLinear}
-                            />
-                        }
-                        <Text
-                            style={forgotPasswordStyleSheet.requestCodeTxt}
+                        {/* Back button */}
+                        <TouchableOpacity
+                            style={forgotPasswordStyleSheet.backBtnContainer}
+                            onPress={() => {
+                                navigation.goBack();
+                            }}
+                            touchSoundDisabled={true}
                         >
-                            {t("request-code-txt")}
-                        </Text>
-                        {
-                            isRecentPushed &&
-                            <ActivityIndicator color={colors.white} />
-                        }
-                    </TouchableOpacity>
+                            <Text style={forgotPasswordStyleSheet.backBtnTxt}>
+                                {t("back-login-btn")}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
 
-                    {/* Back button */}
-                    <TouchableOpacity
-                        style={forgotPasswordStyleSheet.backBtnContainer}
-                        onPress={() => {
-                            navigation.goBack();
-                        }}
-                        touchSoundDisabled={true}
-                    >
-                        <Text style={forgotPasswordStyleSheet.backBtnTxt}>
-                            {t("back-login-btn")}
+                    {/* Version control */}
+                    {
+                        !isOpenKeyboard &&
+                        <Text style={forgotPasswordStyleSheet.versionControl}>
+                            {t("app-version")}
                         </Text>
-                    </TouchableOpacity>
+                    }
                 </View>
 
-                {/* Version control */}
-                {
-                    !isOpenKeyboard &&
-                    <Text style={forgotPasswordStyleSheet.versionControl}>
-                        {t("app-version")}
-                    </Text>
-                }
-            </View>
+                <ErrorModal
+                    stringErr={stringErr}
+                    isError={isError}
+                    setIsError={setIsError}
+                />
 
-            <ErrorModal
-                stringErr={stringErr}
-                isError={isError}
-                setIsError={setIsError}
-            />
+                <AudioPlayer />
 
-            <AudioPlayer />
+                {/* Change background */}
+                <ThemeModal
+                    openChooseTheme={openChooseTheme}
+                    setOpenChooseTheme={setOpenChooseTheme}
+                />
 
-            {/* Change background */}
-            <ThemeModal
-                openChooseTheme={openChooseTheme}
-                setOpenChooseTheme={setOpenChooseTheme}
-            />
+                {/* Change sound setting */}
+                <VolumeModal
+                    openChangeVolume={openChangeVolume}
+                    setOpenChangeVolume={setOpenChangeVolume}
+                />
 
-            {/* Change sound setting */}
-            <VolumeModal
-                openChangeVolume={openChangeVolume}
-                setOpenChangeVolume={setOpenChangeVolume}
-            />
-
-            {/* Choose language */}
-            <LanguageModal
-                openChooseLanguage={openChooseLanguage}
-                setOpenChooseLanguage={setOpenChooseLanguage}
-            />
-        </ImageBackground >
+                {/* Choose language */}
+                <LanguageModal
+                    openChooseLanguage={openChooseLanguage}
+                    setOpenChooseLanguage={setOpenChooseLanguage}
+                />
+            </ImageBackground >
+        </SafeAreaView>
     );
 };
 

@@ -39,13 +39,15 @@ import useNotification from '../hooks/useNotification';
 import { handleValidEmail } from '../utils/handleValidEmail';
 import { handleValidPassword } from '../utils/handleValidPassword';
 import { env } from '../constants/environmentVariables';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
-import { login, logout } from '../store/reducers/authReducer';
+import { login, loginWithoutUser, logout } from '../store/reducers/authReducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ServerResponse } from '../constants/models/ServerResponse';
 import { UserResponse } from '../constants/models/UserResponse';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { TokenResponse } from '../constants/Tokens/TokenResponse';
+import { TokenDecoded } from '../constants/Tokens/TokenDecoded';
 
 const { NODE_ENV, DEV_API, PROD_API } = env;
 const url =
@@ -61,6 +63,7 @@ export default function SiginScreen() {
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [isFetching, setIsFetching] = useState<boolean>(false);
     const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
+    const userMail = useSelector((state: RootState) => state.auth.mail);
     const user = useSelector((state: RootState) => state.auth.user);
 
     const [servers, setServers] = useState<ServerResponse[]>([
@@ -112,51 +115,77 @@ export default function SiginScreen() {
     const { requestCameraPermissionWithoutLinking } = useCamera();
     const { deviceToken } = useNotification();
 
-    // const handleLoginGoogle = async (accessToken) => {
-    //     try {
-    //       const url =
-    //         NODE_ENV == "development"
-    //           ? DEV_API
-    //           : PROD_API;
-    //       const response = await axios.post(`${url}/auth/google/${accessToken}`, {
-    //         deviceToken
-    //       });
-    //       const { token: apiToken, refreshToken } = response.data;
-
-    //       const decodedToken = jwtDecode(apiToken);
-    //       console.log('Decoded Token:', decodedToken);
-    //       const userInfo = JSON.parse(decodedToken.UserInfo);
-    //       console.log('User Info là:', userInfo);
-    //       await AsyncStorage.setItem("refreshToken", refreshToken);
-    //       await AsyncStorage.setItem("token", apiToken);
-
-    //       await login();
-
-    //       navigation.replace('StackBuyerHome');
-    //     } catch (error) {
-    //       console.log('API call error:', error?.response?.data);
-    //       setStringErr(
-    //         error.response?.data?.reasons[0]?.message ?
-    //           error.response.data.reasons[0].message
-    //           :
-    //           "Lỗi mạng vui lòng thử lại sau"
-    //       );
-    //       setIsError(true);
-    //       setIsRecentPushed(false);
-    //       await GoogleSignin.signOut();
-    //     }
-    //   };
-
-    const getCurrentUser = async () => {
+    const handleLoginGoogle = async (accessToken: string, ggEmail: string) => {
         try {
-            const res = await api.get(`${url}/users/current`);
-            const data: UserResponse = res.data;
-            dispatch(login(data));
+            setIsFetching(true);
+            const response = await axios.post(`${url}/auth/google/${accessToken}`, {
+                serverId: selectedServer?.id,
+                deviceToken: deviceToken ? deviceToken : undefined
+            });
+            const { token: apiToken, refreshToken } = response.data;
+            await AsyncStorage.setItem("refreshToken", refreshToken);
+            await AsyncStorage.setItem("token", apiToken);
+            const tokenDecoded: TokenDecoded = jwtDecode(apiToken);
+            const userInfo: TokenResponse = JSON.parse(tokenDecoded.UserInfo);
+
+            if (userInfo.UserId) {
+                const isUser = await getCurrentUser();
+                setIsFetching(false);
+                if (isUser) {
+                    navigation.replace("HomeScreen");
+                } else {
+                    setStringErr(t("is-admin-error"));
+                    setIsError(true);
+                }
+            } else {
+                setIsFetching(false);
+                dispatch(loginWithoutUser(userInfo.Email));
+                navigation.navigate("RegisterUser", { serverId: selectedServer!.id });
+            }
         } catch (error: unknown) {
             // Kiểm tra nếu error là AxiosError
             if (axios.isAxiosError(error)) {
                 const errorData: ErrorResponse = error.response?.data;
                 console.log("API call error:", error.response?.data);
+                if (error.status == 503) {
+                    setStringErr(t("server-maintenance"));
+                    setIsError(true);
+                } else if (errorData.code == "FPB_03" && errorData.reasons[0].title == "account") { //Nếu account chưa xác thực thì navigate sang VerifyCodeScreen
+                    navigation.navigate("VerifyCodeScreen", { email: ggEmail });
+                } else {
+                    setStringErr(
+                        errorData?.reasons?.[0]?.message ??
+                        "Lỗi mạng, vui lòng thử lại sau"
+                    );
+                    setIsError(true);
+                }
+            } else {
+                console.log("Unexpected error:", error);
+                setStringErr("Đã xảy ra lỗi không xác định.");
+                setIsError(true);
+            }
+            setIsFetching(false);
+            await GoogleSignin.signOut();
+        }
+    };
+
+    const getCurrentUser = async () => {
+        try {
+            const res = await api.get(`${url}/users/current`);
+            const data: UserResponse = res.data;
+            if (data.account?.role == "Admin") {
+                await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
+                    dispatch(logout());
+                });
+                return false;
+            }
+            dispatch(login(data));
+            return true;
+        } catch (error: unknown) {
+            // Kiểm tra nếu error là AxiosError
+            if (axios.isAxiosError(error)) {
+                const errorData: ErrorResponse = error.response?.data;
+                console.log("getCurrentUser error:", error.response?.data);
                 if (error.status == 503) {
                     setStringErr(t("server-maintenance"));
                     await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
@@ -174,6 +203,52 @@ export default function SiginScreen() {
             }
 
             setIsError(true);
+            return false;
+        }
+    }
+
+    const refreshNewToken = async () => {
+        try {
+            const rfToken = await AsyncStorage.getItem("refreshToken");
+            if (!rfToken) {
+                await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
+                    dispatch(logout());
+                });
+                return false;
+            }
+            const res = await api.post(`${url}/auth/refresh`, {
+                refreshToken: rfToken
+            });
+            const { token: apiToken, refreshToken } = res.data;
+
+            await AsyncStorage.setItem("refreshToken", refreshToken);
+            await AsyncStorage.setItem("token", apiToken);
+            const tokenDecoded: TokenDecoded = jwtDecode(apiToken);
+            const userInfo: TokenResponse = JSON.parse(tokenDecoded.UserInfo);
+            dispatch(loginWithoutUser(userInfo.Email));
+            return true;
+        } catch (error: unknown) {
+            // Kiểm tra nếu error là AxiosError
+            if (axios.isAxiosError(error)) {
+                const errorData: ErrorResponse = error.response?.data;
+                console.log("refreshNewToken error:", errorData);
+                if (error.status == 503) {
+                    setStringErr(t("server-maintenance"));
+                } else {
+                    setStringErr(
+                        errorData?.reasons?.[0]?.message ??
+                        "Lỗi mạng, vui lòng thử lại sau"
+                    );
+                }
+            } else {
+                console.log("Unexpected error:", error);
+                setStringErr("Đã xảy ra lỗi không xác định.");
+            }
+            await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
+                dispatch(logout());
+            });
+            setIsError(true);
+            return false;
         }
     }
 
@@ -226,19 +301,34 @@ export default function SiginScreen() {
             const { token: apiToken, refreshToken } = response.data;
             await AsyncStorage.setItem("refreshToken", refreshToken);
             await AsyncStorage.setItem("token", apiToken);
-            await getCurrentUser();
-            setIsFetching(false);
-            navigation.replace("HomeScreen");
+
+            const tokenDecoded: TokenDecoded = jwtDecode(apiToken);
+            const userInfo: TokenResponse = JSON.parse(tokenDecoded.UserInfo);
+
+            if (userInfo.UserId) {
+                const isUser = await getCurrentUser();
+                setIsFetching(false);
+                if (isUser) {
+                    navigation.replace("HomeScreen");
+                } else {
+                    setStringErr(t("is-admin-error"));
+                    setIsError(true);
+                }
+            } else {
+                setIsFetching(false);
+                dispatch(loginWithoutUser(userInfo.Email));
+                navigation.navigate("RegisterUser", { serverId: selectedServer!.id });
+            }
         } catch (error: unknown) {
             // Kiểm tra nếu error là AxiosError
             if (axios.isAxiosError(error)) {
                 const errorData: ErrorResponse = error.response?.data;
-                console.log("API call error:", error.response?.data);
+                console.log("handleSigninAccount error:", error.response?.data);
                 if (error.status == 503) {
                     setStringErr(t("server-maintenance"));
                     setIsError(true);
-                } else if (errorData.code == "FPB_00" && errorData.reasons[0].title == "user") { //Nếu lỗi chưa có user ở server này thì chuyển sang trang tạo user
-                    navigation.navigate("RegisterUser");
+                } else if (errorData.code == "FPB_03" && errorData.reasons[0].title == "account") { //Nếu account chưa xác thực thì navigate sang VerifyCodeScreen
+                    navigation.navigate("VerifyCodeScreen", { email: email });
                 } else {
                     setStringErr(
                         errorData?.reasons?.[0]?.message ??
@@ -272,7 +362,7 @@ export default function SiginScreen() {
             const token = await GoogleSignin.getTokens();
             console.log('Access Token:', token.accessToken);
 
-            //   await handleLoginGoogle(token.accessToken);
+            await handleLoginGoogle(token.accessToken, userInfo.data.user.email);
         } catch (error: unknown) {
             console.log(error);
 
@@ -324,7 +414,7 @@ export default function SiginScreen() {
     const handleChangeServer = async (server: ServerResponse) => {
         try {
             setIsFetching(true);
-            const response = await axios.post(`${url}/auth/change-server`, {
+            const response = await api.post(`${url}/auth/change-server`, {
                 serverId: server.id,
             });
             const { token: apiToken, refreshToken } = response.data;
@@ -336,7 +426,7 @@ export default function SiginScreen() {
             // Kiểm tra nếu error là AxiosError
             if (axios.isAxiosError(error)) {
                 const errorData: ErrorResponse = error.response?.data;
-                console.log("API call error:", error.response?.data);
+                console.log("handleChangeServer error:", error.response?.data);
                 if (error.status == 503) {
                     setStringErr(t("server-maintenance"));
                     await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
@@ -364,40 +454,54 @@ export default function SiginScreen() {
 
     //Check token auto login. TH auto này nếu có lỗi do token hết hạn hay ntn đó thì đều Logout hết mà không báo lỗi.
     //Ngoại trừ TH server bảo trì thì mới thông báo server bảo trì thôi
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const token = await AsyncStorage.getItem("token");
+    useFocusEffect(
+        useCallback(() => {
+            const fetchUser = async () => {
+                try {
+                    const token = await AsyncStorage.getItem("token");
 
-                if (token) {
-                    setIsFetching(true);
-                    await getCurrentUser();
-                    setIsFetching(false);
-                }
-            } catch (error: unknown) {
-                // Kiểm tra nếu error là AxiosError
-                if (axios.isAxiosError(error)) {
-                    const errorData: ErrorResponse = error.response?.data;
-                    console.log("API call error:", error.response?.data);
-                    if (error.status == 503) {
-                        setStringErr(t("server-maintenance"));
-                        setIsError(true);
-                    } else {
-                        console.log(errorData?.reasons?.[0]?.message ??
-                            "Lỗi mạng, vui lòng thử lại sau");
+                    if (token) {
+                        const tokenDecoded: TokenDecoded = jwtDecode(token);
+                        const userInfo: TokenResponse = JSON.parse(tokenDecoded.UserInfo);
+                        console.log("new-check", userInfo);
+
+                        if (userInfo.UserId) { //Nếu mà có userId thì gọi api lấy user info => có thể vô thẳng home
+                            setIsFetching(true);
+                            await getCurrentUser();
+                            setIsFetching(false);
+                        } else { //Nếu không có userId thì sẽ có email trong token thì check coi token hết hạn chưa
+                            //Nếu hết hạn thì logout luôn, còn nếu còn hạn thì refresh token và nếu họ gửi api signin
+                            //Thì lúc đó server nhả lỗi và chuyển sang trang RegisterUser
+                            setIsFetching(true);
+                            await refreshNewToken();
+                            setIsFetching(false);
+                        }
                     }
-                } else {
-                    console.log("Unexpected error:", error);
-                }
+                } catch (error: unknown) {
+                    // Kiểm tra nếu error là AxiosError
+                    if (axios.isAxiosError(error)) {
+                        const errorData: ErrorResponse = error.response?.data;
+                        console.log("fetchUser error:", errorData);
+                        if (error.status == 503) {
+                            setStringErr(t("server-maintenance"));
+                            setIsError(true);
+                        } else {
+                            console.log(errorData?.reasons?.[0]?.message ??
+                                "Lỗi mạng, vui lòng thử lại sau");
+                        }
+                    } else {
+                        console.log("Unexpected error:", error);
+                    }
 
-                setIsFetching(false);
-                await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
-                    dispatch(logout());
-                });
+                    setIsFetching(false);
+                    await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
+                        dispatch(logout());
+                    });
+                }
             }
-        }
-        fetchUser();
-    }, [])
+            fetchUser();
+        }, [])
+    );
 
     //Fetch Servers
     useEffect(() => {
@@ -552,7 +656,7 @@ export default function SiginScreen() {
                     </View>
 
                     {
-                        !isLoggedIn ?
+                        (!isLoggedIn && !userMail) ?
                             <>
                                 {/* Email input */}
                                 <TextInput
@@ -638,7 +742,11 @@ export default function SiginScreen() {
                                 <TouchableOpacity
                                     style={signinStyleSheet.loggedInButtonContainer}
                                     onPress={() => {
-                                        navigation.replace("HomeScreen");
+                                        if (isLoggedIn) {
+                                            navigation.replace("HomeScreen");
+                                        } else {
+                                            navigation.replace("RegisterUser", { serverId: selectedServer!.id })
+                                        }
                                     }}
                                     touchSoundDisabled={true}
                                     disabled={isFetching}
@@ -651,7 +759,7 @@ export default function SiginScreen() {
                                         style={signinStyleSheet.loggedInText}
                                         numberOfLines={1}
                                     >
-                                        {t("loggedIn-current")}{user?.account?.email}
+                                        {t("loggedIn-current")}{!userMail ? user?.account?.email : userMail}{userMail}
                                     </Text>
                                 </TouchableOpacity>
                             </>
@@ -659,7 +767,7 @@ export default function SiginScreen() {
 
                     {/* Change account */}
                     {
-                        isLoggedIn &&
+                        (isLoggedIn || userMail) &&
                         <TouchableOpacity
                             style={[signinStyleSheet.serverButton]}
                             onPress={() => {
@@ -711,7 +819,7 @@ export default function SiginScreen() {
                     </TouchableOpacity>
 
                     {
-                        !isLoggedIn &&
+                        (!isLoggedIn && !userMail) &&
                         <>
                             {/* Signin button */}
                             <TouchableOpacity
@@ -801,7 +909,7 @@ export default function SiginScreen() {
                     openChooseServer={openSelectServer}
                     setOpenChooseServer={setOpenSelectServer}
                     servers={servers}
-                    handleChangeServer={isLoggedIn ? handleChangeServer : handleChooseServer}
+                    handleChangeServer={(isLoggedIn || userMail) ? handleChangeServer : handleChooseServer}
                 />
 
                 <ErrorModal
@@ -816,7 +924,7 @@ export default function SiginScreen() {
                         <ActivityIndicator color={colors.grey} size={40} />
                     </View>
                 }
-            </ImageBackground >
+            </ImageBackground>
         </SafeAreaView>
     )
 }

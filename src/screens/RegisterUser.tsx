@@ -19,6 +19,7 @@ import ThemeModal from '../components/ThemeModal';
 import ErrorModal from '../components/ErrorModal';
 import useClick from '../hooks/useClick';
 import { ScreenHeight, ScreenWidth } from '@rneui/base';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type RegisterUserNavigationProp = NativeStackNavigationProp<RootStackParamList, 'RegisterUser'>;
 
@@ -72,196 +73,199 @@ export default function RegisterUser() {
     );
 
     return (
-        <ImageBackground
-            source={
-                theme === "dark" ?
-                    require('../../assets/images/login-dark-background.webp') :
-                    require('../../assets/images/login-light-background.webp')
-            }
-            style={styles.backgroundImage}
-        >
-            <View style={styles.container}>
-                <View style={styles.header}>
-                    <LinearGradient
-                        colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
-                        style={styles.settingIcon}
-                    />
-                    <Menu
-                        visible={menuVisible}
-                        anchor={
-                            <TouchableOpacity
-                                onPress={showMenu}
-                                touchSoundDisabled={true}
-                            >
-                                <MaterialIcons name="settings" size={24} color={colors.white} />
-                            </TouchableOpacity>
-                        }
-                        onRequestClose={hideMenu}
-                        style={{
-                            position: "absolute",
-                            top: 45,
-                            borderRadius: 10,
-                            width: i18n.language === "vi" ? 170 : 190,
-                            backgroundColor: colors.milkyWhite,
-                        }}
-                    >
-                        {/* Background */}
-                        <MenuItem
-                            onPress={() => {
-                                hideMenu();
-                                setOpenChooseTheme(true);
-                            }}
-                        >
-                            <View style={styles.menuItem}>
-                                <Ionicons name={theme === "dark" ?
-                                    "moon-outline" :
-                                    "sunny-outline"
-                                } size={theme === "dark" ? 19 : 21} color={"black"} />
-                                <Text style={styles.menuItemTxt}>
-                                    {t("menu-item-background")}
-                                </Text>
-                            </View>
-                        </MenuItem>
-
-                        {/* Sound */}
-                        <MenuItem
-                            onPress={() => {
-                                hideMenu();
-                                setOpenChangeVolume(true);
-                            }}
-                        >
-                            <View style={styles.menuItem}>
-                                <Ionicons name={getVolumeIcon(volume * 10)} size={20} color={"black"} />
-                                <Text style={styles.menuItemTxt}>
-                                    {t("menu-item-sound")}
-                                </Text>
-                            </View>
-                        </MenuItem>
-
-                        {/* Language */}
-                        <MenuItem
-                            onPress={() => {
-                                hideMenu();
-                                setOpenChooseLanguage(true);
-                            }}
-                        >
-                            <View style={styles.menuItem}>
-                                <Image
-                                    style={{
-                                        width: i18n.language === "vi" ? 19 : 18,
-                                        height: i18n.language === "vi" ? 19 : 18,
-                                    }}
-                                    source={i18n.language === "vi" ? require("../../assets/images/vn-flag.png") : require("../../assets/images/us-flag.png")}
-                                />
-                                <Text style={styles.menuItemTxt}>
-                                    {t("menu-item-language")}
-                                </Text>
-                            </View>
-                        </MenuItem>
-                    </Menu>
-                </View>
-
-                <Text style={styles.title}>
-                    Register Screen
-                </Text>
-
-                <TextInput
-                    style={styles.input}
-                    placeholder={t("emil-username-signin")}
-                    placeholderTextColor="#aaa"
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder={t("password-input-signin")}
-                    placeholderTextColor="#aaa"
-                    secureTextEntry
-                />
-
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                        navigation.replace("Signup");
-                    }}
-                    touchSoundDisabled={true}
-                >
-                    <LinearGradient
-                        colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
-                        style={styles.signinBtnLinear}
-                    />
-                    <Text style={styles.buttonText}>
-                        {t("signup-btn")}
-                    </Text>
-                </TouchableOpacity>
-
-                <View style={styles.signinForgotPassContainer}>
-                    {/* Signin */}
-                    <TouchableOpacity
-                        style={styles.signinForgotPassBtn}
-                        onPress={() => {
-                            navigation.goBack();
-                        }}
-                        touchSoundDisabled={true}
-                    >
-                        <Text style={styles.signinTxt}>
-                            {t("signin-txt")}
-                        </Text>
-                    </TouchableOpacity>
-
-                    {/* Forgot password */}
-                    <TouchableOpacity
-                        style={styles.signinForgotPassBtn}
-                        onPress={() => {
-                            navigation.navigate("ForgotPassword");
-                        }}
-                        touchSoundDisabled={true}
-                    >
-                        <Text style={styles.forgotPasswordTxt}>
-                            {t("forgot-password")}
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-
-                {/* Version control */}
-                {
-                    !isOpenKeyboard &&
-                    <Text style={styles.versionControl}>
-                        {t("app-version")}
-                    </Text>
+        <SafeAreaView>
+            <ImageBackground
+                source={
+                    theme === "dark" ?
+                        require('../../assets/images/login-dark-background.webp') :
+                        require('../../assets/images/login-light-background.webp')
                 }
+                style={styles.backgroundImage}
+            >
+                <View style={styles.container}>
+                    <View style={styles.header}>
+                        <LinearGradient
+                            colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
+                            style={styles.settingIcon}
+                        />
+                        <Menu
+                            visible={menuVisible}
+                            anchor={
+                                <TouchableOpacity
+                                    onPress={showMenu}
+                                    touchSoundDisabled={true}
+                                >
+                                    <MaterialIcons name="settings" size={24} color={colors.white} />
+                                </TouchableOpacity>
+                            }
+                            onRequestClose={hideMenu}
+                            style={{
+                                position: "absolute",
+                                top: 45,
+                                borderRadius: 10,
+                                width: i18n.language === "vi" ? 170 : 190,
+                                backgroundColor: colors.milkyWhite,
+                            }}
+                        >
+                            {/* Background */}
+                            <MenuItem
+                                onPress={() => {
+                                    hideMenu();
+                                    setOpenChooseTheme(true);
+                                }}
+                            >
+                                <View style={styles.menuItem}>
+                                    <Ionicons name={theme === "dark" ?
+                                        "moon-outline" :
+                                        "sunny-outline"
+                                    } size={theme === "dark" ? 19 : 21} color={"black"} />
+                                    <Text style={styles.menuItemTxt}>
+                                        {t("menu-item-background")}
+                                    </Text>
+                                </View>
+                            </MenuItem>
 
-                <AudioPlayer />
-            </View>
+                            {/* Sound */}
+                            <MenuItem
+                                onPress={() => {
+                                    hideMenu();
+                                    setOpenChangeVolume(true);
+                                }}
+                            >
+                                <View style={styles.menuItem}>
+                                    <Ionicons name={getVolumeIcon(volume * 10)} size={20} color={"black"} />
+                                    <Text style={styles.menuItemTxt}>
+                                        {t("menu-item-sound")}
+                                    </Text>
+                                </View>
+                            </MenuItem>
 
-            {/* Change background */}
-            <ThemeModal
-                openChooseTheme={openChooseTheme}
-                setOpenChooseTheme={setOpenChooseTheme}
-            />
+                            {/* Language */}
+                            <MenuItem
+                                onPress={() => {
+                                    hideMenu();
+                                    setOpenChooseLanguage(true);
+                                }}
+                            >
+                                <View style={styles.menuItem}>
+                                    <Image
+                                        style={{
+                                            width: i18n.language === "vi" ? 19 : 18,
+                                            height: i18n.language === "vi" ? 19 : 18,
+                                        }}
+                                        source={i18n.language === "vi" ? require("../../assets/images/vn-flag.png") : require("../../assets/images/us-flag.png")}
+                                    />
+                                    <Text style={styles.menuItemTxt}>
+                                        {t("menu-item-language")}
+                                    </Text>
+                                </View>
+                            </MenuItem>
+                        </Menu>
+                    </View>
 
-            {/* Change sound setting */}
-            <VolumeModal
-                openChangeVolume={openChangeVolume}
-                setOpenChangeVolume={setOpenChangeVolume}
-            />
+                    <Text style={styles.title}>
+                        Register Screen
+                    </Text>
 
-            {/* Choose language */}
-            <LanguageModal
-                openChooseLanguage={openChooseLanguage}
-                setOpenChooseLanguage={setOpenChooseLanguage}
-            />
+                    <TextInput
+                        style={styles.input}
+                        placeholder={t("emil-username-signin")}
+                        placeholderTextColor="#aaa"
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder={t("password-input-signin")}
+                        placeholderTextColor="#aaa"
+                        secureTextEntry
+                    />
 
-            <ErrorModal
-                stringErr={stringErr}
-                isError={isError}
-                setIsError={setIsError}
-            />
-        </ImageBackground >
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                            navigation.replace("Signup");
+                        }}
+                        touchSoundDisabled={true}
+                    >
+                        <LinearGradient
+                            colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
+                            style={styles.signinBtnLinear}
+                        />
+                        <Text style={styles.buttonText}>
+                            {t("signup-btn")}
+                        </Text>
+                    </TouchableOpacity>
+
+                    <View style={styles.signinForgotPassContainer}>
+                        {/* Signin */}
+                        <TouchableOpacity
+                            style={styles.signinForgotPassBtn}
+                            onPress={() => {
+                                navigation.goBack();
+                            }}
+                            touchSoundDisabled={true}
+                        >
+                            <Text style={styles.signinTxt}>
+                                {t("signin-txt")}
+                            </Text>
+                        </TouchableOpacity>
+
+                        {/* Forgot password */}
+                        <TouchableOpacity
+                            style={styles.signinForgotPassBtn}
+                            onPress={() => {
+                                navigation.navigate("ForgotPassword");
+                            }}
+                            touchSoundDisabled={true}
+                        >
+                            <Text style={styles.forgotPasswordTxt}>
+                                {t("forgot-password")}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Version control */}
+                    {
+                        !isOpenKeyboard &&
+                        <Text style={styles.versionControl}>
+                            {t("app-version")}
+                        </Text>
+                    }
+
+                    <AudioPlayer />
+                </View>
+
+                {/* Change background */}
+                <ThemeModal
+                    openChooseTheme={openChooseTheme}
+                    setOpenChooseTheme={setOpenChooseTheme}
+                />
+
+                {/* Change sound setting */}
+                <VolumeModal
+                    openChangeVolume={openChangeVolume}
+                    setOpenChangeVolume={setOpenChangeVolume}
+                />
+
+                {/* Choose language */}
+                <LanguageModal
+                    openChooseLanguage={openChooseLanguage}
+                    setOpenChooseLanguage={setOpenChooseLanguage}
+                />
+
+                <ErrorModal
+                    stringErr={stringErr}
+                    isError={isError}
+                    setIsError={setIsError}
+                />
+            </ImageBackground>
+        </SafeAreaView>
     )
 }
 
 const styles = StyleSheet.create({
     backgroundImage: {
-        flex: 1,
+        width: "100%",
+        height: "100%",
         resizeMode: 'cover', // Đảm bảo hình nền che toàn bộ màn hình
         justifyContent: 'center',
     },

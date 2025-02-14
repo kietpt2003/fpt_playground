@@ -53,6 +53,8 @@ api.interceptors.response.use(
                 return axios(originalRequest);
             } catch (error) {
                 // Handle refresh token error or redirect to login
+                console.log("loi o day", error);
+
             }
         }
 

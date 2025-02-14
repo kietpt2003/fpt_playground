@@ -21,3 +21,4 @@ export type UserResponse = {
 
 export type Gender = "Male" | "Female"
 export type UserStatus = "Active" | "Inactive"
+export type UserRole = "Admin" | "User"
