@@ -1,6 +1,6 @@
 import { View, Text, ImageBackground, ScrollView, TouchableOpacity, Image } from 'react-native'
 import React, { useCallback, useRef, useState } from 'react'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { colors } from '../constants/colors';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -19,12 +19,15 @@ import PTKCoinIcon from '../components/PTKCoinIcon';
 import { ScreenWidth } from '@rneui/base';
 import useAudio from '../hooks/useAudio';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logout } from '../store/reducers/authReducer';
 
 export default function HomeScreen() {
     const theme = useSelector((state: RootState) => state.theme.theme);
     const { t, i18n } = useTranslation();
 
     const navigation = useNavigation<GroupChatNavigationProp>();
+    const dispatch = useDispatch();
 
     const [menuVisible, setMenuVisible] = useState<boolean>(false);
 
@@ -41,6 +44,13 @@ export default function HomeScreen() {
         playSound(); // Phát âm thanh khi bấm
         setMenuVisible(false);
     };
+
+    const handleSignout = async () => {
+        await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
+            dispatch(logout());
+        });
+        navigation.replace("Signin");
+    }
 
     const [stringErr, setStringErr] = useState<string>("");
     const [isError, setIsError] = useState<boolean>(false);
@@ -174,6 +184,7 @@ export default function HomeScreen() {
                             <MenuItem
                                 onPress={() => {
                                     hideMenu();
+                                    handleSignout();
                                 }}
                             >
                                 <View style={homeScreenStyleSheet.menuItem}>

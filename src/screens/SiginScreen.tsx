@@ -140,7 +140,6 @@ export default function SiginScreen() {
             } else {
                 setIsFetching(false);
                 dispatch(loginWithoutUser(userInfo.Email));
-                navigation.navigate("RegisterUser", { serverId: selectedServer!.id });
             }
         } catch (error: unknown) {
             // Kiểm tra nếu error là AxiosError
@@ -359,6 +358,13 @@ export default function SiginScreen() {
                 return;
             }
 
+            if (!handleValidEmail(userInfo.data.user.email)) {
+                setStringErr(t("email-other-error"));
+                setIsError(true);
+                await GoogleSignin.signOut();
+                return;
+            }
+
             const token = await GoogleSignin.getTokens();
             console.log('Access Token:', token.accessToken);
 
@@ -373,6 +379,7 @@ export default function SiginScreen() {
                 setStringErr("Lỗi không xác định. Vui lòng thử lại.");
                 setIsError(true);
             }
+            await GoogleSignin.signOut();
         }
     };
 
@@ -420,7 +427,20 @@ export default function SiginScreen() {
             const { token: apiToken, refreshToken } = response.data;
             await AsyncStorage.setItem("refreshToken", refreshToken);
             await AsyncStorage.setItem("token", apiToken);
-            await getCurrentUser();
+
+            const tokenDecoded: TokenDecoded = jwtDecode(apiToken);
+            const userInfo: TokenResponse = JSON.parse(tokenDecoded.UserInfo);
+
+            if (userInfo.UserId) {
+                const isUser = await getCurrentUser();
+                if (!isUser) {
+                    setStringErr(t("is-admin-error"));
+                    setIsError(true);
+                }
+            } else {
+                dispatch(loginWithoutUser(userInfo.Email));
+            }
+            setSelectedServer(server);
             setIsFetching(false);
         } catch (error: unknown) {
             // Kiểm tra nếu error là AxiosError
@@ -432,11 +452,6 @@ export default function SiginScreen() {
                     await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
                         dispatch(logout());
                     });
-                } else if (errorData.code == "FPB_00" && errorData.reasons[0].title == "user") { //Nếu lỗi chưa có user ở server này thì đăng xuất người dùng ra luôn
-                    await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
-                        dispatch(logout());
-                    });
-                    setStringErr(t("change-server"));
                 } else {
                     setStringErr(
                         errorData?.reasons?.[0]?.message ??
@@ -463,7 +478,6 @@ export default function SiginScreen() {
                     if (token) {
                         const tokenDecoded: TokenDecoded = jwtDecode(token);
                         const userInfo: TokenResponse = JSON.parse(tokenDecoded.UserInfo);
-                        console.log("new-check", userInfo);
 
                         if (userInfo.UserId) { //Nếu mà có userId thì gọi api lấy user info => có thể vô thẳng home
                             setIsFetching(true);
@@ -666,9 +680,10 @@ export default function SiginScreen() {
                                             backgroundColor: emailError.length == 0 ? colors.white : colors.lightRed,
                                             borderColor: emailError.length == 0 ? "rgba(0,0,0,0.5)" : colors.darkRed,
                                             marginBottom: emailError.length == 0 ? 20 : 0,
+                                            color: emailError.length == 0 ? colors.black : colors.white
                                         }
                                     ]}
-                                    placeholder={t("emil-signin")}
+                                    placeholder={t("email-signin")}
                                     placeholderTextColor={emailError.length == 0 ? "#aaa" : colors.white}
                                     value={email}
                                     onChangeText={(text) => {
@@ -698,6 +713,7 @@ export default function SiginScreen() {
                                                 backgroundColor: passwordError.length == 0 ? colors.white : colors.lightRed,
                                                 borderColor: passwordError.length == 0 ? "rgba(0,0,0,0.5)" : colors.darkRed,
                                                 marginBottom: 0,
+                                                color: passwordError.length == 0 ? colors.black : colors.white
                                             }
                                         ]}
                                         placeholder={t("password-input-signin")}
@@ -742,10 +758,10 @@ export default function SiginScreen() {
                                 <TouchableOpacity
                                     style={signinStyleSheet.loggedInButtonContainer}
                                     onPress={() => {
-                                        if (isLoggedIn) {
+                                        if (isLoggedIn && !userMail) {
                                             navigation.replace("HomeScreen");
                                         } else {
-                                            navigation.replace("RegisterUser", { serverId: selectedServer!.id })
+                                            navigation.navigate("RegisterUser", { serverId: selectedServer!.id })
                                         }
                                     }}
                                     touchSoundDisabled={true}
@@ -909,7 +925,7 @@ export default function SiginScreen() {
                     openChooseServer={openSelectServer}
                     setOpenChooseServer={setOpenSelectServer}
                     servers={servers}
-                    handleChangeServer={(isLoggedIn || userMail) ? handleChangeServer : handleChooseServer}
+                    handleChangeServer={isLoggedIn ? handleChangeServer : handleChooseServer}
                 />
 
                 <ErrorModal

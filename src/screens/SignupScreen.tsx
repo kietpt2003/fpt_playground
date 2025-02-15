@@ -78,9 +78,9 @@ export default function SignupScreen() {
         if (email.length == 0) {
             setEmailError(t("email-empty-error"));
             return false;
-            // } else if (!handleValidEmail(email)) {
-            //     setEmailError(t("email-other-error"));
-            //     return false;
+        } else if (!handleValidEmail(email)) {
+            setEmailError(t("email-other-error"));
+            return false;
         } else {
             setEmailError("");
             return true;
@@ -271,7 +271,7 @@ export default function SignupScreen() {
                                 marginBottom: emailError.length == 0 ? 20 : 0,
                             }
                         ]}
-                        placeholder={t("emil-signin")}
+                        placeholder={t("email-signin")}
                         placeholderTextColor={emailError.length == 0 ? "#aaa" : colors.white}
                         value={email}
                         onChangeText={(text) => {
