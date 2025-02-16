@@ -344,8 +344,34 @@ export default function SiginScreen() {
         }
     }
 
-    const handleChooseServer = (server: ServerResponse) => {
-        setSelectedServer(server);
+    const handleChooseServer = async (server: ServerResponse) => {
+        try {
+            setIsFetching(true);
+            const res = await axios.get(`${url}/servers?SortColumn=createdAt`);
+            const data: PaginatedResponse<ServerResponse> = res.data;
+            setServers(data.items);
+            const selectedServer = data.items.find((value) => value.name == server.name);
+            if (selectedServer) {
+                setSelectedServer(selectedServer);
+            }
+            setIsFetching(false);
+        } catch (error: unknown) {
+            // Kiểm tra nếu error là AxiosError
+            if (axios.isAxiosError(error)) {
+                const errorData: ErrorResponse = error.response?.data;
+                console.log("handleChooseServer error:", error.response?.data);
+                if (error.status == 503) {
+                    setStringErr(t("server-maintenance"));
+                    setIsError(true);
+                } else {
+                    console.log(errorData?.reasons?.[0]?.message ??
+                        "Lỗi mạng, vui lòng thử lại sau");
+                }
+            } else {
+                console.log("Unexpected error:", error);
+            }
+            setIsFetching(false);
+        }
     }
 
     const handleGoogleSignIn = async () => {
@@ -416,6 +442,31 @@ export default function SiginScreen() {
             dispatch(logout());
         });
         setIsFetching(false);
+    }
+
+    const fetchServers = async () => {
+        try {
+            const res = await axios.get(`${url}/servers?SortColumn=createdAt`);
+            const data: PaginatedResponse<ServerResponse> = res.data;
+            setServers(data.items);
+            setSelectedServer(data.items[0]);
+
+        } catch (error: unknown) {
+            // Kiểm tra nếu error là AxiosError
+            if (axios.isAxiosError(error)) {
+                const errorData: ErrorResponse = error.response?.data;
+                console.log("API call error:", error.response?.data);
+                if (error.status == 503) {
+                    setStringErr(t("server-maintenance"));
+                    setIsError(true);
+                } else {
+                    console.log(errorData?.reasons?.[0]?.message ??
+                        "Lỗi mạng, vui lòng thử lại sau");
+                }
+            } else {
+                console.log("Unexpected error:", error);
+            }
+        }
     }
 
     const handleChangeServer = async (server: ServerResponse) => {
@@ -519,30 +570,6 @@ export default function SiginScreen() {
 
     //Fetch Servers
     useEffect(() => {
-        const fetchServers = async () => {
-            try {
-                const res = await axios.get(`${url}/servers?SortColumn=createdAt`);
-                const data: PaginatedResponse<ServerResponse> = res.data;
-                setServers(data.items);
-                setSelectedServer(data.items[0]);
-
-            } catch (error: unknown) {
-                // Kiểm tra nếu error là AxiosError
-                if (axios.isAxiosError(error)) {
-                    const errorData: ErrorResponse = error.response?.data;
-                    console.log("API call error:", error.response?.data);
-                    if (error.status == 503) {
-                        setStringErr(t("server-maintenance"));
-                        setIsError(true);
-                    } else {
-                        console.log(errorData?.reasons?.[0]?.message ??
-                            "Lỗi mạng, vui lòng thử lại sau");
-                    }
-                } else {
-                    console.log("Unexpected error:", error);
-                }
-            }
-        }
         fetchServers();
     }, [])
 
@@ -922,6 +949,7 @@ export default function SiginScreen() {
                 />
 
                 <ServerModal
+                    selectedServer={selectedServer}
                     openChooseServer={openSelectServer}
                     setOpenChooseServer={setOpenSelectServer}
                     servers={servers}

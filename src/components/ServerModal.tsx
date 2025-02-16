@@ -17,22 +17,17 @@ import { useTranslation } from "react-i18next";
 import { ServerResponse } from "../constants/models/ServerResponse";
 
 export type ServerModalProps = {
+    selectedServer: ServerResponse | null;
     openChooseServer: boolean;
     setOpenChooseServer: Dispatch<SetStateAction<boolean>>;
     servers: ServerResponse[];
     handleChangeServer: (server: ServerResponse) => void;
 }
 
-export default function ServerModal({ openChooseServer, setOpenChooseServer, servers, handleChangeServer }: ServerModalProps) {
-    const [serverChoose, setServerChoose] = useState<ServerResponse>(servers[0]);
-
+export default function ServerModal({ selectedServer, openChooseServer, setOpenChooseServer, servers, handleChangeServer }: ServerModalProps) {
     const { t } = useTranslation();
 
     const reduxTheme = useSelector((state: RootState) => state.theme.theme);
-
-    useEffect(() => {
-        setServerChoose(servers[0]);
-    }, [servers])
 
     return (
         <Modal
@@ -64,7 +59,6 @@ export default function ServerModal({ openChooseServer, setOpenChooseServer, ser
                                     style={styles.modalOption}
                                     onPress={() => {
                                         handleChangeServer(item);
-                                        setServerChoose(item);
                                         setOpenChooseServer(false);
                                     }}
                                 >
@@ -84,7 +78,7 @@ export default function ServerModal({ openChooseServer, setOpenChooseServer, ser
                                                     t("state-full")}</Text>
                                         </Text>
                                     </View>
-                                    {(serverChoose.id.length != 0 && serverChoose.name == item.name) ? (
+                                    {(selectedServer?.name == item.name) ? (
                                         <MaterialCommunityIcons name="check-circle" size={24} color={reduxTheme === "dark" ? colors.darkBlue : colors.darkOrange} />
                                     ) : (
                                         <MaterialCommunityIcons

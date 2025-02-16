@@ -14,6 +14,7 @@ import { useRoute } from '@react-navigation/native';
 import { GroupChatRouteProp } from './types/groupChatTypes';
 import useClick from '../hooks/useClick';
 import { ScreenWidth } from '@rneui/base';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function GroupChat() {
     const route = useRoute<GroupChatRouteProp>();
@@ -79,101 +80,101 @@ export default function GroupChat() {
     ]);
 
     return (
-        <View
-            style={groupChatStyleSheet.container}
-        >
-            <LinearGradient
-                colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.milkyWhite, colors.icyWhite]} // Hiệu ứng chuyển màu
-                style={groupChatStyleSheet.containerLinear}
-            />
-
-            <ImageBackground
-                source={
-                    theme === "dark" ?
-                        require('../../assets/images/home-dark-header.webp') :
-                        require('../../assets/images/home-light-header.webp')
-                }
-                style={groupChatStyleSheet.backgroundImage}
-            >
-            </ImageBackground>
-
-            {/* Header left */}
-            <HeaderLeft />
-
-            {/* Header right */}
-            <TouchableOpacity
-                style={groupChatStyleSheet.headerRightNoti}
-                onPress={() => {
-                    playSound();
-                }}
-                touchSoundDisabled={true}
-            >
+        <SafeAreaView>
+            <View style={groupChatStyleSheet.container}>
                 <LinearGradient
-                    colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
-                    style={groupChatStyleSheet.headerRightIconLinear}
+                    colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.milkyWhite, colors.icyWhite]} // Hiệu ứng chuyển màu
+                    style={groupChatStyleSheet.containerLinear}
                 />
-                <FontAwesome5
-                    name="question"
-                    size={20}
-                    color={colors.white}
-                />
-            </TouchableOpacity>
 
-            <GroupChatFilters firstFilter={params.firstFilter} />
+                <ImageBackground
+                    source={
+                        theme === "dark" ?
+                            require('../../assets/images/home-dark-header.webp') :
+                            require('../../assets/images/home-light-header.webp')
+                    }
+                    style={groupChatStyleSheet.backgroundImage}
+                >
+                </ImageBackground>
 
-            <View style={groupChatStyleSheet.slotContainer}>
-                <LinearGradient
-                    colors={[colors.icyWhite, colors.white]} // Hiệu ứng chuyển màu
-                    style={groupChatStyleSheet.slotContainerLinear}
-                />
-                <View style={groupChatStyleSheet.paginationContainer}>
-                    <TouchableOpacity
-                        onPress={() => {
-                            if (page == 1) {
-                                setPage(100);
-                            } else {
-                                setPage((current) => current - 1);
-                            }
-                        }}
-                        touchSoundDisabled={true}
-                    >
-                        <FontAwesome
-                            name="chevron-left"
-                            size={ScreenWidth > 350 ? 26 : 20}
-                            color={theme === "dark" ? colors.darkBlue : colors.darkOrange}
-                        />
-                    </TouchableOpacity>
+                {/* Header left */}
+                <HeaderLeft />
 
-                    <Text style={[
-                        groupChatStyleSheet.paginationTxt,
-                        {
-                            color: theme === "dark" ? colors.darkBlue : colors.darkOrange
-                        }
-                    ]}>Trang {page}</Text>
-
-                    <TouchableOpacity
-                        onPress={() => {
-                            if (page == 100) {
-                                setPage(1);
-                            } else {
-                                setPage((current) => current + 1);
-                            }
-                        }}
-                        touchSoundDisabled={true}
-                    >
-                        <FontAwesome
-                            name="chevron-right"
-                            size={ScreenWidth > 350 ? 26 : 20}
-                            color={theme === "dark" ? colors.darkBlue : colors.darkOrange}
-                        />
-                    </TouchableOpacity>
-                </View>
-                <View style={groupChatStyleSheet.subSlotContainer}>
-                    <SlotList
-                        data={data}
+                {/* Header right */}
+                <TouchableOpacity
+                    style={groupChatStyleSheet.headerRightNoti}
+                    onPress={() => {
+                        playSound();
+                    }}
+                    touchSoundDisabled={true}
+                >
+                    <LinearGradient
+                        colors={theme === "dark" ? [colors.darkBlue, colors.lightBlue] : [colors.darkOrange, colors.lightOrange]} // Hiệu ứng chuyển màu
+                        style={groupChatStyleSheet.headerRightIconLinear}
                     />
+                    <FontAwesome5
+                        name="question"
+                        size={20}
+                        color={colors.white}
+                    />
+                </TouchableOpacity>
+
+                <GroupChatFilters firstFilter={params.firstFilter} />
+
+                <View style={groupChatStyleSheet.slotContainer}>
+                    <LinearGradient
+                        colors={[colors.icyWhite, colors.white]} // Hiệu ứng chuyển màu
+                        style={groupChatStyleSheet.slotContainerLinear}
+                    />
+                    <View style={groupChatStyleSheet.paginationContainer}>
+                        <TouchableOpacity
+                            onPress={() => {
+                                if (page == 1) {
+                                    setPage(100);
+                                } else {
+                                    setPage((current) => current - 1);
+                                }
+                            }}
+                            touchSoundDisabled={true}
+                        >
+                            <FontAwesome
+                                name="chevron-left"
+                                size={ScreenWidth > 350 ? 26 : 20}
+                                color={theme === "dark" ? colors.darkBlue : colors.darkOrange}
+                            />
+                        </TouchableOpacity>
+
+                        <Text style={[
+                            groupChatStyleSheet.paginationTxt,
+                            {
+                                color: theme === "dark" ? colors.darkBlue : colors.darkOrange
+                            }
+                        ]}>Trang {page}</Text>
+
+                        <TouchableOpacity
+                            onPress={() => {
+                                if (page == 100) {
+                                    setPage(1);
+                                } else {
+                                    setPage((current) => current + 1);
+                                }
+                            }}
+                            touchSoundDisabled={true}
+                        >
+                            <FontAwesome
+                                name="chevron-right"
+                                size={ScreenWidth > 350 ? 26 : 20}
+                                color={theme === "dark" ? colors.darkBlue : colors.darkOrange}
+                            />
+                        </TouchableOpacity>
+                    </View>
+                    <View style={groupChatStyleSheet.subSlotContainer}>
+                        <SlotList
+                            data={data}
+                        />
+                    </View>
                 </View>
             </View>
-        </View>
+        </SafeAreaView>
     )
 }

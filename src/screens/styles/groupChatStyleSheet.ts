@@ -49,7 +49,7 @@ export const groupChatStyleSheet = StyleSheet.create({
     },
     headerRightNoti: {
         position: "absolute",
-        top: 50,
+        top: 30,
         right: 10,
         width: ScreenHeight / 22,
         height: ScreenHeight / 22,
