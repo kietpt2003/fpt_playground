@@ -123,6 +123,8 @@ export default function SiginScreen() {
                 deviceToken: deviceToken ? deviceToken : undefined
             });
             const { token: apiToken, refreshToken } = response.data;
+            console.log("my tok", apiToken);
+
             await AsyncStorage.setItem("refreshToken", refreshToken);
             await AsyncStorage.setItem("token", apiToken);
             const tokenDecoded: TokenDecoded = jwtDecode(apiToken);
@@ -378,7 +380,6 @@ export default function SiginScreen() {
         try {
             await GoogleSignin.hasPlayServices();
             const userInfo = await GoogleSignin.signIn();
-            console.log(userInfo);
 
             if (!userInfo.data) {
                 return;
@@ -392,7 +393,6 @@ export default function SiginScreen() {
             }
 
             const token = await GoogleSignin.getTokens();
-            console.log('Access Token:', token.accessToken);
 
             await handleLoginGoogle(token.accessToken, userInfo.data.user.email);
         } catch (error: unknown) {
