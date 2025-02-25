@@ -22,28 +22,20 @@ import { ScreenHeight, ScreenWidth } from '@rneui/base';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { validateName } from '../utils/validateName';
 import { validateUsername } from '../utils/validateUsername';
-import { env } from '../constants/environmentVariables';
 import axios from 'axios';
 import { ErrorResponse } from '../constants/Errors/ErrorResponse';
-import { jwtDecode } from 'jwt-decode';
-import { TokenDecoded } from '../constants/Tokens/TokenDecoded';
-import { TokenResponse } from '../constants/Tokens/TokenResponse';
-import api from '../services/api';
 import useNotification from '../hooks/useNotification';
 import { login } from '../store/reducers/authReducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useApiServer } from '../hooks/useApiServer';
+import { useApiClient } from '../hooks/useApiClient';
 
 type RegisterUserNavigationProp = NativeStackNavigationProp<RootStackParamList, 'RegisterUser'>;
 type RegisterUserRouteProp = RouteProp<RootStackParamList, "RegisterUser">;
 
-const { NODE_ENV, DEV_API, PROD_API } = env;
-const url =
-    NODE_ENV == "development"
-        ? DEV_API
-        : PROD_API;
-
 export default function RegisterUser() {
-
+    const { apiUrl } = useApiServer();
+    const apiClient = useApiClient();
     const [menuVisible, setMenuVisible] = useState(false);
 
     const route = useRoute<RegisterUserRouteProp>();
@@ -113,7 +105,7 @@ export default function RegisterUser() {
 
         try {
             setIsFetching(true);
-            const response = await api.post(`${url}/user`, {
+            const response = await apiClient.post(`${apiUrl}/user`, {
                 name: yourName,
                 userName: userName,
                 serverId: serverId,

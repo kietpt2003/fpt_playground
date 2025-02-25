@@ -30,7 +30,6 @@ import { SigninScreenNavigationProp } from './types/signinScreenTypes';
 import * as Location from "expo-location";
 import usePhoto from '../hooks/usePhoto';
 import useCamera from '../hooks/useCamera';
-import api from '../services/api';
 import { PaginatedResponse } from '../constants/Paginations/PaginationResponse';
 import { ErrorResponse } from '../constants/Errors/ErrorResponse';
 import { isPaginationResponse } from '../utils/isPaginationResponse';
@@ -38,7 +37,6 @@ import ServerModal from '../components/ServerModal';
 import useNotification from '../hooks/useNotification';
 import { handleValidEmail } from '../utils/handleValidEmail';
 import { handleValidPassword } from '../utils/handleValidPassword';
-import { env } from '../constants/environmentVariables';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { login, loginWithoutUser, logout } from '../store/reducers/authReducer';
@@ -48,12 +46,8 @@ import { UserResponse } from '../constants/models/UserResponse';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TokenResponse } from '../constants/Tokens/TokenResponse';
 import { TokenDecoded } from '../constants/Tokens/TokenDecoded';
-
-const { NODE_ENV, DEV_API, PROD_API } = env;
-const url =
-    NODE_ENV == "development"
-        ? DEV_API
-        : PROD_API;
+import { useApiServer } from '../hooks/useApiServer';
+import { useApiClient } from '../hooks/useApiClient';
 
 export default function SiginScreen() {
     const [email, setEmail] = useState<string>("");
@@ -65,6 +59,8 @@ export default function SiginScreen() {
     const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
     const userMail = useSelector((state: RootState) => state.auth.mail);
     const user = useSelector((state: RootState) => state.auth.user);
+    const { apiUrl } = useApiServer();
+    const apiClient = useApiClient();
 
     const [servers, setServers] = useState<ServerResponse[]>([
         { id: "", name: "Xavalo", state: "Solitary", status: "Active" },
@@ -118,7 +114,7 @@ export default function SiginScreen() {
     const handleLoginGoogle = async (accessToken: string, ggEmail: string) => {
         try {
             setIsFetching(true);
-            const response = await axios.post(`${url}/auth/google/${accessToken}`, {
+            const response = await axios.post(`${apiUrl}/auth/google/${accessToken}`, {
                 serverId: selectedServer?.id,
                 deviceToken: deviceToken ? deviceToken : undefined
             });
@@ -172,7 +168,7 @@ export default function SiginScreen() {
 
     const getCurrentUser = async () => {
         try {
-            const res = await api.get(`${url}/users/current`);
+            const res = await apiClient.get(`${apiUrl}/users/current`);
             const data: UserResponse = res.data;
             if (data.account?.role == "Admin") {
                 await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
@@ -192,6 +188,7 @@ export default function SiginScreen() {
                     await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
                         dispatch(logout());
                     });
+                    setIsError(true);
                 } else {
                     setStringErr(
                         errorData?.reasons?.[0]?.message ??
@@ -201,9 +198,9 @@ export default function SiginScreen() {
             } else {
                 console.log("Unexpected error:", error);
                 setStringErr("Đã xảy ra lỗi không xác định.");
+                setIsError(true);
             }
 
-            setIsError(true);
             return false;
         }
     }
@@ -217,7 +214,7 @@ export default function SiginScreen() {
                 });
                 return false;
             }
-            const res = await api.post(`${url}/auth/refresh`, {
+            const res = await apiClient.post(`${apiUrl}/auth/refresh`, {
                 refreshToken: rfToken
             });
             const { token: apiToken, refreshToken } = res.data;
@@ -293,7 +290,7 @@ export default function SiginScreen() {
 
         try {
             setIsFetching(true);
-            const response = await axios.post(`${url}/auth/login`, {
+            const response = await axios.post(`${apiUrl}/auth/login`, {
                 email: email,
                 password: password,
                 serverId: selectedServer?.id,
@@ -349,7 +346,7 @@ export default function SiginScreen() {
     const handleChooseServer = async (server: ServerResponse) => {
         try {
             setIsFetching(true);
-            const res = await axios.get(`${url}/servers?SortColumn=createdAt`);
+            const res = await axios.get(`${apiUrl}/servers?SortColumn=createdAt`);
             const data: PaginatedResponse<ServerResponse> = res.data;
             setServers(data.items);
             const selectedServer = data.items.find((value) => value.name == server.name);
@@ -446,7 +443,7 @@ export default function SiginScreen() {
 
     const fetchServers = async () => {
         try {
-            const res = await axios.get(`${url}/servers?SortColumn=createdAt`);
+            const res = await axios.get(`${apiUrl}/servers?SortColumn=createdAt`);
             const data: PaginatedResponse<ServerResponse> = res.data;
             setServers(data.items);
             setSelectedServer(data.items[0]);
@@ -472,7 +469,7 @@ export default function SiginScreen() {
     const handleChangeServer = async (server: ServerResponse) => {
         try {
             setIsFetching(true);
-            const response = await api.post(`${url}/auth/change-server`, {
+            const response = await apiClient.post(`${apiUrl}/auth/change-server`, {
                 serverId: server.id,
             });
             const { token: apiToken, refreshToken } = response.data;

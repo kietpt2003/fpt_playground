@@ -17,6 +17,7 @@ import * as Font from 'expo-font';
 import { PhotoProvider } from './src/context/PhotoContext';
 import { CameraProvider } from './src/context/CameraContext';
 import { NotificationProvider } from './src/context/NotificationContext';
+import { ApiServerProvider } from './src/context/ApiServerContext';
 
 // Register background handler
 messaging().setBackgroundMessageHandler(async remoteMessage => {
@@ -62,24 +63,26 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <Provider store={store}>
-        <NotificationProvider>
-          <AudioProvider>
-            <ClickProvider>
-              <NonPlayerCharacterProvider>
-                <PhotoProvider>
-                  <CameraProvider>
-                    <NavigationContainer>
-                      <GestureHandlerRootView style={{ flex: 1 }}>
-                        <StatusBar backgroundColor={undefined} />
-                        <RootNavigator onMount={() => setIsMounted(true)} />
-                      </GestureHandlerRootView>
-                    </NavigationContainer>
-                  </CameraProvider>
-                </PhotoProvider>
-              </NonPlayerCharacterProvider>
-            </ClickProvider>
-          </AudioProvider>
-        </NotificationProvider>
+        <ApiServerProvider>
+          <NotificationProvider>
+            <AudioProvider>
+              <ClickProvider>
+                <NonPlayerCharacterProvider>
+                  <PhotoProvider>
+                    <CameraProvider>
+                      <NavigationContainer>
+                        <GestureHandlerRootView style={{ flex: 1 }}>
+                          <StatusBar backgroundColor={undefined} />
+                          <RootNavigator onMount={() => setIsMounted(true)} />
+                        </GestureHandlerRootView>
+                      </NavigationContainer>
+                    </CameraProvider>
+                  </PhotoProvider>
+                </NonPlayerCharacterProvider>
+              </ClickProvider>
+            </AudioProvider>
+          </NotificationProvider>
+        </ApiServerProvider>
       </Provider>
     </SafeAreaProvider>
   );

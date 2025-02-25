@@ -19,8 +19,6 @@ import { RootState } from '../store/store';
 import ThemeModal from '../components/ThemeModal';
 import ErrorModal from '../components/ErrorModal';
 import useClick from '../hooks/useClick';
-import api from '../services/api';
-import { env } from '../constants/environmentVariables';
 import axios from 'axios';
 import { ErrorResponse } from '../constants/Errors/ErrorResponse';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -29,14 +27,10 @@ import { handleValidEmail } from '../utils/handleValidEmail';
 import { handleValidPassword } from '../utils/handleValidPassword';
 import useNotification from '../hooks/useNotification';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useApiClient } from '../hooks/useApiClient';
+import { useApiServer } from '../hooks/useApiServer';
 
 type SignupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Signup'>;
-
-const { NODE_ENV, DEV_API, PROD_API } = env;
-const url =
-    NODE_ENV == "development"
-        ? DEV_API
-        : PROD_API;
 
 export default function SignupScreen() {
     const [email, setEmail] = useState<string>("");
@@ -46,6 +40,8 @@ export default function SignupScreen() {
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [isFetching, setIsFetching] = useState<boolean>(false);
     const dispatch = useDispatch();
+    const { apiUrl } = useApiServer();
+    const apiClient = useApiClient();
 
     const [menuVisible, setMenuVisible] = useState(false);
 
@@ -114,7 +110,7 @@ export default function SignupScreen() {
             if (isError) return;
 
             setIsFetching(true);
-            await api.post(`${url}/auth/signup`, {
+            await apiClient.post(`${apiUrl}/auth/signup`, {
                 email: email,
                 password: password,
                 role: "User",
