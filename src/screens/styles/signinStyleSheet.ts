@@ -109,7 +109,6 @@ const signinStyleSheet = StyleSheet.create({
         flexDirection: "row",
         gap: 10,
         borderRadius: 8,
-        borderColor: colors.black,
         borderWidth: 2,
     },
     serverButtonLinear: {
@@ -119,6 +118,7 @@ const signinStyleSheet = StyleSheet.create({
         borderRadius: 8,
         borderColor: colors.black,
         borderWidth: 1,
+        opacity: 0.85
     },
     serverStatus: {
         width: 15,

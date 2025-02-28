@@ -885,7 +885,12 @@ export default function SiginScreen() {
 
                     {/* Choose server */}
                     <TouchableOpacity
-                        style={[signinStyleSheet.serverButton]}
+                        style={[
+                            signinStyleSheet.serverButton,
+                            {
+                                borderColor: theme === "dark" ? colors.white : colors.black,
+                            }
+                        ]}
                         onPress={() => {
                             setOpenSelectServer(true);
                         }}
@@ -904,7 +909,7 @@ export default function SiginScreen() {
                         />
                         <Text style={[signinStyleSheet.buttonText,
                         {
-                            color: colors.black
+                            color: theme === "dark" ? colors.white : colors.black
                         }
                         ]}>
                             {t("server")}{selectedServer == null ? servers[0].name : selectedServer.name}
