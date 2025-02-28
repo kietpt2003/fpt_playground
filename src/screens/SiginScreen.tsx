@@ -48,6 +48,8 @@ import { TokenResponse } from '../constants/Tokens/TokenResponse';
 import { TokenDecoded } from '../constants/Tokens/TokenDecoded';
 import { useApiServer } from '../hooks/useApiServer';
 import { useApiClient } from '../hooks/useApiClient';
+import * as signalR from "@microsoft/signalr"
+import { _ReturnNull } from 'i18next';
 
 export default function SiginScreen() {
     const [email, setEmail] = useState<string>("");
@@ -601,6 +603,57 @@ export default function SiginScreen() {
             };
         }, [])
     );
+
+    const domainName = "10.0.2.2"
+    const webSocketPort = "5272"
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySW5mbyI6IntcIlVzZXJJZFwiOlwiMDE5NTNlMDQtMDU5Yi03OTJjLWFhOGYtNmMwYjc3YmMxYWNhXCIsXCJFbWFpbFwiOlwiaHp1c3N5b2NsQGVtbHRtcC5jb21cIixcIlJvbGVcIjpcIlVzZXJcIn0iLCJUb2tlbkNsYWltIjoiRm9yVmVyaWZ5T25seSIsIm5iZiI6MTc0MDY1OTgwNCwiZXhwIjoxNzQwNjYxNjA0LCJpYXQiOjE3NDA2NTk4MDQsImlzcyI6IktpZXRQVCIsImF1ZCI6IkZQVFBsYXlncm91bmRVc2VyIn0.fkbOK6YjHHTSEAznZDtyD4QtxneXa4PCgCh_VwQTjb"
+
+    const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
+    useEffect(() => {
+        // Create the SignalR connection
+        const newConnection = new signalR.HubConnectionBuilder()
+            .withUrl(`http://${domainName}:${webSocketPort}/chat/hub?access_token=${token}`, {
+                withCredentials: false
+            })
+            .withAutomaticReconnect()
+            .build();
+
+        // Start the connection
+        newConnection.start()
+            .then(() => {
+                console.log('SignalR Connected!');
+                // Call the restricted method "SendMessage"
+                newConnection.invoke("JoinGroup", "01954640-de44-75eb-9eab-618334e8bf4d")
+                    .then(() => console.log("JoinGroup method invoked successfully"))
+                    .catch(err => console.error("Error invoking JoinGroup method:", err));
+                newConnection.on('GroupMethod', (user, receivedMessage) => {
+                    console.log("Raw data received:", user, receivedMessage);
+                    console.log("User type:", typeof user, "Message type:", typeof receivedMessage);
+                });
+                // Call the restricted method "PersonalMessage"
+                newConnection.on('PersonalMethod', (user, receivedMessage) => {
+                    console.log("vo day", user, receivedMessage);
+                });
+            })
+            .catch((err: unknown) => {
+                if (err instanceof Error) {
+                    console.error("SignalR Error:", err.message);
+                } else if (typeof err === "object" && err !== null && "type" in err) {
+                    console.error(`SignalR Hub Error: ${(err as any).error}`);
+                } else {
+                    console.error("Unknown SignalR Error:", err);
+                }
+            });
+
+        setConnection(newConnection);
+
+        // Cleanup the connection when component unmounts
+        return () => {
+            if (connection) {
+                connection.stop();
+            }
+        };
+    }, []);
 
     return (
         <SafeAreaView>

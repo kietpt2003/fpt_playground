@@ -12,6 +12,7 @@
   "dependencies": {
     "@expo/config": "^10.0.6",
     "@faker-js/faker": "^9.3.0",
+    "@microsoft/signalr": "8.0.7",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/slider": "^4.5.5",
     "@react-native-firebase/app": "^21.6.1",
