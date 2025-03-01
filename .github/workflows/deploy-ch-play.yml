@@ -33,7 +33,7 @@ jobs:
       - name: Decode and save the .jks file
         run: |
           cd android/app
-          echo "${{ secrets.MY_JKS_SECRET }}" | base64 --decode > my-release-key.jks
+          echo "${{ secrets.MY_KEYSTORE_SECRET }}" | base64 --decode > my-release-key.keystore
 
       - name: Decode GOOGLE_SERVICES from Secret
         run: |
