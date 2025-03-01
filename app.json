@@ -2,7 +2,7 @@
   "expo": {
     "name": "FPT Playground",
     "slug": "fpt_playground",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "light",
@@ -26,7 +26,7 @@
         "backgroundColor": "#000000"
       },
       "package": "com.kietpt2003.fpt_playground",
-      "versionCode": 2
+      "versionCode": 3
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
