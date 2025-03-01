@@ -341,6 +341,19 @@ export default function ChineseChessHome() {
                         <Text style={chineseChessHomeStyleSheet.menuItemTxt}>{t("find-room")}</Text>
                     </TouchableOpacity>
                 </View>
+
+                <ConfirmModal
+                    stringConfirm={stringConfirm}
+                    isConfirm={isConfirm}
+                    setIsConfirm={setIsConfirm}
+                    handleConfirmFunction={handleBackPress}
+                />
+
+                <ErrorModal
+                    stringErr={stringErr}
+                    isError={isError}
+                    setIsError={setIsError}
+                />
             </ImageBackground>
             {
                 isLoading &&
@@ -370,19 +383,6 @@ export default function ChineseChessHome() {
                     </View>
                 </ImageBackground>
             }
-
-            <ConfirmModal
-                stringConfirm={stringConfirm}
-                isConfirm={isConfirm}
-                setIsConfirm={setIsConfirm}
-                handleConfirmFunction={handleBackPress}
-            />
-
-            <ErrorModal
-                stringErr={stringErr}
-                isError={isError}
-                setIsError={setIsError}
-            />
         </SafeAreaView>
     )
 }

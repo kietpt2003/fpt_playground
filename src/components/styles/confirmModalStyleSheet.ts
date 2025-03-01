@@ -5,9 +5,11 @@ import { colors } from "../../constants/colors";
 const confirmModalStyleSheet = StyleSheet.create({
     modalContainer: {
         alignItems: "center",
+        // width: "100%",
+        // height: "100%",
     },
     container: {
-        rowGap: 1,
+        // rowGap: 1,
         width: ScreenWidth * 0.8,
         height: ScreenHeight / 5,
     },

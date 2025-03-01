@@ -30,7 +30,7 @@ jobs:
         run: npm install
 
       #Keystore setup
-      - name: Decode and save the .jks file
+      - name: Decode and save the .keystore file
         run: |
           cd android/app
           echo "${{ secrets.MY_KEYSTORE_SECRET }}" | base64 --decode > my-release-key.keystore

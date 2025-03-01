@@ -881,14 +881,14 @@ const ChineseChessBoard = () => {
                         </View>
                     </View>
                 }
-            </View>
 
-            <ConfirmModal
-                stringConfirm={stringConfirm}
-                isConfirm={isConfirm}
-                setIsConfirm={setIsConfirm}
-                handleConfirmFunction={handleBackPress}
-            />
+                <ConfirmModal
+                    stringConfirm={stringConfirm}
+                    isConfirm={isConfirm}
+                    setIsConfirm={setIsConfirm}
+                    handleConfirmFunction={handleBackPress}
+                />
+            </View>
         </SafeAreaView>
     );
 };
