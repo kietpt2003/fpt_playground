@@ -47,10 +47,10 @@ jobs:
       # Build AAB file
       - name: Build AAB file
         env:
-          EXPO_PUBLIC_UPLOAD_STORE_FILE: ${{ secrets.UPLOAD_STORE_FILE }}
-          EXPO_PUBLIC_UPLOAD_STORE_PASSWORD: ${{ secrets.UPLOAD_STORE_PASSWORD }}
-          EXPO_PUBLIC_UPLOAD_KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
-          EXPO_PUBLIC_UPLOAD_KEY_PASSWORD: ${{ secrets.UPLOAD_KEY_PASSWORD }}
+          UPLOAD_STORE_FILE: ${{ secrets.UPLOAD_STORE_FILE }}
+          UPLOAD_STORE_PASSWORD: ${{ secrets.UPLOAD_STORE_PASSWORD }}
+          UPLOAD_KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
+          UPLOAD_KEY_PASSWORD: ${{ secrets.UPLOAD_KEY_PASSWORD }}
           MAPBOX_DOWNLOADS_TOKEN: ${{ secrets.MAPBOX_DOWNLOADS_TOKEN }}
         run: |
           cd android
@@ -59,7 +59,7 @@ jobs:
       # Cleanup sensitive files
       - name: Cleanup sensitive files
         run: |
-          rm android/app/my-release-key.jks
+          rm android/app/my-release-key.keystore
           rm android/app/google-services.json
 
       # Upload artifact (optional)
