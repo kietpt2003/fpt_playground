@@ -12,16 +12,19 @@ import HorizontalLevelBar from './HorizontalLevelBar';
 import headerLeftStyleSheet from './styles/headerLeftStyleSheet';
 import { useTranslation } from 'react-i18next';
 
-const userLevel = 50;
+const defaultLevel = 50;
 const totalLevel = 120;
 const totalDuration = 5000; // Tổng thời gian hiệu ứng (5 giây)
+const defaultUserName = "default_user123"
+const defaultYear = 2025;
 
 export default function HeaderLeft() {
     const { t } = useTranslation();
+    const user = useSelector((state: RootState) => state.auth.user);
 
     const translateX = useRef(new Animated.Value(-200)).current;
 
-    const currentLevelPercent = calculateProgressPercentage(userLevel, totalLevel);
+    const currentLevelPercent = calculateProgressPercentage(defaultLevel, totalLevel);
 
     const theme = useSelector((state: RootState) => state.theme.theme);
 
@@ -48,27 +51,27 @@ export default function HeaderLeft() {
             />
             <View style={headerLeftStyleSheet.topContentContainer}>
                 <CircularProgress
-                    currentLevelPercent={currentLevelPercent}
+                    currentLevelPercent={user ? user.userLevelPass.percentage : 0}
                     totalDuration={totalDuration}
-                    targetLevel={userLevel}
+                    targetLevel={user ? user.userLevelPass.level : defaultLevel}
                 />
                 <View style={headerLeftStyleSheet.nameContainer}>
                     <Text
                         style={headerLeftStyleSheet.nameTxt}
                         numberOfLines={1}
                     >
-                        Phạm Tuấn Kiệt
+                        {user ? user.userName : defaultUserName}
                     </Text>
                     <Text
                         style={headerLeftStyleSheet.yearTxt}
                         numberOfLines={1}
-                    >{t("member-since")}2024</Text>
+                    >{t("member-since")}{user ? user.createdAt.split("-")[0] : defaultYear}</Text>
                 </View>
             </View>
             <View style={headerLeftStyleSheet.levelContainer}>
                 <Text style={headerLeftStyleSheet.levelTxt}>Exp:</Text>
                 <HorizontalLevelBar
-                    percentage={currentLevelPercent}
+                    percentage={user ? user.userLevelPass.percentage : 0}
                     totalDuration={totalDuration}
                 />
             </View>

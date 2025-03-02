@@ -38,7 +38,7 @@ const CheckmateText = ({ onComplete }: { onComplete: () => void }) => {
                 position: "absolute",
                 alignSelf: "center",
                 zIndex: 2,
-                top: chineseChessRowSize * 4 - 5
+                top: chineseChessRowSize * 4 - 4
             },
             animatedStyle
         ]}>

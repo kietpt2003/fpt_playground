@@ -21,6 +21,7 @@ import useAudio from '../hooks/useAudio';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logout } from '../store/reducers/authReducer';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 export default function HomeScreen() {
     const theme = useSelector((state: RootState) => state.theme.theme);
@@ -33,8 +34,6 @@ export default function HomeScreen() {
 
     const { playSound } = useClick();
     const { resumeSong } = useAudio();
-
-    const isOpenDailyCheckPoint = useSelector((state: RootState) => state.home.isOpenDailyCheckPoint);
 
     const showMenu = () => {
         playSound(); // Phát âm thanh khi bấm
@@ -49,6 +48,7 @@ export default function HomeScreen() {
         await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
             dispatch(logout());
         });
+        await GoogleSignin.signOut();
         navigation.replace("Signin");
     }
 
@@ -420,7 +420,8 @@ export default function HomeScreen() {
                 {
                     !isGuideline &&
                     <DailyCheckPoint
-                        isOpenDailyCheckPoint={isOpenDailyCheckPoint}
+                        setStringErr={setStringErr}
+                        setIsError={setIsError}
                     />
                 }
 

@@ -1,10 +1,15 @@
+import { Dispatch, SetStateAction } from "react";
+
 export type DailyCheckPointProps = {
-    isOpenDailyCheckPoint: boolean,
+    setStringErr: Dispatch<SetStateAction<string>>
+    setIsError: Dispatch<SetStateAction<boolean>>
 }
 
 export type DailyCheckPointItemProps = {
-    date: string,
-    dayStatus: "Past" | "Today" | "Future",
-    value: number,
-    status: "Checked" | "Not checked"
-}
+    id: string;
+    date: string;
+    dayStatus: "Past" | "Today" | "Future";
+    coinValue?: number;
+    diamondValue?: number;
+    status: "Checked" | "Unchecked";
+};

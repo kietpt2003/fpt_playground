@@ -882,6 +882,8 @@ const ChineseChessBoard = () => {
                     </View>
                 }
 
+            </View>
+            <View>
                 <ConfirmModal
                     stringConfirm={stringConfirm}
                     isConfirm={isConfirm}

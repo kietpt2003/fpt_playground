@@ -81,7 +81,7 @@ const dailyCheckPointStyleSheet = StyleSheet.create({
     },
     checkedContainer: {
         position: "absolute",
-        width: ScreenWidth / 3.9,
+        width: ScreenWidth * 0.82,
         height: ScreenHeight / 7.5,
         borderWidth: 1,
         borderRadius: 20,

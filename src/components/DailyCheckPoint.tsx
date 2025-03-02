@@ -19,71 +19,118 @@ import { useTranslation } from "react-i18next";
 import { setIsOpenDailyCheckPoint } from "../store/reducers/homeReducer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DailyCheckPointItem from "./DailyCheckPointItem";
+import { useApiServer } from "../hooks/useApiServer";
+import { useApiClient } from "../hooks/useApiClient";
+import { PaginatedResponse } from "../constants/Paginations/PaginationResponse";
+import axios from "axios";
+import { ErrorResponse } from "../constants/Errors/ErrorResponse";
+import { convertItemsToDailyCheckpointItems } from "../utils/dailyCheckpointUtils";
+import { handleLogout } from "../utils/authorizationUtils";
 
-export default function DailyCheckPoint({ isOpenDailyCheckPoint }: DailyCheckPointProps) {
+const sortOrder = "ASC";
+const sortColumn = "checkInDate";
+const page = 1;
+const pageSize = 7;
+
+export default function DailyCheckPoint({ setStringErr, setIsError }: DailyCheckPointProps) {
     const theme = useSelector((state: RootState) => state.theme.theme);
     const { playSound } = useClick();
     const { t } = useTranslation();
     const [data, setData] = useState<DailyCheckPointItemProps[]>([]);
     const [sundayCheckPoint, setSundayCheckPoint] = useState<DailyCheckPointItemProps | null>(null);
+    const isOpenDailyCheckPoint = useSelector((state: RootState) => state.home.isOpenDailyCheckPoint);
+    const [isFetching, setFetching] = useState<boolean>(false);
 
-    const dispatch = useDispatch()
+    const { apiUrl } = useApiServer();
+    const apiClient = useApiClient();
 
-    useEffect(() => {
-        // Gọi API
-        const fetchDailyCheckPoint = async () => {
-            const response: DailyCheckPointItemProps[] = [
-                {
-                    date: t("monday"),
-                    dayStatus: "Past",
-                    status: "Not checked",
-                    value: 200
-                },
-                {
-                    date: t("tuesday"),
-                    dayStatus: "Past",
-                    status: "Not checked",
-                    value: 200
-                },
-                {
-                    date: t("wednesday"),
-                    dayStatus: "Past",
-                    status: "Checked",
-                    value: 200
-                },
-                {
-                    date: t("thursday"),
-                    dayStatus: "Today",
-                    status: "Not checked",
-                    value: 200
-                },
-                {
-                    date: t("friday"),
-                    dayStatus: "Future",
-                    status: "Not checked",
-                    value: 200
-                },
-                {
-                    date: t("saturday"),
-                    dayStatus: "Future",
-                    status: "Not checked",
-                    value: 200
-                },
-                {
-                    date: t("sunday"),
-                    dayStatus: "Future",
-                    status: "Not checked",
-                    value: 500
-                },
-            ];
-            if (response.length > 0) {
-                // Lưu 4 phần tử đầu tiên vào state `firstFourItems`
-                setData(response.slice(0, 6));
-                // Lưu phần tử cuối cùng vào state `lastItem`
-                setSundayCheckPoint(response[response.length - 1]);
+    const dispatch = useDispatch();
+
+    async function handleCheckin(dailyCheckpointId: string) {
+        try {
+            setFetching(true);
+            await apiClient.put(`${apiUrl}/daily-checkpoint`, {
+                dailyCheckpointId: dailyCheckpointId
+            })
+
+            if (sundayCheckPoint != null && sundayCheckPoint.id == dailyCheckpointId) {
+                setSundayCheckPoint(prev => prev ? {
+                    ...prev,
+                    status: "Checked"
+                } : null)
+            } else {
+                setData((prevData) =>
+                    prevData.map((item) =>
+                        item.id === dailyCheckpointId ? { ...item, status: "Checked" } : item
+                    )
+                );
             }
-        };
+            setFetching(false);
+        } catch (error: unknown) {
+            // Kiểm tra nếu error là AxiosError
+            if (axios.isAxiosError(error)) {
+                const errorData: ErrorResponse = error.response?.data;
+                console.log("API call error:", error.response?.data);
+                if (error.status == 503) {
+                    setStringErr(t("server-maintenance"));
+                    setIsError(true);
+                    setFetching(false);
+                    await handleLogout(dispatch);
+                } else {
+                    console.log(errorData?.reasons?.[0]?.message ??
+                        "Lỗi mạng, vui lòng thử lại sau");
+                }
+            } else {
+                console.log("Unexpected error:", error);
+            }
+            setFetching(false);
+        }
+    }
 
+    const fetchDailyCheckPoint = async () => {
+        try {
+            setFetching(true);
+            const response = await apiClient.get(`${apiUrl}/daily-checkpoint/current-week?SortOrder=${sortOrder}&SortColumn=${sortColumn}&Page=${page}&PageSize=${pageSize}`)
+            const data: PaginatedResponse<DailyCheckPointItemProps> = response.data;
+
+            if (data.items.length > 6) {
+                // Lưu 4 phần tử đầu tiên vào state `firstFourItems`
+                const convertedItems: DailyCheckPointItemProps[] = convertItemsToDailyCheckpointItems(data.items, t);
+                setData(convertedItems.slice(0, 6));
+                // Lưu phần tử cuối cùng vào state `lastItem`
+                setSundayCheckPoint(convertedItems[convertedItems.length - 1]);
+
+                const filteredDailys: DailyCheckPointItemProps[] = convertedItems.filter(i => i.dayStatus == "Today");
+                if (filteredDailys.length > 0 && filteredDailys[0].status == "Unchecked") {
+                    dispatch(setIsOpenDailyCheckPoint(true));
+                } else {
+                    dispatch(setIsOpenDailyCheckPoint(false));
+                }
+            }
+            setFetching(false);
+        } catch (error: unknown) {
+            // Kiểm tra nếu error là AxiosError
+            if (axios.isAxiosError(error)) {
+                const errorData: ErrorResponse = error.response?.data;
+                console.log("API call error:", error.response?.data);
+                if (error.status == 503) {
+                    setStringErr(t("server-maintenance"));
+                    setIsError(true);
+                    setFetching(false);
+                    await handleLogout(dispatch);
+                } else {
+                    console.log(errorData?.reasons?.[0]?.message ??
+                        "Lỗi mạng, vui lòng thử lại sau");
+                }
+            } else {
+                console.log("Unexpected error:", error);
+            }
+            setFetching(false);
+        }
+    };
+
+    // fetchDailyCheckPoint
+    useEffect(() => {
         fetchDailyCheckPoint();
     }, []);
 
@@ -123,9 +170,6 @@ export default function DailyCheckPoint({ isOpenDailyCheckPoint }: DailyCheckPoi
                         style={dailyCheckPointStyleSheet.closeBtnContainer}
                         onPress={() => {
                             playSound();
-
-                            // TODO: Khúc này mốt nhớ xóa
-                            AsyncStorage.setItem("isOpenDailyCheckPoint", "false");
                             dispatch(setIsOpenDailyCheckPoint(false));
                         }}
                         touchSoundDisabled={true}
@@ -145,10 +189,9 @@ export default function DailyCheckPoint({ isOpenDailyCheckPoint }: DailyCheckPoi
                             showsVerticalScrollIndicator={false}
                             renderItem={({ item }) => (
                                 <DailyCheckPointItem
-                                    date={item.date}
-                                    value={item.value}
-                                    dayStatus={item.dayStatus}
-                                    status={item.status}
+                                    isFetching={isFetching}
+                                    item={item}
+                                    handleCheckin={handleCheckin}
                                 />
                             )}
                             keyExtractor={(item, index) => index.toString()}
@@ -165,8 +208,11 @@ export default function DailyCheckPoint({ isOpenDailyCheckPoint }: DailyCheckPoi
 
                     <TouchableOpacity
                         style={dailyCheckPointStyleSheet.checkPointFinalDateContainer}
-                        disabled={sundayCheckPoint?.status === "Checked" || sundayCheckPoint?.dayStatus !== "Today"}
+                        disabled={isFetching || sundayCheckPoint?.status === "Checked" || sundayCheckPoint?.dayStatus !== "Today" || sundayCheckPoint == null}
                         touchSoundDisabled={true}
+                        onPress={() => {
+                            handleCheckin(sundayCheckPoint!.id);
+                        }}
                     >
                         <LinearGradient
                             colors={[colors.lightYellow, colors.darkYellow]} // Hiệu ứng chuyển màu
@@ -215,7 +261,7 @@ export default function DailyCheckPoint({ isOpenDailyCheckPoint }: DailyCheckPoi
                                 }
                             ]
                         }>
-                            +{sundayCheckPoint?.value} {t("coin")}
+                            +{sundayCheckPoint?.coinValue} {t("coin")}
                         </Text>
                     </TouchableOpacity>
                 </View>

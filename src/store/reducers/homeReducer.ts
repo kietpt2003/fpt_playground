@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const homeSlice = createSlice({
     name: 'home',
     initialState: {
-        isOpenDailyCheckPoint: true,
+        isOpenDailyCheckPoint: false,
         homeGuideline: true,
     },
     reducers: {

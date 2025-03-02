@@ -50,6 +50,7 @@ import { useApiServer } from '../hooks/useApiServer';
 import { useApiClient } from '../hooks/useApiClient';
 import * as signalR from "@microsoft/signalr"
 import { _ReturnNull } from 'i18next';
+import { handleLogout } from '../utils/authorizationUtils';
 
 export default function SiginScreen() {
     const [email, setEmail] = useState<string>("");
@@ -173,9 +174,7 @@ export default function SiginScreen() {
             const res = await apiClient.get(`${apiUrl}/users/current`);
             const data: UserResponse = res.data;
             if (data.account?.role == "Admin") {
-                await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
-                    dispatch(logout());
-                });
+                await handleLogout(dispatch);
                 return false;
             }
             dispatch(login(data));
@@ -187,9 +186,7 @@ export default function SiginScreen() {
                 console.log("getCurrentUser error:", error.response?.data);
                 if (error.status == 503) {
                     setStringErr(t("server-maintenance"));
-                    await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
-                        dispatch(logout());
-                    });
+                    await handleLogout(dispatch);
                     setIsError(true);
                 } else {
                     setStringErr(
@@ -211,9 +208,7 @@ export default function SiginScreen() {
         try {
             const rfToken = await AsyncStorage.getItem("refreshToken");
             if (!rfToken) {
-                await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
-                    dispatch(logout());
-                });
+                await handleLogout(dispatch);
                 return false;
             }
             const res = await apiClient.post(`${apiUrl}/auth/refresh`, {
@@ -244,9 +239,7 @@ export default function SiginScreen() {
                 console.log("Unexpected error:", error);
                 setStringErr("Đã xảy ra lỗi không xác định.");
             }
-            await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
-                dispatch(logout());
-            });
+            await handleLogout(dispatch);
             setIsError(true);
             return false;
         }
@@ -437,9 +430,7 @@ export default function SiginScreen() {
 
     const handleChangeAccount = async () => {
         setIsFetching(true);
-        await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
-            dispatch(logout());
-        });
+        await handleLogout(dispatch);
         setIsFetching(false);
     }
 
@@ -499,9 +490,7 @@ export default function SiginScreen() {
                 console.log("handleChangeServer error:", error.response?.data);
                 if (error.status == 503) {
                     setStringErr(t("server-maintenance"));
-                    await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
-                        dispatch(logout());
-                    });
+                    await handleLogout(dispatch);
                 } else {
                     setStringErr(
                         errorData?.reasons?.[0]?.message ??
@@ -558,9 +547,7 @@ export default function SiginScreen() {
                     }
 
                     setIsFetching(false);
-                    await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
-                        dispatch(logout());
-                    });
+                    await handleLogout(dispatch);
                 }
             }
             fetchUser();
@@ -606,54 +593,63 @@ export default function SiginScreen() {
 
     const domainName = "10.0.2.2"
     const webSocketPort = "5272"
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySW5mbyI6IntcIlVzZXJJZFwiOlwiMDE5NTNlMDQtMDU5Yi03OTJjLWFhOGYtNmMwYjc3YmMxYWNhXCIsXCJFbWFpbFwiOlwiaHp1c3N5b2NsQGVtbHRtcC5jb21cIixcIlJvbGVcIjpcIlVzZXJcIn0iLCJUb2tlbkNsYWltIjoiRm9yVmVyaWZ5T25seSIsIm5iZiI6MTc0MDY1OTgwNCwiZXhwIjoxNzQwNjYxNjA0LCJpYXQiOjE3NDA2NTk4MDQsImlzcyI6IktpZXRQVCIsImF1ZCI6IkZQVFBsYXlncm91bmRVc2VyIn0.fkbOK6YjHHTSEAznZDtyD4QtxneXa4PCgCh_VwQTjb"
 
     const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
-    useEffect(() => {
-        // Create the SignalR connection
-        const newConnection = new signalR.HubConnectionBuilder()
-            .withUrl(`http://${domainName}:${webSocketPort}/chat/hub?access_token=${token}`, {
-                withCredentials: false
-            })
-            .withAutomaticReconnect()
-            .build();
 
-        // Start the connection
-        newConnection.start()
-            .then(() => {
-                console.log('SignalR Connected!');
-                // Call the restricted method "SendMessage"
-                newConnection.invoke("JoinGroup", "01954640-de44-75eb-9eab-618334e8bf4d")
-                    .then(() => console.log("JoinGroup method invoked successfully"))
-                    .catch(err => console.error("Error invoking JoinGroup method:", err));
-                newConnection.on('GroupMethod', (user, receivedMessage) => {
-                    console.log("Raw data received:", user, receivedMessage);
-                    console.log("User type:", typeof user, "Message type:", typeof receivedMessage);
-                });
-                // Call the restricted method "PersonalMessage"
-                newConnection.on('PersonalMethod', (user, receivedMessage) => {
-                    console.log("vo day", user, receivedMessage);
-                });
-            })
-            .catch((err: unknown) => {
-                if (err instanceof Error) {
-                    console.error("SignalR Error:", err.message);
-                } else if (typeof err === "object" && err !== null && "type" in err) {
-                    console.error(`SignalR Hub Error: ${(err as any).error}`);
-                } else {
-                    console.error("Unknown SignalR Error:", err);
-                }
-            });
-
-        setConnection(newConnection);
-
-        // Cleanup the connection when component unmounts
-        return () => {
-            if (connection) {
-                connection.stop();
+    const handleSignalR = async () => {
+        if (isLoggedIn) {
+            const token = await AsyncStorage.getItem("token");
+            if (token == null) {
+                return;
             }
-        };
-    }, []);
+            // Create the SignalR connection
+            const newConnection = new signalR.HubConnectionBuilder()
+                .withUrl(`http://${domainName}:${webSocketPort}/chat/hub?access_token=${token}`, {
+                    withCredentials: false
+                })
+                .withAutomaticReconnect()
+                .build();
+
+            // Start the connection
+            newConnection.start()
+                .then(() => {
+                    console.log('SignalR Connected!');
+                    // Call the restricted method "SendMessage"
+                    newConnection.invoke("JoinGroup", "01954640-de44-75eb-9eab-618334e8bf4d")
+                        .then(() => console.log("JoinGroup method invoked successfully"))
+                        .catch(err => console.error("Error invoking JoinGroup method:", err));
+                    newConnection.on('GroupMethod', (user, receivedMessage) => {
+                        console.log("Raw data received:", user, receivedMessage);
+                        console.log("User type:", typeof user, "Message type:", typeof receivedMessage);
+                    });
+                    // Call the restricted method "PersonalMessage"
+                    newConnection.on('PersonalMethod', (user, receivedMessage) => {
+                        console.log("vo day", user, receivedMessage);
+                    });
+                })
+                .catch((err: unknown) => {
+                    if (err instanceof Error) {
+                        console.error("SignalR Error:", err.message);
+                    } else if (typeof err === "object" && err !== null && "type" in err) {
+                        console.error(`SignalR Hub Error: ${(err as any).error}`);
+                    } else {
+                        console.error("Unknown SignalR Error:", err);
+                    }
+                });
+
+            setConnection(newConnection);
+
+            // Cleanup the connection when component unmounts
+            return () => {
+                if (connection) {
+                    connection.stop();
+                }
+            };
+        }
+    }
+    useEffect(() => {
+        handleSignalR();
+    }, [isLoggedIn]);
 
     return (
         <SafeAreaView>

@@ -2,6 +2,7 @@ import { AccountResponse } from "./AccountResponse";
 import { CoinWalletResponse } from "./CoinWalletResponse";
 import { DiamondWalletResponse } from "./DiamondWalletResponse";
 import { ServerResponse } from "./ServerResponse";
+import { UserLevelPassResponse } from "./UserLevelPassResponse";
 
 export type UserResponse = {
     id: string;
@@ -17,6 +18,7 @@ export type UserResponse = {
     coinWallet?: CoinWalletResponse;
     diamondWallet?: DiamondWalletResponse;
     server?: ServerResponse;
+    userLevelPass: UserLevelPassResponse;
 }
 
 export type Gender = "Male" | "Female"

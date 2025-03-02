@@ -337,7 +337,7 @@ class ChineseChessLogical(reactApplicationContext: ReactApplicationContext) :
                 if (i in 0..9 && j in 0..8) {
                     val targetSquare = gameState[i][j]
                     val loopIndex = i - row
-                    if (loopIndex == 1 && targetSquare.piece != ChineseChessPiece.EMPTY) {
+                    if ((loopIndex == 1 || loopIndex == -1) && targetSquare.piece != ChineseChessPiece.EMPTY) {
                         false
                     } else if (targetSquare.piece == ChineseChessPiece.EMPTY &&
                         ((pieceColor == "black" && i <= 4 && i % 2 == 0) ||

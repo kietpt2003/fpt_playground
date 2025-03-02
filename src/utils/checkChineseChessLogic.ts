@@ -291,7 +291,7 @@ export const checkBishopMove = async (gameState: ChineseChessBoardPiece[][], { p
         if (i >= 0 && i < 10 && j >= 0 && j < 9) {
             const targetSquare = gameState[i][j];
             const loopIndex = i - row;
-            if (loopIndex == 1 && targetSquare.piece !== '') { //Check có vật cản phải từ đầu không
+            if ((loopIndex == 1 || loopIndex == -1) && targetSquare.piece !== '') { //Check có vật cản phải từ đầu không
                 return false;
             }
             if (targetSquare.piece === '' && ((pieceColor === "black" && i <= 4 && i % 2 == 0) || (pieceColor === "red" && i >= 5 && i % 2 == 1))) {

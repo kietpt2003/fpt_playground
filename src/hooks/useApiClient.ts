@@ -35,7 +35,7 @@ export const useApiClient = () => {
 
                 try {
                     const currRefreshToken = await AsyncStorage.getItem("refreshToken");
-                    const response = await axios.post(apiUrl, {
+                    const response = await axios.post(`${apiUrl}/auth/refresh`, {
                         refreshToken: currRefreshToken,
                     });
                     const { token, refreshToken } = response.data;

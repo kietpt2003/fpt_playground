@@ -79,9 +79,6 @@ export default function RootNavigator({ onMount }: RootNavigatorProps) {
             const homeGuideline = await AsyncStorage.getItem("homeGuideline");
 
             dispatch(setHomeGuideline(homeGuideline === "true" || homeGuideline == null))
-
-            const isOpenDailyCheckPoint = await AsyncStorage.getItem("isOpenDailyCheckPoint");
-            dispatch(setIsOpenDailyCheckPoint(isOpenDailyCheckPoint === "true" || isOpenDailyCheckPoint == null))
         })();
     }, []);
 
