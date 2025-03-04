@@ -2,20 +2,29 @@ import { View, Text, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
 import { colors } from '../constants/colors'
-import { DailyCheckPointItemProps } from './types/dailyCheckPointTypes'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next'
 import checkPointItemStyleSheet from './styles/checkPointItemStyleSheet'
+import { DailyCheckPointItemProps } from './types/dailyCheckPointTypes';
 
-export default function CheckPointItem(item: DailyCheckPointItemProps) {
+export type CheckPointItemProps = {
+    isFetching: boolean
+    item: DailyCheckPointItemProps
+    handleCheckin: (dailyCheckpointId: string) => Promise<void>
+};
+
+export default function CheckPointItem({ item, isFetching, handleCheckin }: CheckPointItemProps) {
     const { t } = useTranslation();
 
     return (
         <View>
             <TouchableOpacity
                 style={checkPointItemStyleSheet.checkPointItemContainer}
-                disabled={item.status === "Checked" || item.dayStatus !== "Today"}
+                disabled={isFetching || item.status === "Checked" || item.dayStatus !== "Today"}
                 touchSoundDisabled={true}
+                onPress={() => {
+                    handleCheckin(item.id);
+                }}
             >
                 <LinearGradient
                     colors={[colors.lightYellow, colors.darkYellow]} // Hiệu ứng chuyển màu
@@ -24,7 +33,7 @@ export default function CheckPointItem(item: DailyCheckPointItemProps) {
 
                 {/* Hết hạn ở quá khứ */}
                 {
-                    (item.dayStatus !== "Future" && item.dayStatus !== "Today" && item.status === "Not checked") &&
+                    (item.dayStatus !== "Future" && item.dayStatus !== "Today" && item.status === "Unchecked") &&
                     <View style={checkPointItemStyleSheet.notCheckedContainer}>
                         <Text
                             style={checkPointItemStyleSheet.notCheckedTxt}
@@ -71,7 +80,7 @@ export default function CheckPointItem(item: DailyCheckPointItemProps) {
                         }
                     ]
                 }>
-                    +{item.value}
+                    {item?.coinValue ? `+${item?.coinValue}` : "???"}
                 </Text>
             </TouchableOpacity>
             <View style={checkPointItemStyleSheet.dateItemContainer}>

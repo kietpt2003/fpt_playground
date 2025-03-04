@@ -7,6 +7,10 @@ const itemHeight = ScreenHeight / 9;
 const itemRadius = 10;
 
 const dailyCheckpointScreenStyleSheet = StyleSheet.create({
+    container: {
+        width: ScreenWidth,
+        height: ScreenHeight,
+    },
     containerLinear: {
         position: "absolute",
         width: "100%",
@@ -27,7 +31,7 @@ const dailyCheckpointScreenStyleSheet = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         position: "absolute",
-        top: 40,
+        top: 20,
         paddingHorizontal: 20,
         width: ScreenWidth
     },
@@ -305,7 +309,7 @@ const dailyCheckpointScreenStyleSheet = StyleSheet.create({
         position: "absolute",
         width: "100%",
         height: "100%",
-        borderRadius: 30
+        borderRadius: 50
     },
     functionContentContainer: {
         width: ScreenWidth > 350 ? ScreenHeight / 4 : ScreenHeight / 5,
@@ -314,11 +318,11 @@ const dailyCheckpointScreenStyleSheet = StyleSheet.create({
         marginLeft: 10,
     },
     functionTitle: {
-        fontSize: ScreenWidth > 350 ? 18 : 14,
+        fontSize: ScreenWidth > 350 ? 16 : 13,
         fontFamily: "RobotoMedium"
     },
     functionDescription: {
-        fontSize: ScreenWidth > 350 ? 16 : 13,
+        fontSize: 12,
         color: colors.grey,
         fontFamily: "RobotoLight"
     },

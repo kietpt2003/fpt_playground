@@ -13,16 +13,16 @@ type DailyCheckPointComponentProps = {
     handleCheckin: (dailyCheckpointId: string) => Promise<void>
 }
 
-export default function DailyCheckPointItem(props: DailyCheckPointComponentProps) {
+export default function DailyCheckPointItem({ item, isFetching, handleCheckin }: DailyCheckPointComponentProps) {
     const { t } = useTranslation();
 
     return (
         <TouchableOpacity
             style={dailyCheckPointItemStyleSheet.checkPointItemContainer}
-            disabled={props.isFetching || props.item.status === "Checked" || props.item.dayStatus !== "Today"}
+            disabled={isFetching || item.status === "Checked" || item.dayStatus !== "Today"}
             touchSoundDisabled={true}
             onPress={() => {
-                props.handleCheckin(props.item.id);
+                handleCheckin(item.id);
             }}
         >
             <LinearGradient
@@ -36,13 +36,13 @@ export default function DailyCheckPointItem(props: DailyCheckPointComponentProps
                     style={dailyCheckPointItemStyleSheet.dateItemContainerLinear}
                 />
                 <Text style={dailyCheckPointItemStyleSheet.dateItemTxt}>
-                    {props.item.date}
+                    {item.date}
                 </Text>
             </View>
 
             {/* Hết hạn ở quá khứ */}
             {
-                (props.item.dayStatus !== "Future" && props.item.dayStatus !== "Today" && props.item.status === "Unchecked") &&
+                (item.dayStatus !== "Future" && item.dayStatus !== "Today" && item.status === "Unchecked") &&
                 <View style={dailyCheckPointItemStyleSheet.notCheckedContainer}>
                     <Text style={dailyCheckPointItemStyleSheet.notCheckedTxt}>
                         {t("daily-expired")}
@@ -52,7 +52,7 @@ export default function DailyCheckPointItem(props: DailyCheckPointComponentProps
 
             {/* Đã nhận ở quá khứ và hiện tại */}
             {
-                (props.item.dayStatus !== "Future" && props.item.status === "Checked") &&
+                (item.dayStatus !== "Future" && item.status === "Checked") &&
                 <View style={dailyCheckPointItemStyleSheet.checkedContainer}>
                     <Text style={dailyCheckPointItemStyleSheet.checkedTxt}>
                         {t("daily-checked")}
@@ -62,10 +62,10 @@ export default function DailyCheckPointItem(props: DailyCheckPointComponentProps
 
             {/* Tương lai thì khóa */}
             {
-                (props.item.dayStatus !== "Today") &&
+                (item.dayStatus !== "Today") &&
                 <View style={dailyCheckPointItemStyleSheet.lockContainer}>
                     {
-                        (props.item.dayStatus === "Future") &&
+                        (item.dayStatus === "Future") &&
                         <MaterialCommunityIcons name="lock" size={50} color={colors.brown} />
                     }
                 </View>
@@ -83,7 +83,7 @@ export default function DailyCheckPointItem(props: DailyCheckPointComponentProps
                     }
                 ]
             }>
-                +{props.item.coinValue} {t("coin")}
+                +{item.coinValue} {t("coin")}
             </Text>
         </TouchableOpacity>
     )
