@@ -114,6 +114,10 @@ export default function DailyCheckPointScreen() {
                     )
                 );
             }
+            setTodayDaily(prev => prev ? {
+                ...prev,
+                status: "Checked"
+            } : null);
             setFetching(false);
         } catch (error: unknown) {
             // Kiểm tra nếu error là AxiosError
@@ -128,6 +132,9 @@ export default function DailyCheckPointScreen() {
                 } else {
                     console.log(errorData?.reasons?.[0]?.message ??
                         "Lỗi mạng, vui lòng thử lại sau");
+                    setStringErr(errorData?.reasons?.[0]?.message ??
+                        "Lỗi mạng, vui lòng thử lại sau");
+                    setIsError(true);
                 }
             } else {
                 console.log("Unexpected error:", error);

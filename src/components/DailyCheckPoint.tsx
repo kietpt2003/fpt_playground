@@ -79,6 +79,9 @@ export default function DailyCheckPoint({ setStringErr, setIsError }: DailyCheck
                 } else {
                     console.log(errorData?.reasons?.[0]?.message ??
                         "Lỗi mạng, vui lòng thử lại sau");
+                    setStringErr(errorData?.reasons?.[0]?.message ??
+                        "Lỗi mạng, vui lòng thử lại sau");
+                    setIsError(true);
                 }
             } else {
                 console.log("Unexpected error:", error);

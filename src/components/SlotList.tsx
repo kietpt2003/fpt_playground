@@ -14,7 +14,7 @@ export default function SlotList({ data }: SlotListProps) {
                 <SlotItem item={item} />
             )}
             keyExtractor={(item, index) => index.toString()}
-            numColumns={3} // Hiển thị 2 cột
+            numColumns={3} // Hiển thị 3 cột
             columnWrapperStyle={{
                 justifyContent: "space-between", // Giãn đều giữa các cột
             }}
