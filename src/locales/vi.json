@@ -11,7 +11,7 @@
     "theme-light-txt": "Sáng",
     "theme-dark-txt": "Tối",
     "forgot-password": "Quên mật khẩu?",
-    "app-version": "version 1.0.4",
+    "app-version": "version 1.0.5",
     "forgot-pass-title": "QUÊN MẬT KHẨU",
     "forgot-pass-guide": "Nhập email mà bạn muốn nhận mã khôi phục",
     "your-email": "Email của bạn",
@@ -183,5 +183,6 @@
     "user-name-input-description": "Tạo tên người dùng hoặc sử dụng đề xuất của chúng tôi. Bạn có thể thay đổi tên người dùng này bất cứ lúc nào.",
     "name-input-error": "Tên của bạn phải có độ dài từ 1-25 ký tự, không chứa ký tự đặc biệt",
     "user-name-input-error": "Tên người dùng phải có độ dài từ 1-25 ký tự, không chứa ký tự đặc biệt, không viết hoa và không chứa khoảng trắng",
-    "user-name-exist-error": "Tên người dùng đã tồn tại"
+    "user-name-exist-error": "Tên người dùng đã tồn tại",
+    "finger-print-validation-msg": "Xác thực vân tay"
 }

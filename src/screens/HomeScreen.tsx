@@ -22,6 +22,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logout } from '../store/reducers/authReducer';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics';
+import { useApiClient } from '../hooks/useApiClient';
+import { useApiServer } from '../hooks/useApiServer';
+import { handleLogout } from '../utils/authorizationUtils';
+import axios from 'axios';
+import { ErrorResponse } from '../constants/Errors/ErrorResponse';
+const rnBiometrics = new ReactNativeBiometrics();
 
 export default function HomeScreen() {
     const theme = useSelector((state: RootState) => state.theme.theme);
@@ -44,20 +51,105 @@ export default function HomeScreen() {
         setMenuVisible(false);
     };
 
-    const handleSignout = async () => {
-        await AsyncStorage.multiRemove(["token", "refreshToken"], () => {
-            dispatch(logout());
-        });
-        await GoogleSignin.signOut();
-        navigation.replace("Signin");
-    }
-
     const [stringErr, setStringErr] = useState<string>("");
     const [isError, setIsError] = useState<boolean>(false);
 
     const isGuideline = useSelector((state: RootState) => state.home.homeGuideline);
     const scrollViewRef = useRef<ScrollView>(null);
     const [onScrolling, setOnScrolling] = useState(false);
+
+    const apiClient = useApiClient();
+    const { apiUrl } = useApiServer();
+
+    const checkBiometrics = async () => {
+        const { available, biometryType } = await rnBiometrics.isSensorAvailable();
+
+        if (available && biometryType === BiometryTypes.Biometrics) {
+            console.log('Thiết bị hỗ trợ vân tay');
+        } else {
+            console.log('Không hỗ trợ vân tay');
+        }
+    };
+
+    const registerBiometricKey = async () => {
+        const { publicKey } = await rnBiometrics.createKeys();
+        try {
+            const res = await apiClient.post(`${apiUrl}/auth/biometrics/register`, {
+                publicKey: publicKey,
+            });
+
+            console.log("register ok");
+
+        } catch (error) {
+            // Kiểm tra nếu error là AxiosError
+            if (axios.isAxiosError(error)) {
+                const errorData: ErrorResponse = error.response?.data;
+                console.log("API call error:", error.response?.data);
+                if (error.status == 503) {
+                    setStringErr(t("server-maintenance"));
+                    setIsError(true);
+                } else {
+                    setStringErr(
+                        errorData?.reasons?.[0]?.message ??
+                        "Lỗi mạng, vui lòng thử lại sau"
+                    );
+                    setIsError(true);
+                }
+            } else {
+                console.log("Unexpected error:", error);
+                setStringErr("Đã xảy ra lỗi không xác định.");
+                setIsError(true);
+            }
+            await GoogleSignin.signOut();
+        }
+    };
+
+    const authenticateWithBiometrics = async () => {
+        try {
+            // 1️⃣ Lấy challenge từ server
+            const res = await apiClient.get(`${apiUrl}/auth/biometrics/challenge`);
+            const data: { challenge: string } = res.data;
+
+            // // 2️⃣ Sử dụng private key để ký challenge
+            const { signature } = await rnBiometrics.createSignature({
+                promptMessage: t("finger-print-validation-msg"),
+                payload: data.challenge, // Challenge từ server
+            });
+
+            const verifyRes = await apiClient.post(`${apiUrl}/auth/biometrics/verify`, {
+                challenge: data.challenge,
+                signature: signature
+            });
+
+            if (verifyRes.status == 200) {
+                console.log("verify ok");
+            } else {
+                console.log("sth wrong");
+            }
+
+        } catch (error) {
+            // Kiểm tra nếu error là AxiosError
+            if (axios.isAxiosError(error)) {
+                const errorData: ErrorResponse = error.response?.data;
+                console.log("API call error:", error.response?.data);
+                if (error.status == 503) {
+                    setStringErr(t("server-maintenance"));
+                    setIsError(true);
+                } else {
+                    setStringErr(
+                        errorData?.reasons?.[0]?.message ??
+                        "Lỗi mạng, vui lòng thử lại sau"
+                    );
+                    setIsError(true);
+                }
+            } else {
+                console.log("Unexpected error:", error);
+                setStringErr("Đã xảy ra lỗi không xác định.");
+                setIsError(true);
+            }
+            await GoogleSignin.signOut();
+        }
+    };
 
     useFocusEffect(
         useCallback(() => {
@@ -184,7 +276,7 @@ export default function HomeScreen() {
                             <MenuItem
                                 onPress={() => {
                                     hideMenu();
-                                    handleSignout();
+                                    handleLogout(dispatch);
                                 }}
                             >
                                 <View style={homeScreenStyleSheet.menuItem}>

@@ -11,7 +11,7 @@
     "theme-light-txt": "Day",
     "theme-dark-txt": "Night",
     "forgot-password": "Forgot Password",
-    "app-version": "version 1.0.4",
+    "app-version": "version 1.0.5",
     "forgot-pass-title": "FORGOT YOUR PASSWORD",
     "forgot-pass-guide": "Enter the email you want to receive the recovery code",
     "your-email": "Your email",
@@ -183,5 +183,6 @@
     "user-name-input-description": "Create a Username or use our suggestions. You can change this Username at any time.",
     "name-input-error": "Your name must be 1-25 characters long, no special characters included",
     "user-name-input-error": "Username must be 1-25 characters long, contain no special, no uppercase, and no spaces",
-    "user-name-exist-error": "Username exist"
+    "user-name-exist-error": "Username exist",
+    "finger-print-validation-msg": "Fingerprint authentication"
 }
