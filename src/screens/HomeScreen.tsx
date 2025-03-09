@@ -1,4 +1,4 @@
-import { View, Text, ImageBackground, ScrollView, TouchableOpacity, Image } from 'react-native'
+import { View, Text, ImageBackground, ScrollView, TouchableOpacity, Image, ActivityIndicator, TextInput } from 'react-native'
 import React, { useCallback, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
@@ -28,6 +28,7 @@ import { useApiServer } from '../hooks/useApiServer';
 import { handleLogout } from '../utils/authorizationUtils';
 import axios from 'axios';
 import { ErrorResponse } from '../constants/Errors/ErrorResponse';
+import QRCode from 'react-native-qrcode-svg';
 const rnBiometrics = new ReactNativeBiometrics();
 
 export default function HomeScreen() {
@@ -38,6 +39,8 @@ export default function HomeScreen() {
     const dispatch = useDispatch();
 
     const [menuVisible, setMenuVisible] = useState<boolean>(false);
+
+    const [qrCodeUrl, setQrCodeUrl] = useState("");
 
     const { playSound } = useClick();
     const { resumeSong } = useAudio();
@@ -147,9 +150,70 @@ export default function HomeScreen() {
                 setStringErr("Đã xảy ra lỗi không xác định.");
                 setIsError(true);
             }
-            await GoogleSignin.signOut();
         }
     };
+
+    const [otp, setOtp] = useState("");
+
+    const verifyOtp = async () => {
+        try {
+            console.log("vo day");
+
+            await apiClient.post(`${apiUrl}/auth/authenticator/verify`, {
+                otp: otp
+            })
+            console.log("verify success");
+
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                const errorData: ErrorResponse = error.response?.data;
+                console.log("API call error:", error.response?.data);
+                if (error.status == 503) {
+                    setStringErr(t("server-maintenance"));
+                    setIsError(true);
+                } else {
+                    setStringErr(
+                        errorData?.reasons?.[0]?.message ??
+                        "Lỗi mạng, vui lòng thử lại sau"
+                    );
+                    setIsError(true);
+                }
+            } else {
+                console.log("Unexpected error:", error);
+                setStringErr("Đã xảy ra lỗi không xác định.");
+                setIsError(true);
+            }
+        }
+    };
+
+    const ggAuthenSetup = async () => {
+        try {
+            const res = await apiClient.post(`${apiUrl}/auth/authenticator/setup`)
+            const data: { qrCodeUrl: string } = res.data;
+            setQrCodeUrl(data.qrCodeUrl);
+
+        } catch (error) {
+            // Kiểm tra nếu error là AxiosError
+            if (axios.isAxiosError(error)) {
+                const errorData: ErrorResponse = error.response?.data;
+                console.log("API call error:", error.response?.data);
+                if (error.status == 503) {
+                    setStringErr(t("server-maintenance"));
+                    setIsError(true);
+                } else {
+                    setStringErr(
+                        errorData?.reasons?.[0]?.message ??
+                        "Lỗi mạng, vui lòng thử lại sau"
+                    );
+                    setIsError(true);
+                }
+            } else {
+                console.log("Unexpected error:", error);
+                setStringErr("Đã xảy ra lỗi không xác định.");
+                setIsError(true);
+            }
+        }
+    }
 
     useFocusEffect(
         useCallback(() => {
