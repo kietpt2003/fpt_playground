@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "FPT Playground",
+    "slug": "fpt_playground",
+    "version": "1.0.6",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "audio"
+        ]
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#000000"
+      },
+      "package": "com.kietpt2003.fpt_playground",
+      "versionCode": 7
+    },
+    "web": {
+      "favicon": "./assets/images/favicon.png"
+    }
+  }
+}

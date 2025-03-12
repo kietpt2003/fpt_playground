@@ -1,0 +1,70 @@
+name: Build AAB File And Automation EAS Submit
+
+on:
+  push:
+    branches:
+      - prod # Specify the branches that will trigger the workflow
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Setup Java 17 environment
+      - name: Setup Java 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin" # Use the Eclipse Temurin distribution
+          java-version: "17"
+
+      # Setup Node.js environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.17.0 # Use the node version compatible with your project
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      #Keystore setup
+      - name: Decode and save the .keystore file
+        run: |
+          cd android/app
+          echo "${{ secrets.MY_KEYSTORE_SECRET }}" | base64 --decode > my-release-key.keystore
+
+      - name: Decode GOOGLE_SERVICES from Secret
+        run: |
+          cd android/app
+          echo "${{ secrets.GOOGLE_SERVICES }}" | base64 --decode > google-services.json
+
+      # Make gradlew executable
+      - name: Grant execute permission for gradlew
+        run: chmod +x android/gradlew
+
+      # Build AAB file
+      - name: Build AAB file
+        env:
+          UPLOAD_STORE_FILE: ${{ secrets.UPLOAD_STORE_FILE }}
+          UPLOAD_STORE_PASSWORD: ${{ secrets.UPLOAD_STORE_PASSWORD }}
+          UPLOAD_KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
+          UPLOAD_KEY_PASSWORD: ${{ secrets.UPLOAD_KEY_PASSWORD }}
+          MAPBOX_DOWNLOADS_TOKEN: ${{ secrets.MAPBOX_DOWNLOADS_TOKEN }}
+        run: |
+          cd android
+          ./gradlew bundleRelease
+
+      # Cleanup sensitive files
+      - name: Cleanup sensitive files
+        run: |
+          rm android/app/my-release-key.keystore
+          rm android/app/google-services.json
+
+      # Upload artifact (optional)
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: android/app/build/outputs/bundle/release/*.aab
