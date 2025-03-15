@@ -25,6 +25,11 @@ export type RootStackParamList = {
     ChineseChessBoard: { isPlaySfx: boolean };
     RegisterUser: { serverId: string };
     VerifyCodeScreen: { email: string };
+    FriendChatDetailV2: {
+        userMasked?: UserMaskedResponse;
+        friend?: FriendResponse;
+        conversationId: string;
+    };
 };
 
 export type NavigationProps = StackNavigationProp<RootStackParamList>;

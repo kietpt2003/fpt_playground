@@ -27,6 +27,7 @@ import ChineseChessHome from "../screens/ChineseChessHome";
 import ChineseChessBoard from "../components/ChineseChessBoard";
 import RegisterUser from "../screens/RegisterUser";
 import VerifyCodeScreen from "../screens/VerifyCodeScreen";
+import FriendChatDetailV2 from "../screens/FriendChatDetailV2";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -106,6 +107,7 @@ export default function RootNavigator({ onMount }: RootNavigatorProps) {
             <Stack.Screen name="ChineseChessBoard" component={ChineseChessBoard} />
             <Stack.Screen name="RegisterUser" component={RegisterUser} />
             <Stack.Screen name="VerifyCodeScreen" component={VerifyCodeScreen} />
+            <Stack.Screen name="FriendChatDetailV2" component={FriendChatDetailV2} />
         </Stack.Navigator>
     )
 }

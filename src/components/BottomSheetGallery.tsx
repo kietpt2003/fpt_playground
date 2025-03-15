@@ -60,7 +60,7 @@ const BottomSheetGallery = forwardRef<BottomSheetGalleryMethods, BottomSheetGall
         const [showAlbumsList, setShowAlbumsList] = useState<boolean>(false);
 
         const inset = useSafeAreaInsets();
-        const closeHeight = ScreenHeight + statusBarHeight;
+        const closeHeight = ScreenHeight;
         const openHeight = snapTo;
         const topAnimation = useSharedValue(closeHeight);
         const context = useSharedValue(0);
@@ -143,7 +143,7 @@ const BottomSheetGallery = forwardRef<BottomSheetGalleryMethods, BottomSheetGall
 
                 if (!isTop) {
                     if (event.velocityY < 0 && (topAnimation.value < ScreenHeight / 2 || (speedRate > 0.08 && topAnimation.value < openHeight))) {
-                        topAnimation.value = withSpring(statusBarHeight, {
+                        topAnimation.value = withSpring(ScreenHeight * .07, {
                             damping: 100,
                             stiffness: 400,
                         });
@@ -168,7 +168,7 @@ const BottomSheetGallery = forwardRef<BottomSheetGalleryMethods, BottomSheetGall
                         });
                         runOnJS(setIsTop)(false);
                     } else {
-                        topAnimation.value = withSpring(statusBarHeight, {
+                        topAnimation.value = withSpring(ScreenHeight * .07, {
                             damping: 100,
                             stiffness: 400,
                         });
@@ -227,13 +227,13 @@ const BottomSheetGallery = forwardRef<BottomSheetGalleryMethods, BottomSheetGall
                             });
                             runOnJS(setIsTop)(false);
                         } else {
-                            topAnimation.value = withSpring(statusBarHeight, {
+                            topAnimation.value = withSpring(ScreenHeight * .07, {
                                 damping: 100,
                                 stiffness: 400,
                             });
                         }
                 } else if (!isPanEnabled && enableScroll && isTop) {
-                    topAnimation.value = withSpring(statusBarHeight, {
+                    topAnimation.value = withSpring(ScreenHeight * .07, {
                         damping: 100,
                         stiffness: 400,
                     });

@@ -28,7 +28,7 @@ export default function FriendItem({ item, opacity, AVATAR_SIZE, scale }: Friend
     return (
         <TouchableOpacity
             onPress={() => {
-                navigation.navigate("FriendChatDetail", {
+                navigation.navigate("FriendChatDetailV2", {
                     userMasked: item.usermasked,
                     friend: item.friend,
                     conversationId: item.id

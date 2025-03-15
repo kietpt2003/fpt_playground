@@ -52,6 +52,8 @@
     "react-native-canvas": "0.1.40",
     "react-native-fs": "2.20.0",
     "react-native-gesture-handler": "~2.20.2",
+    "react-native-gifted-chat": "2.8.0",
+    "react-native-keyboard-controller": "1.16.7",
     "react-native-localize": "^3.3.0",
     "react-native-material-menu": "^2.0.0",
     "react-native-modal": "^13.0.1",

@@ -1,6 +1,5 @@
-import { View, Text, TextInput, Animated, BackHandler, ActivityIndicator } from 'react-native'
+import { View, Text, TextInput, Animated, ActivityIndicator } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { User } from '../constants/entities/User'
 import friendsScreenStyleSheet from './styles/friendsScreenStyleSheet'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useTranslation } from 'react-i18next'
@@ -262,6 +261,8 @@ export default function FriendsScreen() {
                             }}
                             onEndReached={() => fetchUserConversations()}
                             onEndReachedThreshold={0.1}
+                            windowSize={10}
+                            maxToRenderPerBatch={10}
                             ListFooterComponent={() => (
                                 hasMore && <ActivityIndicator size={24} color="#ed8900" />
                             )}
