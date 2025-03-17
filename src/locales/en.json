@@ -188,5 +188,7 @@
     "empty-signature": "Signature cannot be empty",
     "friend-first-msg": "You and this person are friends now",
     "empy-user-conversations": "Empty conversations",
-    "loading-msg": "Loading..."
+    "loading-msg": "Loading...",
+    "reply-yourself": "Reply yourself",
+    "reply": "Reply "
 }

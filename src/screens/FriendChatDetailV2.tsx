@@ -23,7 +23,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as signalR from "@microsoft/signalr"
 import { RootStackParamList } from '../navigation/types/types';
-import { GiftedChat, IMessage, InputToolbar, Send } from 'react-native-gifted-chat';
+import { Bubble, Day, GiftedChat, IMessage, InputToolbar, Send } from 'react-native-gifted-chat';
+import { Swipeable } from 'react-native-gesture-handler';
+import ChatMessageBox from '../components/ChatMessageBox';
+import ReplyMessageBar from '../components/ReplyMessageBar';
 
 export type FriendChatDetailRoutePropV2 = RouteProp<RootStackParamList, "FriendChatDetailV2">;
 const messageData = [
@@ -225,6 +228,9 @@ export default function FriendChatDetailV2() {
     const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
     const theme = useSelector((state: RootState) => state.theme.theme);
 
+    const [replyMessage, setReplyMessage] = useState<IMessage | null>(null);
+    const swipeableRowRef = useRef<Swipeable | null>(null);
+
     const {
         requestPermission,
     } = usePhoto();
@@ -331,7 +337,8 @@ export default function FriendChatDetailV2() {
                     createdAt: new Date(message.date),
                     user: {
                         _id: message.from,
-                        name: message.from ? 'You' : 'Bob',
+                        name: message.from ? 'You' : friend!.name,
+                        avatar: friend?.avatarUrl ? friend?.avatarUrl : ""
                     },
                     received: message.from == 0 ? false : true,
                     pending: true
@@ -355,6 +362,26 @@ export default function FriendChatDetailV2() {
             GiftedChat.append(previousMessages, messages),
         )
     }, [])
+
+    const updateRowRef = useCallback(
+        (ref: any) => {
+            if (
+                ref &&
+                replyMessage &&
+                ref.props.children.props.currentMessage?._id === replyMessage._id
+            ) {
+                swipeableRowRef.current = ref;
+            }
+        },
+        [replyMessage]
+    );
+
+    useEffect(() => {
+        if (replyMessage && swipeableRowRef.current) {
+            swipeableRowRef.current.close();
+            swipeableRowRef.current = null;
+        }
+    }, [replyMessage]);
 
     return (
         <SafeAreaView style={{
@@ -425,6 +452,60 @@ export default function FriendChatDetailV2() {
                 }}
                 renderComposer={() => <View />}
                 isLoadingEarlier={true}
+                renderDay={(props) => {
+                    return (
+                        <Day
+                            {...props}
+                            wrapperStyle={{
+                                backgroundColor: undefined,
+                            }}
+                            textStyle={{
+                                color: colors.grey,
+                                fontFamily: "Roboto"
+                            }}
+                        />
+                    )
+                }}
+                renderBubble={(props) => { //For background message color
+                    return (
+                        <Bubble
+                            {...props}
+                            textStyle={{
+                                right: {
+                                    color: colors.black,
+                                    fontFamily: "Roboto"
+                                },
+                            }}
+                            wrapperStyle={{
+                                left: {
+                                    backgroundColor: '#fff',
+                                },
+                                right: {
+                                    backgroundColor: theme === "dark" ? colors.lighterBlue : colors.lighterOrange,
+                                },
+                            }}
+                        />
+                    );
+                }}
+                renderMessage={(props) => ( //For apply swipe animation on chat box message
+                    <ChatMessageBox
+                        {...props}
+                        setReplyOnSwipeOpen={setReplyMessage}
+                        updateRowRef={updateRowRef}
+                    />
+                )}
+                renderChatFooter={() => ( //Render reply chat message
+                    <ReplyMessageBar clearReply={() => setReplyMessage(null)} message={replyMessage} />
+                )}
+                timeTextStyle={{
+                    right: {
+                        color: colors.grey,
+                        fontFamily: "Roboto"
+                    },
+                    left: {
+                        fontFamily: "Roboto"
+                    }
+                }}
                 renderTicks={(message: IMessage) => {
                     if (!message.received) { //Cần handle case này để các msg của Friend không hiện dấu tick
                         return;
@@ -435,7 +516,15 @@ export default function FriendChatDetailV2() {
                             bottom: 5,
                             left: 10
                         }}>
-                            <Text>Tick</Text>
+                            <UserAvatar
+                                imageWidth={15}
+                                imageHeight={15}
+                                imageBorderWidth={0}
+                                imageBorderColor={undefined}
+                                imageBorderRadius={40}
+                                loadingIndicatorSize={5}
+                                avatarUrl={friend?.avatarUrl}
+                            />
                         </View>
                     )
                 }}

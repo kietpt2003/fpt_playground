@@ -188,5 +188,7 @@
     "empty-signature": "Chữ ký không được để trống",
     "friend-first-msg": "Bạn và người này đã kết bạn",
     "empy-user-conversations": "Không có tin nhắn nào",
-    "loading-msg": "Đang load dữ liệu"
+    "loading-msg": "Đang load dữ liệu",
+    "reply-yourself": "Trả lời bản thân",
+    "reply": "Trả lời "
 }
