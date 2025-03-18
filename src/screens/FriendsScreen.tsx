@@ -26,6 +26,7 @@ import LottieView from 'lottie-react-native'
 import { UserConversationResponse } from '../constants/models/conversations/UserConversationResponse'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../navigation/types/types'
+import SearchFriends from '../components/SearchFriends'
 
 faker.seed(20);
 
@@ -64,6 +65,8 @@ export default function FriendsScreen() {
     const [stringErr, setStringErr] = useState<string>("");
     const [isError, setIsError] = useState<boolean>(false);
     const [refreshing, setRefreshing] = useState(false);
+
+    const [searchValue, setSearchValue] = useState<string>("");
 
     const { apiUrl } = useApiServer();
     const apiClient = useApiClient();
@@ -219,90 +222,101 @@ export default function FriendsScreen() {
                         <TextInput
                             style={friendsScreenStyleSheet.searchInput}
                             placeholder={t("search-friend-placeholder")}
+                            value={searchValue}
+                            onChangeText={(val) => {
+                                setSearchValue(val);
+                            }}
                         />
                     </View>
                 </View>
 
-                <View style={friendsScreenStyleSheet.flatListContainer}>
-                    {isFetching && page === 1 ? (
-                        <View style={friendsScreenStyleSheet.loadingContent}>
-                            <LottieView
-                                source={theme === "dark" ? require("../../assets/animations/sleepyPanda.json") : require("../../assets/animations/catEating.json")}
-                                style={friendsScreenStyleSheet.lottieAnimation}
-                                autoPlay
-                                loop
-                                speed={0.8}
-                            />
-                            <Text style={friendsScreenStyleSheet.loadingText}>{t("loading-msg")}</Text>
-                        </View>
+                {
+                    searchValue.length <= 0 ?
+                        <View style={friendsScreenStyleSheet.flatListContainer}>
+                            {isFetching && page === 1 ? (
+                                <View style={friendsScreenStyleSheet.loadingContent}>
+                                    <LottieView
+                                        source={theme === "dark" ? require("../../assets/animations/sleepyPanda.json") : require("../../assets/animations/catEating.json")}
+                                        style={friendsScreenStyleSheet.lottieAnimation}
+                                        autoPlay
+                                        loop
+                                        speed={0.8}
+                                    />
+                                    <Text style={friendsScreenStyleSheet.loadingText}>{t("loading-msg")}</Text>
+                                </View>
 
-                    ) : noResults ? (
-                        <View style={friendsScreenStyleSheet.loadingContent}>
-                            <LottieView
-                                source={theme === "dark" ? require("../../assets/animations/sleepyPanda.json") : require("../../assets/animations/catEating.json")}
-                                style={friendsScreenStyleSheet.lottieAnimation}
-                                autoPlay
-                                loop
-                                speed={0.8}
-                            />
-                            <Text style={friendsScreenStyleSheet.loadingText}>{t("empy-user-conversations")}</Text>
-                        </View>
-                    ) : (
-                        <Animated.FlatList<UserConversationResponse>
-                            data={data}
-                            onScroll={Animated.event(
-                                [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-                                { useNativeDriver: true }
-                            )}
-                            keyExtractor={(item) => item.id}
-                            showsVerticalScrollIndicator={false}
-                            contentContainerStyle={{
-                                padding: SPACING
-                            }}
-                            onEndReached={() => fetchUserConversations()}
-                            onEndReachedThreshold={0.1}
-                            windowSize={10}
-                            maxToRenderPerBatch={10}
-                            ListFooterComponent={() => (
-                                hasMore && <ActivityIndicator size={24} color="#ed8900" />
-                            )}
-                            refreshing={refreshing}
-                            onRefresh={handleRefresh}
-                            renderItem={({ item, index }) => {
-                                const inputRange = [
-                                    -1,
-                                    0,
-                                    ITEM_SIZE * index,
-                                    ITEM_SIZE * (index + 2)
-                                ]
+                            ) : noResults ? (
+                                <View style={friendsScreenStyleSheet.loadingContent}>
+                                    <LottieView
+                                        source={theme === "dark" ? require("../../assets/animations/sleepyPanda.json") : require("../../assets/animations/catEating.json")}
+                                        style={friendsScreenStyleSheet.lottieAnimation}
+                                        autoPlay
+                                        loop
+                                        speed={0.8}
+                                    />
+                                    <Text style={friendsScreenStyleSheet.loadingText}>{t("empy-user-conversations")}</Text>
+                                </View>
+                            ) : (
+                                <Animated.FlatList<UserConversationResponse>
+                                    data={data}
+                                    onScroll={Animated.event(
+                                        [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                                        { useNativeDriver: true }
+                                    )}
+                                    keyExtractor={(item) => item.id}
+                                    showsVerticalScrollIndicator={false}
+                                    contentContainerStyle={{
+                                        padding: SPACING
+                                    }}
+                                    onEndReached={() => fetchUserConversations()}
+                                    onEndReachedThreshold={0.1}
+                                    windowSize={10}
+                                    maxToRenderPerBatch={10}
+                                    ListFooterComponent={() => (
+                                        hasMore && <ActivityIndicator size={24} color="#ed8900" />
+                                    )}
+                                    refreshing={refreshing}
+                                    onRefresh={handleRefresh}
+                                    renderItem={({ item, index }) => {
+                                        const inputRange = [
+                                            -1,
+                                            0,
+                                            ITEM_SIZE * index,
+                                            ITEM_SIZE * (index + 2)
+                                        ]
 
-                                const opacityInputRange = [
-                                    -1,
-                                    0,
-                                    ITEM_SIZE * index,
-                                    ITEM_SIZE * (index + .5)
-                                ]
+                                        const opacityInputRange = [
+                                            -1,
+                                            0,
+                                            ITEM_SIZE * index,
+                                            ITEM_SIZE * (index + .5)
+                                        ]
 
-                                const scale = scrollY.interpolate({
-                                    inputRange,
-                                    outputRange: [1, 1, 1, 0]
-                                })
+                                        const scale = scrollY.interpolate({
+                                            inputRange,
+                                            outputRange: [1, 1, 1, 0]
+                                        })
 
-                                const opacity = scrollY.interpolate({
-                                    inputRange: opacityInputRange,
-                                    outputRange: [1, 1, 1, 0]
-                                })
+                                        const opacity = scrollY.interpolate({
+                                            inputRange: opacityInputRange,
+                                            outputRange: [1, 1, 1, 0]
+                                        })
 
-                                return <FriendItem
-                                    AVATAR_SIZE={AVATAR_SIZE}
-                                    opacity={opacity}
-                                    scale={scale}
-                                    item={item}
+                                        return <FriendItem
+                                            AVATAR_SIZE={AVATAR_SIZE}
+                                            opacity={opacity}
+                                            scale={scale}
+                                            item={item}
+                                        />
+                                    }}
                                 />
-                            }}
-                        />
-                    )}
-                </View>
+                            )}
+                        </View>
+                        :
+                        <View style={friendsScreenStyleSheet.flatListContainer}>
+                            <SearchFriends />
+                        </View>
+                }
             </View>
         </SafeAreaView>
     )
